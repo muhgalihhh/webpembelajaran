@@ -13,7 +13,6 @@ return new class extends Migration {
         // database/migrations/..._add_columns_to_users_table.php
         Schema::table('users', function (Blueprint $table) {
             $table->string('username')->unique()->after('name');
-            $table->string('school_name')->nullable()->after('password');
             $table->foreignId('class_id')->nullable()->constrained('classes')->onDelete('set null'); // Hanya untuk siswa
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->string('profile_picture')->nullable();

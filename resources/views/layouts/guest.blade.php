@@ -15,16 +15,24 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css']);
     @livewireStyles
 </head>
 
 <body>
+
+    <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+            <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
+            <span class="text-gray-700">Loading...</span>
+        </div>
+    </div>
     {{ $slot }}
     @livewireScripts
 
     <x-form.password-toggle />
 
+    @vite(['resources/js/app.js'])
 
 </body>
 

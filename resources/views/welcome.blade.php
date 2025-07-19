@@ -10,7 +10,8 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css'])
+    @livewireStyles
 
     <style>
         /* Custom CSS minimal untuk penyesuaian presisi */
@@ -89,6 +90,13 @@
 </head>
 
 <body class="bg-[#EBF3FF] text-gray-800">
+
+    <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+            <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
+            <span class="text-gray-700">Loading...</span>
+        </div>
+    </div>
     <div class="h-screen-auto-overflow">
         <header
             class="bg-[#4A90E2] text-white py-3 px-6 flex justify-between items-center rounded-b-lg shadow-md w-full max-w-7xl mx-auto">
@@ -104,8 +112,8 @@
                     </svg>
                     <span>ADMIN</span>
                 </a>
-                {{-- Tombol Daftar --}}
-                <a href="{{ route('register') }}"
+
+                <a href="{{ route('register') }}" wire:navigate
                     class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold border border-[#4A90E2] hover:bg-[#4A90E2] hover:text-white transition-colors duration-200">
                     Daftar
                 </a>
@@ -192,6 +200,12 @@
             &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
         </footer>
     </div>
+    @vite(['resources/js/app.js'])
+
+
+    @livewireScripts
+
+
 </body>
 
 </html>
