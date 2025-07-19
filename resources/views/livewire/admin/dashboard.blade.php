@@ -1,0 +1,3 @@
+<div>
+    Dashboard Admin
+</div>
