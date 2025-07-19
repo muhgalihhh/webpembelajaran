@@ -10,7 +10,7 @@
         Kembali ke Halaman Utama
     </a>
 
-    <form>
+    <form class="mt-6 space-y-4" wire:submit.prevent="login">
         @csrf
 
         <x-form.input-group type="text" id="username" placeholder="Masukkan Username" model="username" icon="fa fa-user"

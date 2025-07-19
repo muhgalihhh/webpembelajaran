@@ -1,17 +1,17 @@
-{{-- 
-    Komponen ini murni Alpine.js.
-    x-data mendefinisikan state (apakah modal terlihat atau tidak).
-    x-on:open-logout-modal.window="show = true" berarti "Dengarkan event 'open-logout-modal' dari mana saja, dan jika ada, tampilkan modal".
---}}
 <div x-data="{ show: false }" x-on:open-logout-modal.window="show = true" x-show="show" x-cloak
-    x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-20"
-    x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-20" x-transition:leave-end="opacity-0"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-60">
+    x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+    x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+    class="fixed inset-0 z-[9999] flex items-center justify-center">
+
+    {{-- Background Overlay Transparan - Menggunakan style inline sebagai fallback --}}
+    <div class="absolute inset-0 bg-black bg-opacity-50" style="background-color: rgba(0, 0, 0, 0.5);"
+        @click="show = false"></div>
+
     {{-- Konten Modal --}}
-    <div @click.away="show = false" x-show="show" x-transition:enter="ease-out duration-300"
-        x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-        x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100"
-        x-transition:leave-end="opacity-0 scale-95" class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-4">
+    <div x-show="show" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95"
+        x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200"
+        x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+        class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm mx-4 relative z-10">
 
         {{-- Header --}}
         <div class="flex justify-between items-center pb-3 border-b">
@@ -33,7 +33,7 @@
                 Batal
             </button>
 
-            {{-- Tombol ini mengirim event 'perform-logout' yang akan ditangkap oleh komponen LogoutHandler --}}
+
             <button @click="$dispatch('perform-logout')"
                 class="px-4 py-2 bg-red-600 text-white rounded-md font-semibold hover:bg-red-700 transition">
                 Ya, Keluar
