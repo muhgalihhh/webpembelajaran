@@ -172,6 +172,9 @@
             class="w-full py-4 mx-auto text-xs font-bold text-center text-white max-w-7xl bg-[#4A90E2] rounded-t-lg">
             &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
         </footer>
+
+        <x-ui.logout-modal />
+
     </div>
 </body>
 

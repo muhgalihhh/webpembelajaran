@@ -6,14 +6,11 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Attributes\On;
 
 #[Layout("layouts.landing")]
 #[Title("Selamat Datang di Sistem Pembelajaran")]
-
 class Index extends Component
 {
-
     public $showLogoutModal = false;
 
     public function confirmLogout()
@@ -36,6 +33,7 @@ class Index extends Component
     {
         $this->showLogoutModal = false;
     }
+
     public function render()
     {
         return view('livewire.student.index');

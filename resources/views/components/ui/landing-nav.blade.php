@@ -74,11 +74,12 @@
                     <span>{{ Auth::user()->name }}</span>
                 </div>
 
-                {{-- Tombol Logout Desktop --}}
+                {{-- Di bagian tombol logout desktop --}}
                 <button type="button" wire:click="confirmLogout"
                     class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md font-semibold transition-colors duration-200">
                     Logout
                 </button>
+
             </div>
 
             {{-- Hamburger menu icon untuk Mobile (dengan Alpine.js) --}}
@@ -234,9 +235,10 @@
                     <span>{{ Auth::user()->name }}</span>
                 </div>
 
-                {{-- Tombol Logout Mobile --}}
+
+                {{-- Di bagian tombol logout mobile --}}
                 <button type="button" wire:click="confirmLogout"
-                    class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded mt-4 w-full">
+                    class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md font-semibold transition-colors duration-200">
                     Logout
                 </button>
             </div>
