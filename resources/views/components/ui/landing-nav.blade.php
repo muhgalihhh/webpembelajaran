@@ -75,7 +75,7 @@
                 </div>
 
                 {{-- Tombol Logout (Desktop) --}}
-                <button wire:click="confirmLogout"
+                <button @click.prevent="$dispatch('open-logout-modal')"
                     class="bg-red-600 text-white px-3 py-1 rounded-md font-semibold hover:bg-red-700 transition-colors duration-200">
                     Logout
                 </button>
@@ -225,7 +225,7 @@
                 </div>
 
                 {{-- Tombol Logout (Mobile) --}}
-                <button wire:click="confirmLogout"
+                <button @click.prevent="$dispatch('open-logout-modal')"
                     class="bg-red-600 text-white px-3 py-1 rounded-md font-semibold hover:bg-red-700 transition-colors duration-200">
                     Logout
                 </button>

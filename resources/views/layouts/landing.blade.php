@@ -27,8 +27,9 @@
         {{ $slot }}
     </div>
     @livewireScripts
+    <x-ui.logout-confirmation />
 
-
+    @livewire('auth.logout-handler')
 </body>
 
 </html>

@@ -32,7 +32,7 @@ class Register extends Component
     public string $username = '';
 
     #[LivewireRule('required|string|email|max:255|unique:users')]
-    public string $email = ''; // <-- Ditambahkan
+    public string $email = '';
 
     #[LivewireRule('required|string|min:8|confirmed')]
     public string $password = '';
@@ -96,6 +96,6 @@ class Register extends Component
 
     public function render()
     {
-        return view('livewire.auth.register-user');
+        return view('livewire.auth.register');
     }
 }

@@ -84,7 +84,4 @@
         &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
     </footer>
 
-    @if ($showLogoutModal)
-        <x-ui.modal show="$showLogoutModal" type="$modalType"></x-ui.modal>
-    @endif
 </div>

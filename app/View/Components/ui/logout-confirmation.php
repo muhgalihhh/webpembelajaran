@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class modal extends Component
+class logout-confirmation extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class modal extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ui.modal');
+        return view('components.ui.logout-confirmation');
     }
 }
