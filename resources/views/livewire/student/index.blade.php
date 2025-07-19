@@ -89,6 +89,9 @@
 
 <body class="bg-[#EBF3FF] text-gray-800">
     <div class="h-screen-auto-overflow">
+        <x-ui.landing-nav />
+
+        {{-- Bagian utama konten --}}
         <main class="relative flex items-center justify-center flex-grow px-6 py-8 md:py-12">
             {{-- Div untuk logo latar belakang. Penting: posisinya di sini agar bisa diatur z-index di belakang konten. --}}
             <div class="bg-school-logo"></div>
@@ -173,7 +176,7 @@
             &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
         </footer>
 
-        <x-ui.logout-modal />
+
 
     </div>
 </body>

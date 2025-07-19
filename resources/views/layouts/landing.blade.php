@@ -24,6 +24,7 @@
     <x-ui.landing-nav />
     {{ $slot }}
     @livewireScripts
+
 </body>
 
 </html>

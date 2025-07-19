@@ -7,7 +7,6 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
-#[Layout("layouts.landing")]
 #[Title("Selamat Datang di Sistem Pembelajaran")]
 class Index extends Component
 {
