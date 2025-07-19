@@ -88,9 +88,9 @@ class Register extends Component
         Auth::login($user);
 
         if ($assignedRole === 'siswa') {
-            return redirect()->intended(route('siswa.dashboard'))->with('success', 'Akun siswa Anda berhasil dibuat!');
+            return redirect()->intended(route('siswa.index'))->with('success', 'Akun siswa Anda berhasil dibuat!');
         } elseif ($assignedRole === 'guru') {
-            return redirect()->intended(route('guru.dashboard'))->with('success', 'Akun guru Anda berhasil dibuat!');
+            return redirect()->intended(route('guru.index'))->with('success', 'Akun guru Anda berhasil dibuat!');
         }
     }
 

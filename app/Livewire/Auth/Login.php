@@ -23,12 +23,12 @@ class Login extends Component
 
     public function authenticateStudent()
     {
-        $this->authenticate('siswa', 'siswa.dashboard');
+        $this->authenticate('siswa', 'siswa.index');
     }
 
     public function authenticateTeacher()
     {
-        $this->authenticate('guru', 'guru.dashboard');
+        $this->authenticate('guru', 'guru.index');
     }
 
     private function authenticate(string $expectedRole, string $redirectTo)
