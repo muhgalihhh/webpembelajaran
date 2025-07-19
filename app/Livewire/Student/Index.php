@@ -11,14 +11,7 @@ use Illuminate\Support\Facades\Auth;
 #[Title("Selamat Datang di Sistem Pembelajaran")]
 class Index extends Component
 {
-    // Properti untuk modal logout
-    public bool $showLogoutModal = false;
 
-    // Method untuk menampilkan modal
-    public function confirmLogout()
-    {
-        $this->showLogoutModal = true;
-    }
 
     // Method untuk logout
     public function logoutUser()
@@ -27,9 +20,6 @@ class Index extends Component
             Auth::logout();
             session()->invalidate();
             session()->regenerateToken();
-
-            // Reset modal state
-            $this->showLogoutModal = false;
 
             // Redirect dengan JavaScript untuk memastikan
             $this->dispatch('redirect-to-welcome');
@@ -40,10 +30,7 @@ class Index extends Component
     }
 
     // Method untuk membatalkan logout
-    public function cancelLogout()
-    {
-        $this->showLogoutModal = false;
-    }
+
 
     public function render()
     {
