@@ -15,7 +15,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 
-    @vite(['resources/css/app.css']);
+    @vite(['resources/css/app.css'])
     @livewireStyles
 </head>
 

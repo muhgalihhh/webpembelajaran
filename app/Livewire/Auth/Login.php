@@ -7,51 +7,54 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
-use Livewire\Attributes\Rule as LivewireRule;
+use Livewire\Attributes\Validate;
 
 #[Layout('layouts.app')]
-
 class Login extends Component
 {
-    #[LivewireRule('required|string')]
+    #[Validate('required|string')]
     public string $username = '';
 
-    #[LivewireRule('required|string')]
+    #[Validate('required|string')]
     public string $password = '';
 
     public bool $showPassword = false;
 
-    public function authenticateStudent()
-    {
-        $this->authenticate('siswa', 'siswa.index');
-    }
-
-    public function authenticateTeacher()
-    {
-        $this->authenticate('guru', 'guru.index');
-    }
-
-    private function authenticate(string $expectedRole, string $redirectTo)
+    public function login($role)
     {
         $this->validate();
 
-        $user = User::where('username', $this->username)->first();
-
-        if (!$user || !Auth::attempt(['username' => $this->username, 'password' => $this->password])) {
-            throw ValidationException::withMessages([
-                'username' => __('Username atau password tidak sesuai.'),
-            ]);
+        // Attempt login
+        if (!Auth::attempt(['username' => $this->username, 'password' => $this->password])) {
+            $this->addError('username', 'Username atau password tidak sesuai.');
+            return;
         }
 
-        if (!$user->hasRole($expectedRole)) {
+        $user = Auth::user();
+
+        // Check role
+        if (!$user->hasRole($role)) {
             Auth::logout();
-            throw ValidationException::withMessages([
-                'username' => __('Anda tidak memiliki akses sebagai ' . ucfirst($expectedRole) . '.'),
-            ]);
+            $this->addError('username', 'Anda tidak memiliki akses sebagai ' . ucfirst($role) . '.');
+            return;
         }
 
         session()->regenerate();
-        return redirect()->intended(route($redirectTo));
+
+        // Redirect based on role
+        $redirectRoute = match($role) {
+            'siswa' => 'student.index',
+            'guru' => 'teacher.index',
+            'admin' => 'admin.index',
+            default => 'dashboard'
+        };
+
+        $this->redirect(route($redirectRoute), navigate: true);
+    }
+
+    public function togglePassword()
+    {
+        $this->showPassword = !$this->showPassword;
     }
 
     public function render()

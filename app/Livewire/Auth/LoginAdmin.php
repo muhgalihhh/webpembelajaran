@@ -4,50 +4,50 @@ namespace App\Livewire\Auth;
 
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Rule;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException; // Import ValidationException
 use App\Models\User;
 
-#[Layout('layouts.app')] // Mengatur layout menggunakan atribut
-#[Title('Login Admin')] // Mengatur judul menggunakan atribut
+#[Layout('layouts.app')]
+#[Title('Login Admin')]
 class LoginAdmin extends Component
 {
-    #[Rule('required|string')] // Aturan validasi langsung pada properti
+    #[Validate('required|string')]
     public string $username = '';
 
-    #[Rule('required|string')] // Aturan validasi langsung pada properti
+    #[Validate('required|string')]
     public string $password = '';
 
     public bool $showPassword = false;
 
     public function authenticate()
     {
-        // Validasi akan dipicu secara otomatis oleh atribut #[Rule]
         $this->validate();
 
-        $user = User::where('username', $this->username)->first(); // Mencari user berdasarkan username
-
-        // Jika user tidak ditemukan ATAU kredensial tidak cocok
-        if (!$user || !Auth::attempt(['username' => $this->username, 'password' => $this->password])) {
-            throw ValidationException::withMessages([
-                'username' => __('Username atau password tidak sesuai.'), // Melemparkan exception untuk error kredensial
-            ]);
+        // Attempt login
+        if (!Auth::attempt(['username' => $this->username, 'password' => $this->password])) {
+            $this->addError('username', 'Username atau password tidak sesuai.');
+            return;
         }
 
-        // Pastikan pengguna yang login adalah admin
-        if (!$user->hasRole('admin')) { // Memeriksa peran
-            Auth::logout(); // Logout jika tidak sesuai peran
-            throw ValidationException::withMessages([
-                'username' => __('Anda tidak memiliki akses sebagai Admin.'), // Melemparkan exception untuk error peran
-            ]);
+        $user = Auth::user();
+
+        // Check admin role
+        if (!$user->hasRole('admin')) {
+            Auth::logout();
+            $this->addError('username', 'Anda tidak memiliki akses sebagai Admin.');
+            return;
         }
 
-        session()->regenerate(); // Regenerate session for security
-        session()->regenerateToken(); // Regenerate token for security
+        session()->regenerate();
 
-        return redirect()->intended(route('admin.dashboard', absolute: false));
+        $this->redirect(route('admin.index'), navigate: true);
+    }
+
+    public function togglePassword()
+    {
+        $this->showPassword = !$this->showPassword;
     }
 
     public function render()

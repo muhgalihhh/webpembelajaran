@@ -49,15 +49,6 @@
                     <a href=""
                         class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
                         wire:navigate>Dashboard Admin</a>
-                    <a href=""
-                        class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
-                        wire:navigate>Kelola Guru</a>
-                    <a href=""
-                        class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
-                        wire:navigate>Kelola Siswa</a>
-                    <a href=""
-                        class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
-                        wire:navigate>Kelola Mapel</a>
                 @endrole
             </nav>
 
@@ -188,24 +179,6 @@
                         x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
                         class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
                         wire:navigate>Dashboard Admin</a>
-
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-100"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
-                        wire:navigate>Kelola Guru</a>
-
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-125"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
-                        wire:navigate>Kelola Siswa</a>
-
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-150"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
-                        wire:navigate>Kelola Mapel</a>
                 @endrole
             </nav>
 

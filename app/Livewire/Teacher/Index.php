@@ -2,7 +2,12 @@
 
 namespace App\Livewire\Teacher;
 
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
+
+#[Layout("layouts.landing")]
+#[Title('Selamat Datang Guru')]
 
 class Index extends Component
 {

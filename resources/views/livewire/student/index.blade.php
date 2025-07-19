@@ -1,4 +1,4 @@
-<div class="h-screen-auto-overflow">
+<div class="h-screen overflow-auto">
     {{-- Bagian utama konten --}}
     <main class="relative flex items-center justify-center flex-grow px-6 py-8 md:py-12">
         {{-- Div untuk logo latar belakang. Penting: posisinya di sini agar bisa diatur z-index di belakang konten. --}}

@@ -10,31 +10,32 @@
         Kembali ke Halaman Utama
     </a>
 
-    {{-- Form ini akan mengirimkan aksi melalui tombol wireClick, jadi tidak perlu wire:submit.prevent pada form --}}
-    <form class="mt-6" wire:submit.prevent="login">
-
-        @csrf
-
-        <x-form.input-group type="text" id="username" placeholder="Masukkan Username" wire:model.live="username"
-            {{-- Diubah dari model="username" --}} icon="fa fa-user" required autofocus />
+    <form wire:submit="authenticate" class="mt-6">
+        <x-form.input-group type="text" id="username" placeholder="Masukkan Username" wire:model="username"
+            icon="fa fa-user" required autofocus />
         @error('username')
-            <small class="text-red-500 text-sm">{{ $message }}</small>
-        @enderror {{-- Tambahkan ini jika input-group Anda tidak otomatis menampilkan error --}}
+            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+        @enderror
 
-        <x-form.input-group type="password" id="password" placeholder="Masukkan Kata Sandi" wire:model.live="password"
-            {{-- Diubah dari model="password" --}} icon="fa fa-lock" passwordToggle required />
+        <x-form.input-group type="{{ $showPassword ? 'text' : 'password' }}" id="password"
+            placeholder="Masukkan Kata Sandi" wire:model="password" icon="fa fa-lock" required>
+            <button type="button" wire:click="togglePassword"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                <i class="fa {{ $showPassword ? 'fa-eye-slash' : 'fa-eye' }}"></i>
+            </button>
+        </x-form.input-group>
         @error('password')
-            <small class="text-red-500 text-sm">{{ $message }}</small>
-        @enderror {{-- Tambahkan ini jika input-group Anda tidak otomatis menampilkan error --}}
-
-
+            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+        @enderror
 
         <div class="flex justify-between gap-x-3 mb-6">
-
-            <x-form.button type="button" wire:click="authenticate" label="Masuk Akun Admin" {{-- Perbaikan wireClick menjadi wire:click --}}
-                class="flex-1 bg-[#0651a7]" />
+            <button type="submit"
+                class="flex-1 bg-[#0651a7] hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                <span wire:loading.remove wire:target="authenticate">Masuk Akun Admin</span>
+                <span wire:loading wire:target="authenticate">
+                    <i class="fa fa-spinner fa-spin mr-2"></i>Memproses...
+                </span>
+            </button>
         </div>
-
     </form>
-
 </x-ui.auth-card>
