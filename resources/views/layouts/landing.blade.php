@@ -7,31 +7,40 @@
 
     <title>{{ $title ?? 'Page Title' }}</title>
 
-
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
         integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-
     @vite(['resources/css/app.css'])
     @livewireStyles
 </head>
 
-<body>
-    <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center">
-        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+<body x-data="{ pageLoaded: false }" x-init="setTimeout(() => pageLoaded = true, 100)" x-show="pageLoaded" x-transition.opacity.duration.500ms>
+    <!-- Loading Overlay -->
+    <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center"
+        x-transition.opacity.duration.300ms>
+        <div class="bg-white rounded-lg p-6 flex items-center space-x-3" x-transition.scale.80.opacity.duration.400ms>
             <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
             <span class="text-gray-700">Loading...</span>
         </div>
     </div>
-    <div class="bg-[#EBF3FF] text-gray-800">
 
-        <x-ui.landing-nav />
+    <x-ui.landing-nav />
+    <!-- Main Container -->
+    <div class="bg-[#EBF3FF] text-gray-800" x-show="pageLoaded" x-transition:enter="transition ease-out duration-700"
+        x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
 
-        {{ $slot }}
+
+
+        <!-- Content Slot -->
+        <div x-transition:enter="transition ease-out duration-600 delay-300"
+            x-transition:enter-start="opacity-0 translate-y-8" x-transition:enter-end="opacity-100 translate-y-0">
+            {{ $slot }}
+        </div>
     </div>
+
     @livewireScripts
     <x-ui.logout-confirmation />
 

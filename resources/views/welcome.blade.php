@@ -13,93 +13,53 @@
     @vite(['resources/css/app.css'])
     @livewireStyles
 
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <style>
-        /* Custom CSS minimal untuk penyesuaian presisi */
-        body {
-            font-family: 'Figtree', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+        /* Transisi fade untuk halaman */
+        [x-cloak] {
+            display: none !important;
         }
 
-        /* Ini penting untuk menjaga konten di dalam viewport tanpa scroll */
-        .h-screen-auto-overflow {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
 
-        /* Background image untuk logo sekolah SD */
-        .bg-school-logo {
-            background-image: url('{{ asset('images/logo sd.png') }}');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 800px;
-            opacity: 0.2;
-            /* Mengurangi opasitas sedikit agar lebih transparan */
-            position: absolute;
-            /* Mengambil elemen keluar dari alur dokumen normal */
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            /* Memastikan logo berada di belakang konten */
-        }
-
-        /* Penempatan gambar siswa - responsive */
-        .student-image {
-            max-width: 100%;
-            height: auto;
-            max-height: 400px;
-            object-fit: contain;
-        }
-
-        /* Override untuk memastikan warna icon */
-        .icon-blue svg {
-            color: #4A90E2;
-        }
-
-        /* Pastikan elemen tautan kartu juga memiliki efek hover */
-        .feature-card-link {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            cursor: pointer;
-        }
-
-        .feature-card-link:hover {
-            transform: translateY(-5px);
-            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .bg-school-logo {
-                background-size: 450px 450px;
-            }
-
-            .student-image {
-                max-height: 300px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .bg-school-logo {
-                background-size: 350px 350px;
-            }
+        .fade-in.show {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 
 <body class="bg-[#EBF3FF] text-gray-800">
-
+    <!-- Loading overlay untuk Livewire -->
     <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center">
         <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
             <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
             <span class="text-gray-700">Loading...</span>
         </div>
     </div>
-    <div class="h-screen-auto-overflow">
+
+    <!-- Main container dengan Alpine.js transisi -->
+    <div class="h-screen-auto-overflow" x-data="{
+        loaded: false,
+        init() {
+            // Delay sedikit untuk memastikan DOM siap
+            setTimeout(() => {
+                this.loaded = true;
+            }, 100);
+        }
+    }" x-cloak>
+
+        <!-- Header dengan transisi -->
         <header
-            class="bg-[#4A90E2] text-white py-3 px-6 flex justify-between items-center rounded-b-lg shadow-md w-full max-w-7xl mx-auto">
+            class="bg-[#4A90E2] text-white py-3 px-6 flex justify-between items-center rounded-b-lg shadow-md w-full max-w-7xl mx-auto fade-in"
+            :class="{ 'show': loaded }" x-transition:enter="transition ease-out duration-700 delay-100">
+
             <div class="text-xl font-bold">Media Pembelajaran Digital</div>
             <div class="flex items-center space-x-3">
                 {{-- Tombol ADMIN --}}
@@ -120,13 +80,23 @@
             </div>
         </header>
 
-        <main class="relative flex items-center justify-center flex-grow px-6 py-8 md:py-12">
+        <!-- Main section dengan transisi -->
+        <main class="relative flex items-center justify-center flex-grow px-6 py-8 md:py-12 fade-in"
+            :class="{ 'show': loaded }" x-transition:enter="transition ease-out duration-800 delay-200"
+            x-transition:enter-start="opacity-0 transform translate-y-8"
+            x-transition:enter-end="opacity-100 transform translate-y-0">
+
             {{-- Div untuk logo latar belakang. Penting: posisinya di sini agar bisa diatur z-index di belakang konten. --}}
             <div class="bg-school-logo"></div>
 
             <div
                 class="relative z-10 flex flex-col items-center justify-center w-full max-w-6xl lg:flex-row lg:items-center">
-                <div class="flex flex-col items-center text-center lg:items-start lg:text-left lg:w-1/2 lg:pr-8">
+                <!-- Konten teks -->
+                <div class="flex flex-col items-center text-center lg:items-start lg:text-left lg:w-1/2 lg:pr-8"
+                    x-show="loaded" x-transition:enter="transition ease-out duration-1000 delay-400"
+                    x-transition:enter-start="opacity-0 transform -translate-x-8"
+                    x-transition:enter-end="opacity-100 transform translate-x-0">
+
                     <h1 class="mb-4 text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
                         MASUK ATAU DAFTAR AKUN MEDIA PEMBELAJARAN DIGITAL SEKOLAH DASAR | KELAS VI
                     </h1>
@@ -136,22 +106,36 @@
                     </p>
                     {{-- Tombol Masuk Sekarang --}}
                     <a href="{{ route('login') }}"
-                        class="bg-[#4A90E2] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-blue-600 transition-colors duration-200"
+                        class="bg-[#4A90E2] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105"
                         wire:navigate>
                         Masuk Sekarang
                     </a>
                 </div>
 
-                <div class="flex justify-center mt-8 lg:w-1/2 lg:mt-0">
+                <!-- Gambar siswa -->
+                <div class="flex justify-center mt-8 lg:w-1/2 lg:mt-0" x-show="loaded"
+                    x-transition:enter="transition ease-out duration-1000 delay-600"
+                    x-transition:enter-start="opacity-0 transform translate-x-8 scale-95"
+                    x-transition:enter-end="opacity-100 transform translate-x-0 scale-100">
+
                     <img src="{{ asset('images/Siswa.png') }}" alt="Student" class="student-image">
                 </div>
             </div>
         </main>
 
-        <section class="grid w-full grid-cols-1 gap-4 px-6 pb-6 mx-auto md:grid-cols-3 max-w-7xl">
+        <!-- Feature cards section -->
+        <section class="grid w-full grid-cols-1 gap-4 px-6 pb-6 mx-auto md:grid-cols-3 max-w-7xl" x-show="loaded"
+            x-transition:enter="transition ease-out duration-900 delay-800"
+            x-transition:enter-start="opacity-0 transform translate-y-8"
+            x-transition:enter-end="opacity-100 transform translate-y-0">
+
             {{-- Kartu Materi Lengkap --}}
             <a href=""
-                class="flex flex-col items-center p-4 text-center bg-white shadow-md feature-card-link rounded-xl">
+                class="flex flex-col items-center p-4 text-center bg-white shadow-md feature-card-link rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                x-transition:enter="transition ease-out duration-600 delay-900"
+                x-transition:enter-start="opacity-0 transform translate-y-4"
+                x-transition:enter-end="opacity-100 transform translate-y-0">
+
                 <div class="bg-[#EBF3FF] rounded-full p-3 mb-3 icon-blue">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-6 h-6">
@@ -166,7 +150,11 @@
 
             {{-- Kartu Kuis Interaktif --}}
             <a href=""
-                class="flex flex-col items-center p-4 text-center bg-white shadow-md feature-card-link rounded-xl">
+                class="flex flex-col items-center p-4 text-center bg-white shadow-md feature-card-link rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                x-transition:enter="transition ease-out duration-600 delay-1000"
+                x-transition:enter-start="opacity-0 transform translate-y-4"
+                x-transition:enter-end="opacity-100 transform translate-y-0">
+
                 <div class="bg-[#EBF3FF] rounded-full p-3 mb-3 icon-blue">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-6 h-6">
@@ -181,7 +169,11 @@
 
             {{-- Kartu Referensi Game Edukatif --}}
             <a href=""
-                class="flex flex-col items-center p-4 text-center bg-white shadow-md feature-card-link rounded-xl">
+                class="flex flex-col items-center p-4 text-center bg-white shadow-md feature-card-link rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                x-transition:enter="transition ease-out duration-600 delay-1100"
+                x-transition:enter-start="opacity-0 transform translate-y-4"
+                x-transition:enter-end="opacity-100 transform translate-y-0">
+
                 <div class="bg-[#EBF3FF] rounded-full p-3 mb-3 icon-blue">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-6 h-6">
@@ -195,16 +187,18 @@
             </a>
         </section>
 
+        <!-- Footer -->
         <footer
-            class="w-full py-4 mx-auto text-xs font-bold text-center text-white max-w-7xl bg-[#4A90E2] rounded-t-lg">
+            class="w-full py-4 mx-auto text-xs font-bold text-center text-white max-w-7xl bg-[#4A90E2] rounded-t-lg fade-in"
+            :class="{ 'show': loaded }" x-transition:enter="transition ease-out duration-600 delay-1200"
+            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+
             &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
         </footer>
     </div>
+
     @vite(['resources/js/app.js'])
-
-
     @livewireScripts
-
 
 </body>
 
