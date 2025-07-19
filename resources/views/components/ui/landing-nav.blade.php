@@ -1,4 +1,3 @@
-// resources/views/components/ui/landing-nav.blade.php
 <header
     class="bg-[#4A90E2] text-white py-3 px-6 flex justify-between items-center rounded-b-lg shadow-md w-full max-w-7xl mx-auto relative z-20"
     x-data="{ mobileMenuOpen: false }">

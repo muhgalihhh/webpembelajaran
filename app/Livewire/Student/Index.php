@@ -10,6 +10,7 @@ use Livewire\Attributes\On;
 
 
 #[Title("Selamat Datang di Sistem Pembelajaran")]
+#[Layout("layouts.landing")]
 class Index extends Component
 {
     // Properti untuk modal logout
@@ -24,24 +25,12 @@ class Index extends Component
     }
 
     // Method untuk logout
-    public function logoutUser()
+    public function logout()
     {
-        try {
-            Auth::logout();
-            session()->invalidate();
-            session()->regenerateToken();
-
-            // Reset modal state
-            $this->showLogoutModal = false;
-            $this->modalType = '';
-
-
-            // Redirect dengan JavaScript untuk memastikan
-            $this->dispatch('redirect-to-welcome');
-
-        } catch (\Exception $e) {
-            session()->flash('error', 'Terjadi kesalahan saat logout.');
-        }
+        Auth::logout();
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+        return redirect('/');
     }
 
     // Method untuk membatalkan logout

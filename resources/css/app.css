@@ -9,3 +9,76 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+
+/* Custom CSS minimal untuk penyesuaian presisi */
+body {
+    font-family: 'Figtree', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ini penting untuk menjaga konten di dalam viewport tanpa scroll */
+.h-screen-auto-overflow {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Background image untuk logo sekolah SD */
+.bg-school-logo {
+    background-image: url('{{ asset('images/logo sd.png') }}');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 800px;
+    /* Ukuran default untuk desktop */
+    opacity: 0.2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* Penempatan gambar siswa - responsive */
+.student-image {
+    max-width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: contain;
+}
+
+/* Override untuk memastikan warna icon */
+/* Jika menggunakan Heroicons, ini bisa dihapus dan pakai kelas Tailwind langsung */
+.icon-blue svg {
+    color: #4A90E2;
+}
+
+/* Pastikan elemen tautan kartu juga memiliki efek hover */
+.feature-card-link {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.feature-card-link:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .bg-school-logo {
+        background-size: 650px;
+    }
+
+    .student-image {
+        max-height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .bg-school-logo {
+        background-size: 350px;
+    }
+}

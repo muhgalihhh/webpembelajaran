@@ -1,3 +1,5 @@
+@props(['show' => false, 'type' => ''])
+
 <div x-data="{ open: @js($show), modalType: @js($type) }" x-show="open" x-on:close-modal.window="open = false; modalType = ''"
     x-on:keydown.escape.window="open = false; modalType = ''" x-on:click.self="open = false; modalType = ''"
     class="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900 bg-opacity-50">
@@ -25,11 +27,11 @@
         </div>
         <div class="mt-4 flex justify-end space-x-3">
             @if ($type === 'logout')
-                <button @click="open = false" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
+                <button @click="$wire.cancelLogout()"
+                    class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
                     Batal
                 </button>
-                <button wire:click="logoutUser" @click="open = false"
-                    class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                <button wire:click="logout" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
                     Ya, Keluar
                 </button>
             @else
