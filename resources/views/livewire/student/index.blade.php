@@ -166,7 +166,7 @@
                         </div>
 
                         {{-- Tombol Logout (Desktop) --}}
-                        <button x-data x-on:click="$dispatch('open-modal')"
+                        <button wire:click="confirmLogout"
                             class="bg-red-600 text-white px-3 py-1 rounded-md font-semibold hover:bg-red-700 transition-colors duration-200">
                             Logout
                         </button>
@@ -330,7 +330,7 @@
                         </div>
 
                         {{-- Tombol Logout (Mobile) --}}
-                        <button x-data x-on:click="$dispatch('open-modal')"
+                        <button wire:click="confirmLogout"
                             class="bg-red-600 text-white px-3 py-1 rounded-md font-semibold hover:bg-red-700 transition-colors duration-200">
                             Logout
                         </button>
@@ -395,7 +395,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.035-.259a3.375 3.375 0 0 0 2.456-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM10.5 17.25H2.25" />
+                            d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.035-.259a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM10.5 17.25H2.25" />
                     </svg>
                 </div>
                 <h3 class="mb-1 text-lg font-semibold">Kuis Interaktif</h3>
@@ -427,7 +427,7 @@
         </footer>
 
 
-        <x-ui.modal></x-ui.modal>
+        <x-ui.modal :show="$showLogoutModal" :type="$modalType"></x-ui.modal>
     </div>
 </body>
 

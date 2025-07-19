@@ -1,3 +1,4 @@
+// resources/views/components/ui/landing-nav.blade.php
 <header
     class="bg-[#4A90E2] text-white py-3 px-6 flex justify-between items-center rounded-b-lg shadow-md w-full max-w-7xl mx-auto relative z-20"
     x-data="{ mobileMenuOpen: false }">
@@ -74,7 +75,11 @@
                     <span>{{ Auth::user()->name }}</span>
                 </div>
 
-
+                {{-- Tombol Logout (Desktop) --}}
+                <button wire:click="confirmLogout"
+                    class="bg-red-600 text-white px-3 py-1 rounded-md font-semibold hover:bg-red-700 transition-colors duration-200">
+                    Logout
+                </button>
             </div>
 
             {{-- Hamburger menu icon untuk Mobile (dengan Alpine.js) --}}
@@ -96,11 +101,7 @@
             {{-- Tombol ADMIN (Untuk Pengguna Belum Login) --}}
             <a href="{{ route('admin.login') }}" wire:navigate
                 class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold flex items-center space-x-1 hover:bg-blue-500 hover:text-white transition-colors duration-200">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
+                <i class="fas fa-user-shield text-lg"></i>
                 <span>ADMIN</span>
             </a>
             {{-- Tombol Daftar (Untuk Pengguna Belum Login) --}}
@@ -145,12 +146,6 @@
 
                     <a href="#" x-show="mobileMenuOpen"
                         x-transition:enter="transition ease-out duration-300 transform delay-150"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
-                        wire:navigate>Referensi Game Edukatif</a>
-
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-175"
                         x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
                         class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md flex items-center transition-colors duration-200"
                         wire:navigate>
@@ -230,8 +225,11 @@
                     <span>{{ Auth::user()->name }}</span>
                 </div>
 
-
-
+                {{-- Tombol Logout (Mobile) --}}
+                <button wire:click="confirmLogout"
+                    class="bg-red-600 text-white px-3 py-1 rounded-md font-semibold hover:bg-red-700 transition-colors duration-200">
+                    Logout
+                </button>
             </div>
         </div>
     @endauth
