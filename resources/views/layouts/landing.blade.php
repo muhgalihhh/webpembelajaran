@@ -25,6 +25,14 @@
     {{ $slot }}
     @livewireScripts
 
+    {{-- Script untuk handle redirect setelah logout --}}
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('redirect-to-welcome', () => {
+                window.location.href = "{{ route('welcome') }}";
+            });
+        });
+    </script>
 </body>
 
 </html>

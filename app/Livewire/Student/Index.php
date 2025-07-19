@@ -7,27 +7,39 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 
+
 #[Title("Selamat Datang di Sistem Pembelajaran")]
 class Index extends Component
 {
-    public $showLogoutModal = false;
+    // Properti untuk modal logout
+    public bool $showLogoutModal = false;
 
+    // Method untuk menampilkan modal
     public function confirmLogout()
     {
         $this->showLogoutModal = true;
     }
 
+    // Method untuk logout
     public function logoutUser()
     {
-        Auth::logout();
-        session()->invalidate();
-        session()->regenerateToken();
+        try {
+            Auth::logout();
+            session()->invalidate();
+            session()->regenerateToken();
 
-        $this->showLogoutModal = false;
+            // Reset modal state
+            $this->showLogoutModal = false;
 
-        return redirect()->route('welcome');
+            // Redirect dengan JavaScript untuk memastikan
+            $this->dispatch('redirect-to-welcome');
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Terjadi kesalahan saat logout.');
+        }
     }
 
+    // Method untuk membatalkan logout
     public function cancelLogout()
     {
         $this->showLogoutModal = false;

@@ -1,27 +1,23 @@
-@props(['name', 'title'])
+<div x-data="{ show: false }" x-show="show" x-on:open-modal.window="show = true" x-on:close-modal.window="show = false"
+    x-on:keydown.escape.window="show = false" x-on:click.self="show = false" {{-- TAMBAHKAN INI --}}
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900 bg-opacity-50">
 
-<div x-data="{ show: false, name: '{{ $name }}' }" x-show="show" x-on:open-modal.window="show = ($event.detail.name === name)"
-    x-on:close-modal.window="show = false" x-on:keydown.escape.window="show = false" style="display:none;"
-    class="fixed z-50 inset-0" x-transition.duration>
 
-    {{-- Gray Background --}}
-    <div x-on:click="show = false" class="fixed inset-0 bg-gray-300 opacity-40"></div>
-
-    {{-- Modal Body --}}
-    <div class="bg-white rounded m-auto fixed inset-0 max-w-2xl overflow-y-auto" style="max-height:500px">
-        @if (isset($title))
-            <div class="px-4 py-3 flex items-center justify-between border-b border-gray-300">
-                <div class="text-xl text-gray-800">{{ $title }}</div>
-                <button x-on:click="$dispatch('close-modal')">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-        @endif
-        <div class="p-4">
-            {{ $slot }}
+    {{-- modal content --}}
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md m-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold"></h2>
+            <button @click="show = false" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mb-4 text-gray-700">
+            <p class="text-gray-700">This is a modal dialog. You can put any content here.</p>
+        </div>
+        <div class="mt-4 flex justify-end">
+            <button @click="show = false" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Close
+            </button>
         </div>
     </div>
 </div>
