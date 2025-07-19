@@ -21,19 +21,16 @@
     <form>
         @csrf
 
-        <small class="text-gray-500 text-sm block mb-2 px-4 text-left">*tulis dengan format SDN 01 XYZ</small>
-        <x-form.input-group type="text" id="school_name" placeholder="Masukkan Nama Sekolah" model="school_name"
-            iconClass="fa-solid fa-school" />
         <x-form.input-group type="text" id="full_name" placeholder="Masukkan Nama Lengkap" model="name"
-            iconClass="fa-solid fa-user" required />
+            icon="fa-solid fa-user" required />
         <x-form.input-group type="text" id="reg_username" placeholder="Masukkan Username" model="username"
-            iconClass="fa-solid fa-id-badge" required />
+            icon="fa-solid fa-id-badge" required />
         <x-form.input-group type="email" id="reg_email" placeholder="Masukkan Email" model="email"
-            {{-- type email --}} iconClass="fa-solid fa-envelope" required /> {{-- icon email --}}
+            {{-- type email --}} icon="fa-solid fa-envelope" required /> {{-- icon email --}}
         <x-form.input-group type="password" id="reg_password" placeholder="Masukkan Kata Sandi" model="password"
-            iconClass="fa-solid fa-lock" passwordToggle required />
+            icon="fa-solid fa-lock" passwordToggle required />
         <x-form.input-group type="password" id="reg_password_confirmation" placeholder="Konfirmasi Kata Sandi"
-            model="password_confirmation" iconClass="fa-solid fa-key" passwordToggle required />
+            model="password_confirmation" icon="fa-solid fa-key" passwordToggle required />
 
         <div class="flex justify-between gap-x-3 mb-6 mt-4">
             <x-form.button type="button" wire:click="registerStudent" label="Buat Akun Siswa"

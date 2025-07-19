@@ -21,9 +21,7 @@ use Livewire\Attributes\Rule as LivewireRule; // Import untuk #[Rule]
 
 class Register extends Component
 {
-    // Menggunakan Livewire\Attributes\Rule untuk validasi
-    #[LivewireRule('nullable|string|max:255')]
-    public string $school_name = '';
+    
 
     #[LivewireRule('required|string|max:255')]
     public string $name = '';
@@ -79,7 +77,6 @@ class Register extends Component
             'username' => $this->username,
             'email' => $this->email, // <-- Gunakan properti email
             'password' => Hash::make($this->password),
-            'school_name' => $this->school_name,
             'status' => 'active',
         ]);
 

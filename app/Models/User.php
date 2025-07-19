@@ -22,7 +22,6 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'school_name',
         'class_id', // Nullable, jadi bisa diisi jika siswa
         'status',
         'profile_picture',
