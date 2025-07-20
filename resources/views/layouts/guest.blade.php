@@ -22,13 +22,14 @@
 <body>
 
     <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center">
-        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
-            <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
+        <div class="flex items-center p-6 space-x-3 bg-white rounded-lg">
+            <div class="w-6 h-6 border-2 border-blue-600 rounded-full animate-spin border-t-transparent"></div>
             <span class="text-gray-700">Loading...</span>
         </div>
     </div>
     {{ $slot }}
     @livewireScripts
+    @livewire('components.flash-alerts')
 
     <x-form.password-toggle />
 
