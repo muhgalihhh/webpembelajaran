@@ -35,8 +35,8 @@
     </div>
 
     @livewireScripts
-    @livewire('components.flash-alerts')
     <x-form.password-toggle />
+
     @vite(['resources/js/app.js'])
 </body>
 

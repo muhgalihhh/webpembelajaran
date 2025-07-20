@@ -42,8 +42,9 @@
     </div>
 
     @livewireScripts
-    @livewire('components.flash-alerts')
+
     <x-ui.logout-confirmation />
+
 
     @vite(['resources/js/app.js'])
 </body>
