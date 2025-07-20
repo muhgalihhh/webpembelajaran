@@ -38,8 +38,8 @@
 <body class="bg-[#EBF3FF] text-gray-800">
     <!-- Loading overlay untuk Livewire -->
     <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center">
-        <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
-            <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
+        <div class="flex items-center p-6 space-x-3 bg-white rounded-lg">
+            <div class="w-6 h-6 border-2 border-blue-600 rounded-full animate-spin border-t-transparent"></div>
             <span class="text-gray-700">Loading...</span>
         </div>
     </div>
@@ -58,7 +58,7 @@
         <!-- Header dengan transisi -->
         <header
             class="bg-[#4A90E2] text-white py-3 px-6 flex justify-between items-center rounded-b-lg shadow-md w-full max-w-7xl mx-auto fade-in"
-            :class="{ 'show': loaded }" x-transition:enter="transition ease-out duration-700 delay-100">
+            :class="{ 'show': loaded }">
 
             <div class="text-xl font-bold">Media Pembelajaran Digital</div>
             <div class="flex items-center space-x-3">
@@ -131,7 +131,7 @@
 
             {{-- Kartu Materi Lengkap --}}
             <a href=""
-                class="flex flex-col items-center p-4 text-center bg-white shadow-md feature-card-link rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                class="flex flex-col items-center p-4 text-center transition-all duration-300 transform bg-white shadow-md feature-card-link rounded-xl hover:scale-105 hover:shadow-lg"
                 x-transition:enter="transition ease-out duration-600 delay-900"
                 x-transition:enter-start="opacity-0 transform translate-y-4"
                 x-transition:enter-end="opacity-100 transform translate-y-0">
@@ -150,7 +150,7 @@
 
             {{-- Kartu Kuis Interaktif --}}
             <a href=""
-                class="flex flex-col items-center p-4 text-center bg-white shadow-md feature-card-link rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                class="flex flex-col items-center p-4 text-center transition-all duration-300 transform bg-white shadow-md feature-card-link rounded-xl hover:scale-105 hover:shadow-lg"
                 x-transition:enter="transition ease-out duration-600 delay-1000"
                 x-transition:enter-start="opacity-0 transform translate-y-4"
                 x-transition:enter-end="opacity-100 transform translate-y-0">
@@ -169,7 +169,7 @@
 
             {{-- Kartu Referensi Game Edukatif --}}
             <a href=""
-                class="flex flex-col items-center p-4 text-center bg-white shadow-md feature-card-link rounded-xl transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                class="flex flex-col items-center p-4 text-center transition-all duration-300 transform bg-white shadow-md feature-card-link rounded-xl hover:scale-105 hover:shadow-lg"
                 x-transition:enter="transition ease-out duration-600 delay-1100"
                 x-transition:enter-start="opacity-0 transform translate-y-4"
                 x-transition:enter-end="opacity-100 transform translate-y-0">

@@ -1,6 +1,6 @@
 <header
     class="bg-[#4A90E2] text-white py-3 px-6 flex justify-between items-center rounded-b-lg shadow-md w-full max-w-7xl mx-auto relative z-20"
-    x-data="{ mobileMenuOpen: false }">
+    x-data="{ mobileMenuOpen: false, profileDropdownOpen: false }">
 
     <div class="text-xl font-bold">Media Pembelajaran Digital</div>
 
@@ -52,10 +52,11 @@
                 @endrole
             </nav>
 
-            {{-- Bagian Username dan Logout (Desktop - Pengguna yang Sudah Login) --}}
-            <div class="items-center hidden space-x-2 md:flex">
-                <div
-                    class="flex items-center px-2 py-1 space-x-2 text-lg font-semibold transition-colors duration-200 rounded-md bg-blue-950 hover:bg-blue-800">
+            {{-- Profile Dropdown (Desktop - Pengguna yang Sudah Login) --}}
+            <div class="relative items-center hidden md:flex">
+                {{-- Profile Button --}}
+                <button @click="profileDropdownOpen = !profileDropdownOpen" @click.away="profileDropdownOpen = false"
+                    class="flex items-center px-3 py-2 space-x-2 text-lg font-semibold transition-all duration-200 rounded-lg bg-blue-950 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -63,13 +64,74 @@
                         </path>
                     </svg>
                     <span>{{ Auth::user()->name }}</span>
-                </div>
-
-                {{-- Tombol Logout (Desktop) --}}
-                <button @click.prevent="$dispatch('open-logout-modal')"
-                    class="px-3 py-1 font-semibold text-white transition-colors duration-200 bg-red-600 rounded-md hover:bg-red-700">
-                    Logout
+                    {{-- Dropdown Arrow --}}
+                    <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': profileDropdownOpen }"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
                 </button>
+
+                {{-- Dropdown Menu --}}
+                <div x-show="profileDropdownOpen" x-cloak x-transition:enter="transition ease-out duration-200 transform"
+                    x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-150 transform"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+                    class="absolute right-0 z-50 w-56 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg top-full">
+
+                    {{-- User Info Section --}}
+                    <div class="px-4 py-3 border-b border-gray-100">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</div>
+                                <div class="text-xs text-gray-500">{{ Auth::user()->email }}</div>
+                                @hasrole('siswa')
+                                    <div class="text-xs font-medium text-blue-600">Siswa</div>
+                                @endhasrole
+                                @hasrole('guru')
+                                    <div class="text-xs font-medium text-green-600">Guru</div>
+                                @endhasrole
+                                @hasrole('admin')
+                                    <div class="text-xs font-medium text-purple-600">Admin</div>
+                                @endhasrole
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Menu Items --}}
+                    <div class="py-2">
+                        <a href="#"
+                            class="flex items-center px-4 py-2 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-50 hover:text-gray-900">
+                            <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                </path>
+                            </svg>
+                            Lihat Profile
+                        </a>
+
+                        <div class="my-1 border-t border-gray-100"></div>
+
+                        <button @click.prevent="$dispatch('open-logout-modal')"
+                            class="flex items-center w-full px-4 py-2 text-sm text-red-600 transition-colors duration-200 hover:bg-red-50 hover:text-red-700">
+                            <svg class="w-4 h-4 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                </path>
+                            </svg>
+                            Logout
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {{-- Hamburger menu icon untuk Mobile (dengan Alpine.js) --}}
@@ -196,6 +258,12 @@
                     </svg>
                     <span>{{ Auth::user()->name }}</span>
                 </div>
+
+                {{-- Tombol Profile (Mobile) --}}
+                <a href="#"
+                    class="block w-full px-3 py-1 mb-2 text-sm font-semibold text-white transition-colors duration-200 bg-blue-700 rounded-md hover:bg-blue-600">
+                    Lihat Profile
+                </a>
 
                 {{-- Tombol Logout (Mobile) --}}
                 <button @click.prevent="$dispatch('open-logout-modal')"

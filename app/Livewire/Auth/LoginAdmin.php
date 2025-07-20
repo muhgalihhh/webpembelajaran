@@ -29,7 +29,6 @@ class LoginAdmin extends Component
 
         if (!Auth::attempt(['username' => $this->username, 'password' => $this->password])) {
             // 3. Panggil method dari Trait untuk menampilkan error
-            $this->showErrorAlert('Login Gagal', 'Username atau password tidak sesuai.');
             return;
         }
 
@@ -37,10 +36,15 @@ class LoginAdmin extends Component
 
         if (!$user->hasRole('admin')) {
             Auth::logout();
-            $this->showErrorAlert('Akses Ditolak', 'Anda tidak memiliki akses sebagai Admin.');
             return;
         }
         session()->regenerate();
+
+        // Flash
+
+        session()->flash('success', 'Selamat datang, ' . $user->name . '!');
+
+        return $this->redirect(route('admin.index'), navigate: true);
     }
 
     public function togglePassword()

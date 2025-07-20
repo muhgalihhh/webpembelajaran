@@ -6,22 +6,18 @@
     {{-- Background Overlay Transparan - Menggunakan style inline sebagai fallback --}}
     <div class="absolute inset-0 bg-black bg-opacity-50" style="background-color: rgba(0, 0, 0, 0.5);"
         @click="show = false"></div>
-
-    {{-- Konten Modal --}}
     <div x-show="show" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95"
         x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200"
         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
         class="relative z-10 w-full max-w-sm p-6 mx-4 bg-white rounded-lg shadow-xl">
 
-        {{-- Header --}}
+
         <div class="flex items-center justify-between pb-3 border-b">
             <h2 class="text-xl font-bold text-gray-800">Konfirmasi Logout</h2>
             <button @click="show = false" class="text-gray-500 hover:text-gray-800">
                 <i class="fas fa-times fa-lg"></i>
             </button>
         </div>
-
-        {{-- Body --}}
         <div class="py-5 text-gray-700">
             <p>Apakah Anda yakin ingin keluar dari aplikasi?</p>
         </div>
