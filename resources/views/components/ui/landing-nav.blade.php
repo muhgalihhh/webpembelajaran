@@ -65,7 +65,6 @@
                     <span>{{ Auth::user()->name }}</span>
                 </div>
 
-                {{-- Tombol Logout (Desktop) dengan SweetAlert --}}
                 <button onclick="handleLogout()"
                     class="px-3 py-1 font-semibold text-white transition-colors duration-200 bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
                     <i class="mr-1 fas fa-sign-out-alt"></i>
@@ -165,9 +164,8 @@
                     <span>{{ Auth::user()->name }}</span>
                 </div>
 
-                {{-- Tombol Logout (Mobile) dengan SweetAlert --}}
                 <button onclick="handleLogout()"
-                    class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    class="px-3 py-1 font-semibold text-white transition-colors duration-200 bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
                     <i class="mr-1 fas fa-sign-out-alt"></i>
                     Logout
                 </button>
@@ -175,16 +173,9 @@
         </div>
     @endauth
 </header>
-
-{{-- Include Logout Handler Component --}}
-@auth
-    @livewire('auth.logout-handler')
-@endauth
-
 <script>
-    // Handle logout with SweetAlert
     function handleLogout() {
-        swalLogout(() => {
+        window.swalLogout(() => {
             // Create and submit logout form
             const form = document.createElement('form');
             form.method = 'POST';
@@ -197,7 +188,7 @@
 
             form.appendChild(csrfToken);
             document.body.appendChild(form);
-            form.submit();
+            form.submit(); // This causes immediate redirect
         });
     }
 </script>
