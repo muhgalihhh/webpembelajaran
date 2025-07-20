@@ -4,7 +4,9 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "watch": "vite build --watch",
+        "start": "concurrently \"npm run watch\" \"php artisan serve\""
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
@@ -15,6 +17,7 @@
         "vite": "^6.2.4"
     },
     "dependencies": {
-        "alpinejs": "^3.14.9"
+        "alpinejs": "^3.14.9",
+        "sweetalert2": "^11.6.13"
     }
 }
