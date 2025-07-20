@@ -200,11 +200,4 @@
             form.submit();
         });
     }
-
-    // Show success message when logout is completed (optional)
-    @if (session('logout_success'))
-        document.addEventListener('DOMContentLoaded', function() {
-            swalSuccess('{{ session('logout_success') }}');
-        });
-    @endif
 </script>

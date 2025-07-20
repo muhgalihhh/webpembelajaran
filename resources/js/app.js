@@ -51,6 +51,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         });
+
+        window.addEventListener("redirect-after-swal", (event) => {
+            const url = event.detail.url;
+            // Small delay to ensure the SweetAlert is fully rendered before redirecting
+            setTimeout(() => {
+                window.location.href = url;
+            }, 1000); // Adjust delay as needed (e.g., 1000ms for a 1-second display)
+        });
     });
 
     // Loading handler

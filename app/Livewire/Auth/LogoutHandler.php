@@ -4,11 +4,11 @@ namespace App\Livewire\Auth;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
-use App\Traits\WithSweetAlert;
+use App\Traits\WithSweetAlert; // Ensure this trait is used
 
 class LogoutHandler extends Component
 {
-    use WithSweetAlert;
+    use WithSweetAlert; // Make sure this line is present
 
     protected $listeners = ['confirmLogout'];
 
@@ -23,8 +23,9 @@ class LogoutHandler extends Component
 
     public function confirmLogout()
     {
-        // Show loading
-        $this->swalLoading('Logging out...', 'Mohon tunggu sebentar');
+        // First, close any existing loading alert if it's still open
+        $this->swalClose();
+        $this->swalSuccess('Logout Berhasil', 'Terima kasih telah menggunakan aplikasi');
 
         try {
             Auth::logout();
@@ -33,12 +34,7 @@ class LogoutHandler extends Component
 
 
 
-            session()->flash('logout_success', [
-                'title' => 'Logout Berhasil',
-                'message' => 'Terima kasih telah menggunakan aplikasi'
-            ]);
-
-            return $this->redirect('/', navigate: true);
+            $this->dispatch('redirect-after-swal', url: '/');
 
         } catch (\Exception $e) {
             $this->swalError('Gagal Logout', 'Terjadi kesalahan saat logout. Silakan coba lagi.');

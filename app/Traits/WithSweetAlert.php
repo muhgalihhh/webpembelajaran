@@ -19,9 +19,7 @@ trait WithSweetAlert
         ]);
     }
 
-    /**
-     * Show error alert
-     */
+
     public function swalError($title, $text = '')
     {
         $this->dispatch('swal', [

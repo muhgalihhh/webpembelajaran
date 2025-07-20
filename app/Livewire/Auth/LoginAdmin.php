@@ -8,11 +8,14 @@ use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Traits\WithSweetAlert;
 
 #[Layout('layouts.app')]
 #[Title('Login Admin')]
 class LoginAdmin extends Component
 {
+    use WithSweetAlert;
+
     #[Validate('required|string')]
     public string $username = '';
 
@@ -40,7 +43,11 @@ class LoginAdmin extends Component
             return;
         }
 
+
+        $this->swalSuccess('Login Berhasil', 'Selamat datang, ' . $user->name . '!');
         session()->regenerate();
+
+
 
         $this->redirect(route('admin.index'), navigate: true);
     }
