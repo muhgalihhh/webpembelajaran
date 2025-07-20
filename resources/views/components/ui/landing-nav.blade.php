@@ -7,55 +7,55 @@
     <div class="flex items-center space-x-3">
         @auth
             {{-- Navigasi Utama (Desktop - Pengguna yang Sudah Login) --}}
-            <nav class="hidden md:flex space-x-4">
+            <nav class="hidden space-x-4 md:flex">
                 {{-- Tautan untuk Siswa --}}
                 @role('siswa')
                     <a href=""
-                        class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
+                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
                         wire:navigate>Materi Pembelajaran</a>
                     <a href=""
-                        class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
+                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
                         wire:navigate>Kuis/Quis</a>
                     <a href="#"
-                        class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
+                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
                         wire:navigate>Referensi Game Edukatif</a>
                     <a href=""
-                        class="relative inline-block hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md flex items-center justify-center transition-colors duration-200"
+                        class="relative flex items-center justify-center inline-block px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
                         wire:navigate>
-                        <i class="fas fa-bell text-2xl"></i>
+                        <i class="text-2xl fas fa-bell"></i>
                         <span
-                            class="absolute top-0 right-0 inline-flex items-center justify-center w-3 h-3 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse">!</span>
+                            class="absolute top-0 right-0 inline-flex items-center justify-center w-3 h-3 text-xs font-bold text-white bg-red-500 rounded-full animate-pulse">!</span>
                     </a>
                 @endrole
 
                 {{-- Tautan untuk Guru --}}
                 @role('guru')
                     <a href=""
-                        class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
+                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
                         wire:navigate>Dashboard Guru</a>
                     <a href=""
-                        class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
+                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
                         wire:navigate>Upload Materi</a>
                     <a href=""
-                        class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
+                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
                         wire:navigate>Buat Kuis</a>
                     <a href=""
-                        class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
+                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
                         wire:navigate>Cek Peringkat</a>
                 @endrole
 
                 {{-- Tautan untuk Admin --}}
                 @role('admin')
                     <a href=""
-                        class="hover:text-gray-600 text-black bg-white py-1 px-2 border border-black font-semibold rounded-md transition-colors duration-200"
+                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
                         wire:navigate>Dashboard Admin</a>
                 @endrole
             </nav>
 
             {{-- Bagian Username dan Logout (Desktop - Pengguna yang Sudah Login) --}}
-            <div class="hidden md:flex items-center space-x-2">
+            <div class="items-center hidden space-x-2 md:flex">
                 <div
-                    class="text-lg font-semibold items-center space-x-2 bg-blue-950 py-1 px-2 rounded-md hover:bg-blue-800 transition-colors duration-200 flex">
+                    class="flex items-center px-2 py-1 space-x-2 text-lg font-semibold transition-colors duration-200 rounded-md bg-blue-950 hover:bg-blue-800">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -67,7 +67,7 @@
 
                 {{-- Tombol Logout (Desktop) --}}
                 <button @click.prevent="$dispatch('open-logout-modal')"
-                    class="bg-red-600 text-white px-3 py-1 rounded-md font-semibold hover:bg-red-700 transition-colors duration-200">
+                    class="px-3 py-1 font-semibold text-white transition-colors duration-200 bg-red-600 rounded-md hover:bg-red-700">
                     Logout
                 </button>
             </div>
@@ -75,7 +75,7 @@
             {{-- Hamburger menu icon untuk Mobile (dengan Alpine.js) --}}
             <div class="md:hidden">
                 <button @click="mobileMenuOpen = !mobileMenuOpen"
-                    class="text-white focus:outline-none p-1 transition-transform duration-300"
+                    class="p-1 text-white transition-transform duration-300 focus:outline-none"
                     :class="{ 'rotate-90': mobileMenuOpen }">
                     {{-- Animated Hamburger Icon --}}
                     <svg class="w-6 h-6 transition-all duration-300" fill="none" stroke="currentColor"
@@ -91,7 +91,7 @@
             {{-- Tombol ADMIN (Untuk Pengguna Belum Login) --}}
             <a href="{{ route('admin.login') }}" wire:navigate
                 class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold flex items-center space-x-1 hover:bg-blue-500 hover:text-white transition-colors duration-200">
-                <i class="fas fa-user-shield text-lg"></i>
+                <i class="text-lg fas fa-user-shield"></i>
                 <span>ADMIN</span>
             </a>
             {{-- Tombol Daftar (Untuk Pengguna Belum Login) --}}
@@ -119,29 +119,29 @@
                     <a href="" x-show="mobileMenuOpen"
                         x-transition:enter="transition ease-out duration-300 transform delay-75"
                         x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-3 px-4 rounded-md font-semibold transition-colors duration-200 block"
+                        class="block w-full px-4 py-3 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Dashboard Siswa</a>
 
                     <a href="" x-show="mobileMenuOpen"
                         x-transition:enter="transition ease-out duration-300 transform delay-100"
                         x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
+                        class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Materi Pembelajaran</a>
 
                     <a href="" x-show="mobileMenuOpen"
                         x-transition:enter="transition ease-out duration-300 transform delay-125"
                         x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
+                        class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Kuis/Quis</a>
 
                     <a href="#" x-show="mobileMenuOpen"
                         x-transition:enter="transition ease-out duration-300 transform delay-150"
                         x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md flex items-center transition-colors duration-200"
+                        class="flex items-center w-full px-3 py-2 text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>
-                        <i class="fas fa-bell text-xl mr-2"></i>
+                        <i class="mr-2 text-xl fas fa-bell"></i>
                         Notifikasi
-                        <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1 animate-pulse">!</span>
+                        <span class="px-2 py-1 ml-auto text-xs text-white bg-red-500 rounded-full animate-pulse">!</span>
                     </a>
                 @endrole
 
@@ -150,25 +150,25 @@
                     <a href="" x-show="mobileMenuOpen"
                         x-transition:enter="transition ease-out duration-300 transform delay-75"
                         x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
+                        class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Dashboard Guru</a>
 
                     <a href="" x-show="mobileMenuOpen"
                         x-transition:enter="transition ease-out duration-300 transform delay-100"
                         x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
+                        class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Upload Materi</a>
 
                     <a href="" x-show="mobileMenuOpen"
                         x-transition:enter="transition ease-out duration-300 transform delay-125"
                         x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
+                        class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Buat Kuis</a>
 
                     <a href="" x-show="mobileMenuOpen"
                         x-transition:enter="transition ease-out duration-300 transform delay-150"
                         x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
+                        class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Cek Peringkat</a>
                 @endrole
 
@@ -177,7 +177,7 @@
                     <a href="" x-show="mobileMenuOpen"
                         x-transition:enter="transition ease-out duration-300 transform delay-75"
                         x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
-                        class="text-white hover:text-gray-200 hover:bg-blue-600 w-full py-2 px-3 rounded-md font-semibold transition-colors duration-200"
+                        class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Dashboard Admin</a>
                 @endrole
             </nav>
@@ -185,9 +185,9 @@
             {{-- Username dan Logout di Mobile dengan Animation --}}
             <div x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-300 transform delay-200"
                 x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                class="px-6 pt-2 border-t border-blue-700 mt-2">
+                class="px-6 pt-2 mt-2 border-t border-blue-700">
 
-                <div class="flex items-center space-x-2 text-white mb-2 py-1">
+                <div class="flex items-center py-1 mb-2 space-x-2 text-white">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -199,9 +199,10 @@
 
                 {{-- Tombol Logout (Mobile) --}}
                 <button @click.prevent="$dispatch('open-logout-modal')"
-                    class="bg-red-600 text-white px-3 py-1 rounded-md font-semibold hover:bg-red-700 transition-colors duration-200">
+                    class="px-3 py-1 font-semibold text-white transition-colors duration-200 bg-red-600 rounded-md hover:bg-red-700">
                     Logout
                 </button>
+                {{-- @livewire('auth.logout-handler'); --}}
             </div>
         </div>
     @endauth

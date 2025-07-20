@@ -21,8 +21,8 @@
     <!-- Loading Overlay -->
     <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center"
         x-transition.opacity.duration.300ms>
-        <div class="bg-white rounded-lg p-6 flex items-center space-x-3" x-transition.scale.80.opacity.duration.400ms>
-            <div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
+        <div class="flex items-center p-6 space-x-3 bg-white rounded-lg" x-transition.scale.80.opacity.duration.400ms>
+            <div class="w-6 h-6 border-2 border-blue-600 rounded-full animate-spin border-t-transparent"></div>
             <span class="text-gray-700">Loading...</span>
         </div>
     </div>
@@ -43,8 +43,6 @@
 
     @livewireScripts
     <x-ui.logout-confirmation />
-
-    @livewire('auth.logout-handler')
 
     @vite(['resources/js/app.js'])
 </body>

@@ -1,5 +1,10 @@
 <?php
 
+// =============================================
+// STEP 1: Buat file Trait
+// File: app/Traits/WithSweetAlert.php
+// =============================================
+
 namespace App\Traits;
 
 trait WithSweetAlert

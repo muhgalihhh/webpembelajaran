@@ -17,10 +17,9 @@ class LogoutHandler extends Component
         Auth::logout();
 
 
+
         request()->session()->invalidate();
         request()->session()->regenerateToken();
-
-        $this->swalSuccess('Berhasil', 'Anda telah berhasil keluar dari sistem.');
 
         return $this->redirect('/', navigate: true);
     }
