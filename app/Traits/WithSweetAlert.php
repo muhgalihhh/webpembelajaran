@@ -1,164 +1,113 @@
 <?php
 
-// =============================================
-// STEP 1: Buat file Trait
-// File: app/Traits/WithSweetAlert.php
-// =============================================
-
 namespace App\Traits;
 
 trait WithSweetAlert
 {
     /**
-     * Menampilkan alert success
+     * Show success alert
      */
-    public function swalSuccess($title, $text = '', $options = [])
+    public function swalSuccess($title, $text = '', $timer = 3000)
     {
-        $defaultOptions = [
-            'type' => 'success',
+        $this->dispatch('swal', [
+            'icon' => 'success',
+            'title' => $title,
+            'text' => $text,
+            'timer' => $timer,
+            'timerProgressBar' => true,
+            'showConfirmButton' => false
+        ]);
+    }
+
+    /**
+     * Show error alert
+     */
+    public function swalError($title, $text = '')
+    {
+        $this->dispatch('swal', [
+            'icon' => 'error',
             'title' => $title,
             'text' => $text,
             'confirmButtonText' => 'OK',
-            'timer' => 3000,
-            'timerProgressBar' => true
-        ];
-
-        $this->dispatch('swal:fire', array_merge($defaultOptions, $options));
+            'confirmButtonColor' => '#EF4444'
+        ]);
     }
 
     /**
-     * Menampilkan alert error
+     * Show warning alert
      */
-    public function swalError($title, $text = '', $options = [])
+    public function swalWarning($title, $text = '')
     {
-        $defaultOptions = [
-            'type' => 'error',
+        $this->dispatch('swal', [
+            'icon' => 'warning',
             'title' => $title,
             'text' => $text,
-            'confirmButtonText' => 'OK'
-        ];
-
-        $this->dispatch('swal:fire', array_merge($defaultOptions, $options));
+            'confirmButtonText' => 'OK',
+            'confirmButtonColor' => '#F59E0B'
+        ]);
     }
 
     /**
-     * Menampilkan alert warning
+     * Show info alert
      */
-    public function swalWarning($title, $text = '', $options = [])
+    public function swalInfo($title, $text = '')
     {
-        $defaultOptions = [
-            'type' => 'warning',
+        $this->dispatch('swal', [
+            'icon' => 'info',
             'title' => $title,
             'text' => $text,
-            'confirmButtonText' => 'OK'
-        ];
-
-        $this->dispatch('swal:fire', array_merge($defaultOptions, $options));
+            'confirmButtonText' => 'OK',
+            'confirmButtonColor' => '#3B82F6'
+        ]);
     }
 
     /**
-     * Menampilkan alert info
+     * Show confirmation dialog
      */
-    public function swalInfo($title, $text = '', $options = [])
+    public function swalConfirm($title, $text = '', $method = null, $params = [])
     {
-        $defaultOptions = [
-            'type' => 'info',
-            'title' => $title,
-            'text' => $text,
-            'confirmButtonText' => 'OK'
-        ];
-
-        $this->dispatch('swal:fire', array_merge($defaultOptions, $options));
-    }
-
-    /**
-     * Menampilkan konfirmasi dialog
-     */
-    public function swalConfirm($title, $text = '', $confirmMethod = null, $params = [], $options = [])
-    {
-        $defaultOptions = [
-            'type' => 'warning',
+        $this->dispatch('swal-confirm', [
+            'icon' => 'question',
             'title' => $title,
             'text' => $text,
             'showCancelButton' => true,
             'confirmButtonText' => 'Ya',
             'cancelButtonText' => 'Batal',
             'confirmButtonColor' => '#EF4444',
-            'cancelButtonColor' => '#6B7280'
-        ];
-
-        $alertOptions = array_merge($defaultOptions, $options);
-
-        // Tambahkan method dan params untuk callback
-        if ($confirmMethod) {
-            $alertOptions['method'] = $confirmMethod;
-            $alertOptions['params'] = $params;
-        }
-
-        $this->dispatch('swal:confirm', $alertOptions);
+            'cancelButtonColor' => '#6B7280',
+            'method' => $method,
+            'params' => $params
+        ]);
     }
 
     /**
-     * Menampilkan toast notification
+     * Show toast notification
      */
-    public function swalToast($message, $type = 'success', $options = [])
+    public function swalToast($message, $icon = 'success', $position = 'top-end')
     {
-        $defaultOptions = [
-            'type' => $type,
-            'message' => $message,
-            'position' => 'top-end',
+        $this->dispatch('swal-toast', [
+            'icon' => $icon,
+            'title' => $message,
+            'toast' => true,
+            'position' => $position,
             'timer' => 3000,
-            'showConfirmButton' => false,
-            'timerProgressBar' => true
-        ];
-
-        $this->dispatch('swal:toast', array_merge($defaultOptions, $options));
+            'timerProgressBar' => true,
+            'showConfirmButton' => false
+        ]);
     }
 
     /**
-     * Menampilkan input dialog
-     */
-    public function swalInput($title, $inputType = 'text', $callback = null, $options = [])
-    {
-        $defaultOptions = [
-            'title' => $title,
-            'input' => $inputType,
-            'showCancelButton' => true,
-            'confirmButtonText' => 'Submit',
-            'cancelButtonText' => 'Batal',
-            'inputValidator' => null
-        ];
-
-        $alertOptions = array_merge($defaultOptions, $options);
-
-        if ($callback) {
-            $alertOptions['callback'] = $callback;
-        }
-
-        $this->dispatch('swal:input', $alertOptions);
-    }
-
-    /**
-     * Custom SweetAlert dengan opsi penuh
-     */
-    public function swalCustom($options = [])
-    {
-        $this->dispatch('swal:fire', $options);
-    }
-
-    /**
-     * Loading alert
+     * Show loading alert
      */
     public function swalLoading($title = 'Loading...', $text = 'Mohon tunggu sebentar')
     {
-        $this->dispatch('swal:fire', [
+        $this->dispatch('swal-loading', [
             'title' => $title,
             'text' => $text,
             'allowOutsideClick' => false,
             'allowEscapeKey' => false,
-            'allowEnterKey' => false,
             'showConfirmButton' => false,
-            'onOpen' => 'Swal.showLoading()'
+            'didOpen' => 'showLoading'
         ]);
     }
 
@@ -167,6 +116,6 @@ trait WithSweetAlert
      */
     public function swalClose()
     {
-        $this->dispatch('swal:close');
+        $this->dispatch('swal-close');
     }
 }

@@ -2,35 +2,51 @@
 
 namespace App\Livewire\Auth;
 
-use App\Traits\WithSweetAlert;
 use Livewire\Component;
-use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\WithSweetAlert;
 
 class LogoutHandler extends Component
 {
     use WithSweetAlert;
-    // Method ini akan berjalan ketika event 'perform-logout' diterima
-    #[On('perform-logout')]
-    public function logout()
+
+    protected $listeners = ['confirmLogout'];
+
+    public function showLogoutConfirmation()
     {
-        Auth::logout();
-
-
-
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
-
-        return $this->redirect('/', navigate: true);
+        $this->swalConfirm(
+            'Konfirmasi Logout',
+            'Apakah Anda yakin ingin keluar dari aplikasi?',
+            'confirmLogout'
+        );
     }
 
-    // Komponen ini tidak merender HTML apapun (headless)
+    public function confirmLogout()
+    {
+        // Show loading
+        $this->swalLoading('Logging out...', 'Mohon tunggu sebentar');
+
+        try {
+            Auth::logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+
+
+
+            session()->flash('logout_success', [
+                'title' => 'Logout Berhasil',
+                'message' => 'Terima kasih telah menggunakan aplikasi'
+            ]);
+
+            return $this->redirect('/', navigate: true);
+
+        } catch (\Exception $e) {
+            $this->swalError('Gagal Logout', 'Terjadi kesalahan saat logout. Silakan coba lagi.');
+        }
+    }
+
     public function render()
     {
-        return <<<'HTML'
-        <div>
-            {{-- This component is headless and does not render anything --}}
-        </div>
-        HTML;
+        return view('livewire.auth.logout-handler');
     }
 }

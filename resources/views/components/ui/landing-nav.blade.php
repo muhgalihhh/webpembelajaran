@@ -65,22 +65,21 @@
                     <span>{{ Auth::user()->name }}</span>
                 </div>
 
-                {{-- Tombol Logout (Desktop) --}}
-                <button @click.prevent="$dispatch('open-logout-modal')"
-                    class="px-3 py-1 font-semibold text-white transition-colors duration-200 bg-red-600 rounded-md hover:bg-red-700">
+                {{-- Tombol Logout (Desktop) dengan SweetAlert --}}
+                <button onclick="handleLogout()"
+                    class="px-3 py-1 font-semibold text-white transition-colors duration-200 bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    <i class="mr-1 fas fa-sign-out-alt"></i>
                     Logout
                 </button>
             </div>
 
-            {{-- Hamburger menu icon untuk Mobile (dengan Alpine.js) --}}
+            {{-- Hamburger menu icon untuk Mobile --}}
             <div class="md:hidden">
                 <button @click="mobileMenuOpen = !mobileMenuOpen"
                     class="p-1 text-white transition-transform duration-300 focus:outline-none"
                     :class="{ 'rotate-90': mobileMenuOpen }">
-                    {{-- Animated Hamburger Icon --}}
                     <svg class="w-6 h-6 transition-all duration-300" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
-                        {{-- Menggunakan template literal untuk mengubah path berdasarkan state --}}
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             :d="mobileMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'">
                         </path>
@@ -88,13 +87,12 @@
                 </button>
             </div>
         @else
-            {{-- Tombol ADMIN (Untuk Pengguna Belum Login) --}}
+            {{-- Tombol untuk Pengguna Belum Login --}}
             <a href="{{ route('admin.login') }}" wire:navigate
                 class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold flex items-center space-x-1 hover:bg-blue-500 hover:text-white transition-colors duration-200">
                 <i class="text-lg fas fa-user-shield"></i>
                 <span>ADMIN</span>
             </a>
-            {{-- Tombol Daftar (Untuk Pengguna Belum Login) --}}
             <a href="{{ route('register') }}"
                 class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold border border-[#4A90E2] hover:bg-[#4A90E2] hover:text-white transition-colors duration-200"
                 wire:navigate>
@@ -103,7 +101,7 @@
         @endauth
     </div>
 
-    {{-- Mobile Menu Dropdown dengan Alpine.js Animations --}}
+    {{-- Mobile Menu Dropdown --}}
     @auth
         <div x-show="mobileMenuOpen" x-cloak x-transition:enter="transition ease-out duration-300 transform"
             x-transition:enter-start="opacity-0 -translate-y-4 scale-95"
@@ -114,29 +112,18 @@
             class="md:hidden absolute top-full left-0 w-full bg-[#4A90E2] shadow-lg rounded-b-lg pb-4 z-50 min-h-[200px]">
 
             <nav class="flex flex-col items-start px-6 py-4 space-y-3">
-                {{-- Menu untuk Siswa (Mobile) dengan Staggered Animation --}}
+                {{-- Mobile menu items (same as before) --}}
                 @role('siswa')
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-75"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
+                    <a href=""
                         class="block w-full px-4 py-3 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Dashboard Siswa</a>
-
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-100"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
+                    <a href=""
                         class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Materi Pembelajaran</a>
-
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-125"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
+                    <a href=""
                         class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Kuis/Quis</a>
-
-                    <a href="#" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-150"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
+                    <a href="#"
                         class="flex items-center w-full px-3 py-2 text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>
                         <i class="mr-2 text-xl fas fa-bell"></i>
@@ -145,51 +132,32 @@
                     </a>
                 @endrole
 
-                {{-- Menu untuk Guru (Mobile) dengan Staggered Animation --}}
                 @role('guru')
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-75"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
+                    <a href=""
                         class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Dashboard Guru</a>
-
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-100"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
+                    <a href=""
                         class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Upload Materi</a>
-
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-125"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
+                    <a href=""
                         class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Buat Kuis</a>
-
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-150"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
+                    <a href=""
                         class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Cek Peringkat</a>
                 @endrole
 
-                {{-- Menu untuk Admin (Mobile) dengan Staggered Animation --}}
                 @role('admin')
-                    <a href="" x-show="mobileMenuOpen"
-                        x-transition:enter="transition ease-out duration-300 transform delay-75"
-                        x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
+                    <a href=""
                         class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 rounded-md hover:text-gray-200 hover:bg-blue-600"
                         wire:navigate>Dashboard Admin</a>
                 @endrole
             </nav>
 
-            {{-- Username dan Logout di Mobile dengan Animation --}}
-            <div x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-300 transform delay-200"
-                x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-                class="px-6 pt-2 mt-2 border-t border-blue-700">
-
+            {{-- Username dan Logout di Mobile --}}
+            <div class="px-6 pt-2 mt-2 border-t border-blue-700">
                 <div class="flex items-center py-1 mb-2 space-x-2 text-white">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 3a9 9 0 11-18 0 9 9 0 0118 0z">
                         </path>
@@ -197,13 +165,46 @@
                     <span>{{ Auth::user()->name }}</span>
                 </div>
 
-                {{-- Tombol Logout (Mobile) --}}
-                <button @click.prevent="$dispatch('open-logout-modal')"
-                    class="px-3 py-1 font-semibold text-white transition-colors duration-200 bg-red-600 rounded-md hover:bg-red-700">
+                {{-- Tombol Logout (Mobile) dengan SweetAlert --}}
+                <button onclick="handleLogout()"
+                    class="w-full px-3 py-2 font-semibold text-white transition-colors duration-200 bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <i class="mr-1 fas fa-sign-out-alt"></i>
                     Logout
                 </button>
-                {{-- @livewire('auth.logout-handler'); --}}
             </div>
         </div>
     @endauth
 </header>
+
+{{-- Include Logout Handler Component --}}
+@auth
+    @livewire('auth.logout-handler')
+@endauth
+
+<script>
+    // Handle logout with SweetAlert
+    function handleLogout() {
+        swalLogout(() => {
+            // Create and submit logout form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route('logout') }}';
+
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+
+            form.appendChild(csrfToken);
+            document.body.appendChild(form);
+            form.submit();
+        });
+    }
+
+    // Show success message when logout is completed (optional)
+    @if (session('logout_success'))
+        document.addEventListener('DOMContentLoaded', function() {
+            swalSuccess('{{ session('logout_success') }}');
+        });
+    @endif
+</script>

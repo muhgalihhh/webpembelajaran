@@ -34,10 +34,13 @@
             </button>
 
 
-            <button @click="$dispatch('perform-logout')"
-                class="px-4 py-2 font-semibold text-white transition bg-red-600 rounded-md hover:bg-red-700">
-                Ya, Keluar
-            </button>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                    class="px-4 py-2 font-semibold text-white transition bg-red-600 rounded-md hover:bg-red-700">
+                    Ya, Keluar
+                </button>
+            </form>
         </div>
     </div>
 </div>
