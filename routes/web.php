@@ -25,6 +25,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:siswa'])->group(function () {
         Route::get('/siswa', \App\Livewire\Student\Index::class)->name('student.index');
         Route::get('/siswa/dashboard', \App\Livewire\Student\Dashboard::class)->name('student.dashboard');
+        Route::get('/siswa/materi', \App\Livewire\Student\Materi::class)->name('student.materi');
     });
 
     // Rute untuk Guru (hanya bisa diakses oleh user dengan role 'guru')
