@@ -9,6 +9,9 @@
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     @vite(['resources/css/app.css'])
     @livewireStyles
@@ -64,22 +67,18 @@
             <div class="flex items-center space-x-3">
                 {{-- Tombol ADMIN --}}
                 <a href="{{ route('admin.login') }}" wire:navigate
-                    class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold flex items-center space-x-1 hover:bg-blue-500 hover:text-white transition-colors duration-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
+                    class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold flex items-center space-x-1 hover:bg-gray-200 hover:text-gray-600 transition-colors duration-200">
+                    <i class="fas fa-user-shield"></i>
                     <span>ADMIN</span>
                 </a>
 
                 <a href="{{ route('register') }}" wire:navigate
-                    class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold border border-[#4A90E2] hover:bg-[#4A90E2] hover:text-white transition-colors duration-200">
+                    class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold border border-[#4A90E2] hover:bg-gray-200 hover:text-gray-600 transition-colors duration-200">
+                    <i class="fas fa-user-plus"></i>
                     Daftar
                 </a>
             </div>
         </header>
-
         <!-- Main section dengan transisi -->
         <main class="relative flex items-center justify-center flex-grow px-6 py-8 md:py-12 fade-in"
             :class="{ 'show': loaded }" x-transition:enter="transition ease-out duration-800 delay-200"
@@ -101,7 +100,8 @@
                         MASUK ATAU DAFTAR AKUN MEDIA PEMBELAJARAN DIGITAL SEKOLAH DASAR | KELAS VI
                     </h1>
                     <p class="max-w-xl mb-8 text-base italic text-gray-600 sm:text-lg">
-                        "Belajar hari ini adalah investasi untuk masa depan yang lebih cerah. Jadilah yang terbaik versi
+                        "Belajar hari ini adalah investasi untuk masa depan yang lebih cerah. Jadilah yang terbaik
+                        versi
                         dirimu!"
                     </p>
                     {{-- Tombol Masuk Sekarang --}}
@@ -163,7 +163,8 @@
                     </svg>
                 </div>
                 <h3 class="mb-1 text-lg font-semibold">Kuis Interaktif</h3>
-                <p class="text-sm text-gray-600">Asah pemahamanmu dengan mengerjakan kuis dari guru, dan capai peringkat
+                <p class="text-sm text-gray-600">Asah pemahamanmu dengan mengerjakan kuis dari guru, dan capai
+                    peringkat
                     terbaik dengan Nilai tertinggi!</p>
             </a>
 

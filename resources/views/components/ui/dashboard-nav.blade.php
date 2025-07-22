@@ -1,5 +1,5 @@
 <header
-    class="bg-[#4A90E2] text-white py-3 px-6 flex justify-between items-center rounded-b-lg shadow-md w-full max-w-7xl mx-auto relative "
+    class="bg-[#4A90E2] text-white py-3 px-6 flex justify-between items-center shadow-md w-full max-w-7xl mx-auto relative "
     x-data="{ mobileMenuOpen: false, profileDropdownOpen: false }">
 
     <div class="text-xl font-bold">Media Pembelajaran Digital</div>
@@ -9,47 +9,17 @@
 
             <nav class="hidden space-x-4 md:flex">
 
-                @role('siswa')
-                    <a href=""
-                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
-                        wire:navigate>Materi Pembelajaran</a>
-                    <a href=""
-                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
-                        wire:navigate>Kuis/Quis</a>
-                    <a href="#"
-                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
-                        wire:navigate>Referensi Game Edukatif</a>
-                    <a href=""
-                        class="relative flex items-center justify-center inline-block px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
-                        wire:navigate>
-                        <i class="text-2xl fas fa-bell"></i>
-                        <span
-                            class="absolute top-0 right-0 inline-flex items-center justify-center w-3 h-3 text-xs font-bold text-white bg-red-500 rounded-full animate-pulse">!</span>
-                    </a>
-                @endrole
+
 
                 {{-- Tautan untuk Guru --}}
-                @role('guru')
-                    <a href=""
-                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
-                        wire:navigate>Dashboard Guru</a>
-                    <a href=""
-                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
-                        wire:navigate>Upload Materi</a>
-                    <a href=""
-                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
-                        wire:navigate>Buat Kuis</a>
-                    <a href=""
-                        class="px-2 py-1 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
-                        wire:navigate>Cek Peringkat</a>
-                @endrole
+
 
                 {{-- Tautan untuk Admin --}}
                 @role('admin')
-                    <a href="{{ route('admin.dashboard') }}" wire:navigate
+                    <a href="{{ route('admin.index') }}" wire:navigate
                         class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold border border-[#4A90E2] hover:bg-gray-200 hover:text-gray-600 transition-colors duration-200">
-                        <i class="text-lg fas fa-tachometer-alt"></i>
-                        Dashboard Admin
+                        <i class="fas fa-home"></i>
+                        Halaman awal admin
                     </a>
                 @endrole
             </nav>

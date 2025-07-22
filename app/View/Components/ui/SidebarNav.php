@@ -1,19 +1,20 @@
 <?php
 
-namespace App\View\Components\ui;
+namespace App\View\Components\Ui;
 
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class auth-card extends Component
+class SidebarNav extends Component
 {
+
     /**
      * Create a new component instance.
      */
     public function __construct()
     {
-        //
+
     }
 
     /**
@@ -21,6 +22,6 @@ class auth-card extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ui.auth-card');
+        return view('components.ui.sidebar-nav');
     }
 }

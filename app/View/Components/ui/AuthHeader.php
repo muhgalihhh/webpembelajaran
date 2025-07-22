@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class landing-nav extends Component
+class AuthHeader extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class landing-nav extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ui.landing-nav');
+        return view('components.ui.auth-header');
     }
 }

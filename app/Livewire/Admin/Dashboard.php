@@ -2,10 +2,36 @@
 
 namespace App\Livewire\Admin;
 
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
+use App\Models\User; // To count users
+use App\Models\Classes; // To count classes
+use App\Models\Subject; // To count subjects
+use App\Models\Quiz; // To count quizzes
+use App\Models\Task; // To count tasks
 
+#[Layout('layouts.dashboard')] // Use the new admin layout
+#[Title('Admin Dashboard - Metrics')]
 class Dashboard extends Component
 {
+    public $totalStudents;
+    public $totalTeachers;
+    public $totalClasses;
+    public $totalSubjects;
+    public $totalQuizzes;
+    public $totalTasks;
+
+    public function mount()
+    {
+        $this->totalStudents = User::role('siswa')->count();
+        $this->totalTeachers = User::role('guru')->count();
+        $this->totalClasses = Classes::count();
+        $this->totalSubjects = Subject::count();
+        $this->totalQuizzes = Quiz::count();
+        $this->totalTasks = Task::count();
+    }
+
     public function render()
     {
         return view('livewire.admin.dashboard');

@@ -17,7 +17,8 @@
     @livewireStyles
 </head>
 
-<body x-data="{ pageLoaded: false }" x-init="setTimeout(() => pageLoaded = true, 100)" x-show="pageLoaded" x-transition.opacity.duration.500ms>
+<body x-data="{ pageLoaded: false }" x-init="setTimeout(() => pageLoaded = true, 100)" x-show="pageLoaded" x-transition.opacity.duration.500ms
+    class="bg-[#EBF3FF] text-gray-900">
 
     @if (session()->has('success'))
         <x-ui.alert-popup type="success" :message="session('success')" />
@@ -36,19 +37,21 @@
         </div>
     </div>
 
-    <x-ui.landing-nav />
     <!-- Main Container -->
-    <div class="bg-[#EBF3FF] text-gray-800" x-show="pageLoaded" x-transition:enter="transition ease-out duration-700"
-        x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+    <div class="h-screen-auto-overflow" x-data="{
+        loaded: false,
+        init() {
+            // Delay sedikit untuk memastikan DOM siap
+            setTimeout(() => {
+                this.loaded = true;
+            }, 100);
+        }
+    }" x-cloak>
 
-
-
-        <!-- Content Slot -->
-        <div x-transition:enter="transition ease-out duration-600 delay-300"
-            x-transition:enter-start="opacity-0 translate-y-8" x-transition:enter-end="opacity-100 translate-y-0">
-            {{ $slot }}
-        </div>
+        <x-ui.landing-nav />
+        {{ $slot }}
     </div>
+
 
     @livewireScripts
 
