@@ -1,6 +1,6 @@
 {{-- Perubahan utama: `fixed` hanya untuk mobile (di bawah lg), di desktop (lg) menjadi `relative` --}}
 <aside
-    class="fixed inset-y-0 left-0 z-40 flex flex-col flex-shrink-0 space-y-4 overflow-y-auto bg-white border-r border-gray-200 shadow-lg lg:relative lg:translate-x-0"
+    class="fixed inset-y-0 left-0 z-40 flex flex-col flex-shrink-0 space-y-4 overflow-y-auto bg-gray-200 border-r border-gray-200 shadow-lg lg:relative lg:translate-x-0"
     :class="{
         'w-64': !sidebarCollapsed,
         'lg:w-20 w-64': sidebarCollapsed,
@@ -30,7 +30,7 @@
     {{-- Menu Navigasi --}}
     <nav class="flex-grow">
         <a href="{{ route('admin.dashboard') }}" wire:navigate title="Dashboard"
-            class="flex items-center border border-black p-3 my-2 text-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100' }}"
+            class="flex items-center border border-black p-3 my-2 text-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
             :class="{ 'justify-center': sidebarCollapsed }">
             <i class="w-6 text-center fa-solid fa-tachometer-alt"></i>
             <span class="ml-3" x-show="!sidebarCollapsed">Dashboard</span>
@@ -42,7 +42,7 @@
         <ul class="space-y-2">
             <li>
                 <a href="{{ route('admin.manage-teachers') }}" wire:navigate title="Manajemen Guru"
-                    class="flex items-center border border-black p-3 text-gray-700 {{ request()->routeIs('admin.manage-teachers') ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100' }}"
+                    class="flex items-center border border-black p-3 text-gray-700 {{ request()->routeIs('admin.manage-teachers') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-chalkboard-teacher"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Manajemen Guru</span>
@@ -50,7 +50,7 @@
             </li>
             <li>
                 <a href="{{ route('admin.manage-students') }}" wire:navigate title="Manajemen Siswa"
-                    class="flex items-center border border-black p-3 text-gray-700 {{ request()->routeIs('admin.manage-students') ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100' }}"
+                    class="flex items-center border border-black p-3 text-gray-700 {{ request()->routeIs('admin.manage-students') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-user-graduate"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Manajemen Siswa</span>
@@ -58,7 +58,7 @@
             </li>
             <li>
                 <a href="{{ route('admin.manage-classes') }}" wire:navigate title="Manajemen Kelas"
-                    class="flex items-center border border-black p-3 text-gray-700 {{ request()->routeIs('admin.manage-classes') ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100' }}"
+                    class="flex items-center border border-black p-3 text-gray-700 {{ request()->routeIs('admin.manage-classes') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-school"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Manajemen Kelas</span>
@@ -66,7 +66,7 @@
             </li>
             <li>
                 <a href="{{ route('admin.manage-subjects') }}" wire:navigate title="Manajemen Mapel"
-                    class="flex items-center border border-black p-3 text-gray-700 {{ request()->routeIs('admin.manage-subjects') ? 'bg-gray-200 font-bold' : 'hover:bg-gray-100' }}"
+                    class="flex items-center border border-black p-3 text-gray-700 {{ request()->routeIs('admin.manage-subjects') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-book"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Manajemen Mapel</span>

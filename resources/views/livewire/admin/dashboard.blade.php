@@ -15,7 +15,7 @@
 
     {{-- Konten metrik --}}
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-between p-6 bg-white border shadow-md">
             <div>
                 <h3 class="text-sm font-medium text-gray-500 uppercase">Total Students</h3>
                 <p class="text-3xl font-bold text-gray-900">{{ $totalStudents }}</p>
@@ -24,7 +24,7 @@
                 <i class="fas fa-user-graduate fa-2x"></i>
             </div>
         </div>
-        <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-between p-6 bg-white border shadow-md">
             <div>
                 <h3 class="text-sm font-medium text-gray-500 uppercase">Total Teachers</h3>
                 <p class="text-3xl font-bold text-gray-900">{{ $totalTeachers }}</p>
@@ -33,7 +33,7 @@
                 <i class="fas fa-chalkboard-teacher fa-2x"></i>
             </div>
         </div>
-        <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-between p-6 bg-white border shadow-md">
             <div>
                 <h3 class="text-sm font-medium text-gray-500 uppercase">Total Classes</h3>
                 <p class="text-3xl font-bold text-gray-900">{{ $totalClasses }}</p>
@@ -42,7 +42,7 @@
                 <i class="fas fa-school fa-2x"></i>
             </div>
         </div>
-        <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-between p-6 bg-white border shadow-md">
             <div>
                 <h3 class="text-sm font-medium text-gray-500 uppercase">Total Subjects</h3>
                 <p class="text-3xl font-bold text-gray-900">{{ $totalSubjects }}</p>
@@ -51,7 +51,7 @@
                 <i class="fas fa-book fa-2x"></i>
             </div>
         </div>
-        <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-between p-6 bg-white border shadow-md">
             <div>
                 <h3 class="text-sm font-medium text-gray-500 uppercase">Total Quizzes</h3>
                 <p class="text-3xl font-bold text-gray-900">{{ $totalQuizzes }}</p>
@@ -60,7 +60,7 @@
                 <i class="fas fa-question-circle fa-2x"></i>
             </div>
         </div>
-        <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
+        <div class="flex items-center justify-between p-6 bg-white border shadow-md">
             <div>
                 <h3 class="text-sm font-medium text-gray-500 uppercase">Total Tasks</h3>
                 <p class="text-3xl font-bold text-gray-900">{{ $totalTasks }}</p>
