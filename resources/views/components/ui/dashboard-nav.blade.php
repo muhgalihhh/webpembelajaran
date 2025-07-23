@@ -16,10 +16,11 @@
 
                 {{-- Tautan untuk Admin --}}
                 @role('admin')
-                    <a href="{{ route('admin.index') }}" wire:navigate
-                        class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold border border-[#4A90E2] hover:bg-gray-200 hover:text-gray-600 transition-colors duration-200">
+                    <a href="{{ route('admin.index') }}"
+                        class="flex items-center justify-center gap-2 px-3 py-2 font-semibold text-black transition-colors duration-200 bg-white border border-black rounded-md hover:text-gray-600"
+                        wire:navigate>
                         <i class="fas fa-home"></i>
-                        Halaman awal admin
+                        Home
                     </a>
                 @endrole
             </nav>
