@@ -1,12 +1,12 @@
 <?php
 
-namespace App\View\Components\ui;
+namespace App\View\Components\ui\admin;
 
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class auth-header extends Component
+class sidebar-admin extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class auth-header extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ui.auth-header');
+        return view('components.ui.admin.sidebar-admin');
     }
 }

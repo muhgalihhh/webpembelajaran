@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class alert-popup extends Component
+class ConfirmDialog extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class alert-popup extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ui.alert-popup');
+        return view('components.ui.confirm-dialog');
     }
 }

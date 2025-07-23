@@ -1,12 +1,12 @@
 <?php
 
-namespace App\View\Components\ui;
+namespace App\View\Components\ui\admin;
 
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class landing-nav extends Component
+class navbar extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class landing-nav extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ui.landing-nav');
+        return view('components.ui.admin.navbar');
     }
 }

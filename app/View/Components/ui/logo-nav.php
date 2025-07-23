@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class auth-card extends Component
+class logo-nav extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class auth-card extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ui.auth-card');
+        return view('components.ui.logo-nav');
     }
 }

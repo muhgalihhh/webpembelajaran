@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $title ?? 'Page Title' }}</title>
+    <title>{{ $title ?? 'Media Pembelajaran Digital' }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
@@ -17,7 +17,8 @@
     @livewireStyles
 </head>
 
-<body x-data="{ pageLoaded: false }" x-init="setTimeout(() => pageLoaded = true, 100)" x-show="pageLoaded" x-transition.opacity.duration.500ms>
+<body x-data="{ pageLoaded: false }" x-init="setTimeout(() => pageLoaded = true, 100)" x-show="pageLoaded" x-transition.opacity.duration.500ms
+    class="bg-[#EBF3FF] text-gray-900 h-screen">
 
     @if (session()->has('success'))
         <x-ui.alert-popup type="success" :message="session('success')" />
@@ -27,7 +28,6 @@
         <x-ui.alert-popup type="error" :message="session('error')" />
     @endif
 
-    <!-- Loading Overlay -->
     <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center"
         x-transition.opacity.duration.300ms>
         <div class="flex items-center p-6 space-x-3 bg-white rounded-lg" x-transition.scale.80.opacity.duration.400ms>
@@ -36,25 +36,26 @@
         </div>
     </div>
 
-    <x-ui.landing-nav />
-    <!-- Main Container -->
-    <div class="bg-[#EBF3FF] text-gray-800" x-show="pageLoaded" x-transition:enter="transition ease-out duration-700"
-        x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+    <div class="w-full h-full" x-data="{
+        loaded: false,
+        init() {
+            // Delay sedikit untuk memastikan DOM siap
+            setTimeout(() => {
+                this.loaded = true;
+            }, 100);
+        }
+    }" x-cloak>
 
+        <x-ui.landing-nav />
+        {{ $slot }}
 
-
-        <!-- Content Slot -->
-        <div x-transition:enter="transition ease-out duration-600 delay-300"
-            x-transition:enter-start="opacity-0 translate-y-8" x-transition:enter-end="opacity-100 translate-y-0">
-            {{ $slot }}
-        </div>
+        <footer class="w-full py-4 mx-auto text-xs font-bold text-center text-white bg-[#4A90E2] rounded-t-lg">
+            &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
+        </footer>
     </div>
 
     @livewireScripts
-
     <x-ui.logout-confirmation />
-
-
     @vite(['resources/js/app.js'])
 </body>
 

@@ -21,7 +21,7 @@
     x-transition:enter-end="opacity-100 transform translate-y-0" x-transition:leave="transition ease-in duration-300"
     x-transition:leave-start="opacity-100 transform translate-y-0"
     x-transition:leave-end="opacity-0 transform translate-y-2"
-    class="fixed bottom-5 right-5 w-auto max-w-xs px-4 py-3 rounded-lg shadow-lg text-white border-l-4 {{ $colors[$type] }} z-[99999]"
+    class="fixed bottom-5 right-5 w-auto max-w-xs px-4 py-3 rounded-lg shadow-lg text-white border-l-4 {{ $colors[$type] }} z-[999999]"
     role="alert">
 
     <p class="font-bold">{{ ucfirst($type) }}</p>
