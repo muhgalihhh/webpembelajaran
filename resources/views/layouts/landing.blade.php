@@ -18,7 +18,7 @@
 </head>
 
 <body x-data="{ pageLoaded: false }" x-init="setTimeout(() => pageLoaded = true, 100)" x-show="pageLoaded" x-transition.opacity.duration.500ms
-    class="bg-[#EBF3FF] text-gray-900">
+    class="bg-[#EBF3FF] text-gray-900 h-screen">
 
     @if (session()->has('success'))
         <x-ui.alert-popup type="success" :message="session('success')" />
@@ -38,7 +38,7 @@
     </div>
 
     <!-- Main Container -->
-    <div class="h-screen-auto-overflow" x-data="{
+    <div class="w-full h-full" x-data="{
         loaded: false,
         init() {
             // Delay sedikit untuk memastikan DOM siap
@@ -50,6 +50,10 @@
 
         <x-ui.landing-nav />
         {{ $slot }}
+
+        <footer class="w-full py-4 mx-auto text-xs font-bold text-center text-white bg-[#4A90E2] rounded-t-lg">
+            &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
+        </footer>
     </div>
 
 

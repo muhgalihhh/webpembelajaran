@@ -7,7 +7,7 @@
         <div
             class="relative z-10 flex flex-col items-center justify-center w-full max-w-6xl lg:flex-row lg:items-center">
             <div class="flex flex-col items-center text-center lg:items-start lg:text-left lg:w-1/2 lg:pr-8">
-                <h1 class=" text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
+                <h1 class="text-2xl font-bold leading-tight text-gray-900  sm:text-3xl lg:text-4xl xl:text-5xl">
                     HALOO BU {{ Auth::user()->name }}
                 </h1>
                 <h1 class="mb-4 text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
@@ -80,8 +80,6 @@
 
     </section>
 
-    <footer class="w-full py-4 mx-auto text-xs font-bold text-center text-white max-w-7xl bg-[#4A90E2] rounded-t-lg">
-        &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
-    </footer>
+
 
 </div>

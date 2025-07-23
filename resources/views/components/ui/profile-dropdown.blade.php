@@ -1,4 +1,4 @@
-<div x-data="{ profileDropdownOpen: false }" @click.away="profileDropdownOpen = false" class="relative z-40"> {{-- Added z-40 here --}}
+<div x-data="{ profileDropdownOpen: false }" @click.away="profileDropdownOpen = false" class="relative z-50"> {{-- Higher z-index for dropdown itself --}}
     {{-- Profile Button --}}
     <button @click="profileDropdownOpen = !profileDropdownOpen"
         class="flex items-center px-3 py-2 space-x-2 text-lg font-semibold text-white transition-all duration-200 rounded-lg bg-blue-950 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300">
