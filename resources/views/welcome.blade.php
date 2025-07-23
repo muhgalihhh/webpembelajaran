@@ -60,10 +60,10 @@
 
         <!-- Header dengan transisi -->
         <header
-            class="bg-[#4A90E2] text-white py-3 px-6 flex justify-between items-center rounded-b-lg shadow-md w-full max-w-7xl mx-auto fade-in"
+            class="bg-[#4A90E2] text-white py-3 px-6 flex justify-between items-center rounded-b-lg shadow-md w-full  mx-auto fade-in"
             :class="{ 'show': loaded }">
 
-            <div class="text-xl font-bold">Media Pembelajaran Digital</div>
+            <x-ui.logo-nav />
             <div class="flex items-center space-x-3">
                 {{-- Tombol ADMIN --}}
                 <a href="{{ route('admin.login') }}" wire:navigate
@@ -189,8 +189,7 @@
         </section>
 
         <!-- Footer -->
-        <footer
-            class="w-full py-4 mx-auto text-xs font-bold text-center text-white max-w-7xl bg-[#4A90E2] rounded-t-lg fade-in"
+        <footer class="w-full py-4 mx-auto text-xs font-bold text-center text-white bg-[#4A90E2] rounded-t-lg fade-in"
             :class="{ 'show': loaded }" x-transition:enter="transition ease-out duration-600 delay-1200"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
 
