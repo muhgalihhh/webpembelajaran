@@ -2,7 +2,9 @@
     class="bg-[#4A90E2] text-white py-3 px-4 sm:px-6 flex justify-between items-center shadow-md w-full
     x-data="{ mobileMenuOpen: false, profileDropdownOpen: false }">
 
-    <div class="text-xl font-bold">Media Pembelajaran Digital</div>
+    <x-ui.logo-nav />
+
+
 
     <div class="flex items-center space-x-3">
         @auth

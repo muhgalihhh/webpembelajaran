@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $title ?? 'Page Title' }}</title>
+    <title>{{ $title ?? 'Media Pembelajaran Digital' }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
@@ -28,7 +28,6 @@
         <x-ui.alert-popup type="error" :message="session('error')" />
     @endif
 
-    <!-- Loading Overlay -->
     <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center"
         x-transition.opacity.duration.300ms>
         <div class="flex items-center p-6 space-x-3 bg-white rounded-lg" x-transition.scale.80.opacity.duration.400ms>
@@ -37,7 +36,6 @@
         </div>
     </div>
 
-    <!-- Main Container -->
     <div class="w-full h-full" x-data="{
         loaded: false,
         init() {
@@ -56,12 +54,8 @@
         </footer>
     </div>
 
-
     @livewireScripts
-
     <x-ui.logout-confirmation />
-
-
     @vite(['resources/js/app.js'])
 </body>
 
