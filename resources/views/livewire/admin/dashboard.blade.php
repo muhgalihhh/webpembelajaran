@@ -1,6 +1,19 @@
-<div class="container p-4 mx-auto">
-    <h2 class="mb-6 text-2xl font-bold text-gray-800">Dashboard Metrics</h2>
+<div>
+    {{-- Ini mengisi slot 'pageHeader' di layout utama --}}
+    <x-slot:pageHeader>
+        <div class="flex items-center">
+            {{-- Tombol Hamburger untuk Mobile --}}
+            <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
+                <i class="text-xl fa-solid fa-bars"></i>
+            </button>
+            {{-- Judul Halaman --}}
+            <h2 class="text-2xl font-bold text-gray-800">
+                Dashboard
+            </h2>
+        </div>
+    </x-slot:pageHeader>
 
+    {{-- Konten metrik --}}
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
             <div>
@@ -11,7 +24,6 @@
                 <i class="fas fa-user-graduate fa-2x"></i>
             </div>
         </div>
-
         <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
             <div>
                 <h3 class="text-sm font-medium text-gray-500 uppercase">Total Teachers</h3>
@@ -21,7 +33,6 @@
                 <i class="fas fa-chalkboard-teacher fa-2x"></i>
             </div>
         </div>
-
         <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
             <div>
                 <h3 class="text-sm font-medium text-gray-500 uppercase">Total Classes</h3>
@@ -31,7 +42,6 @@
                 <i class="fas fa-school fa-2x"></i>
             </div>
         </div>
-
         <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
             <div>
                 <h3 class="text-sm font-medium text-gray-500 uppercase">Total Subjects</h3>
@@ -41,7 +51,6 @@
                 <i class="fas fa-book fa-2x"></i>
             </div>
         </div>
-
         <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
             <div>
                 <h3 class="text-sm font-medium text-gray-500 uppercase">Total Quizzes</h3>
@@ -51,7 +60,6 @@
                 <i class="fas fa-question-circle fa-2x"></i>
             </div>
         </div>
-
         <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
             <div>
                 <h3 class="text-sm font-medium text-gray-500 uppercase">Total Tasks</h3>

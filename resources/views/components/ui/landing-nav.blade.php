@@ -49,7 +49,7 @@
                 {{-- Tautan untuk Admin --}}
                 @role('admin')
                     <a href="{{ route('admin.dashboard') }}" wire:navigate
-                        class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold border border-[#4A90E2] hover:bg-gray-200 hover:text-gray-600 transition-colors duration-200">
+                        class="border bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold border border-black hover:bg-gray-200 hover:text-gray-600 transition-colors duration-200">
                         <i class="text-lg fas fa-tachometer-alt"></i>
                         Dashboard Admin
                     </a>

@@ -16,51 +16,105 @@
             $pageTitle = 'Manajemen Mata Pelajaran';
         }
     @endphp
-    <h3 class="mb-6 text-2xl font-bold text-gray-800">{{ $pageTitle }}</h3>
+    <x-slot:pageHeader>
+        <div class="flex items-center">
+            {{-- Tombol Hamburger untuk Mobile --}}
+            <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
+                <i class="text-xl fa-solid fa-bars"></i>
+            </button>
+            {{-- Judul Halaman --}}
+            <h2 class="text-2xl font-bold text-gray-800">
+                {{ $pageTitle }}
+            </h2>
+        </div>
+    </x-slot:pageHeader>
 
     {{-- Filter and Search Section --}}
-    <div class="p-6 mb-6 bg-white rounded-lg shadow-md">
+    <div class="p-6 mb-6 bg-white border shadow-md">
         <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-3">
             {{-- Search Input --}}
             <div class="md:col-span-1">
                 <label for="search" class="block text-sm font-medium text-gray-700">Cari:</label>
                 <input wire:model.live.debounce.300ms="search" type="text" id="search" placeholder="Cari..."
-                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                    class="block w-full p-2 mt-1 border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
             </div>
 
             {{-- Dynamic Filters based on model --}}
             @if ($modelName === 'User')
-                <div class="md:col-span-1">
-                    <label for="status_filter" class="block text-sm font-medium text-gray-700">Filter Status:</label>
-                    <select wire:model.live="status_filter" id="status_filter"
-                        class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                        <option value="all">Semua Status</option>
-                        <option value="active">Aktif</option>
-                        <option value="inactive">Nonaktif</option>
-                    </select>
+                <div>
+
+                    <label for="status_filter" class="block text-sm font-medium text-gray-700">
+                        Filter Status
+                    </label>
+
+
+                    <div class="relative mt-1">
+                        <select wire:model.live="status_filter" id="status_filter"
+                            class="block w-full px-3 py-2 pr-10 text-base bg-white border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="all">Semua Status</option>
+                            <option value="active">Aktif</option>
+                            <option value="inactive">Nonaktif</option>
+                        </select>
+
+
+                        <div
+                            class="absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 pointer-events-none">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
                 </div>
                 @if ($roleFilter === 'siswa')
                     <div class="md:col-span-1">
-                        <label for="class_id_filter" class="block text-sm font-medium text-gray-700">Filter
-                            Kelas:</label>
-                        <select wire:model.live="class_id_filter" id="class_id_filter"
-                            class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                            <option value="">Semua Kelas</option>
-                            @foreach ($availableClasses as $class)
-                                <option value="{{ $class->id }}">{{ $class->name }}</option>
-                            @endforeach
-                        </select>
+                        {{-- Label untuk filter kelas --}}
+                        <label for="class_id_filter" class="block text-sm font-medium text-gray-700">
+                            Filter Kelas
+                        </label>
+
+                        {{-- Wrapper untuk posisi ikon --}}
+                        <div class="relative mt-1">
+                            <select wire:model.live="class_id_filter" id="class_id_filter"
+                                class="block w-full px-3 py-2 pr-10 text-base bg-white border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Semua Kelas</option>
+                                @foreach ($availableClasses as $class)
+                                    <option value="{{ $class->id }}">{{ $class->name }}</option>
+                                @endforeach
+                            </select>
+
+                            {{-- Ikon panah dropdown --}}
+                            <div
+                                class="absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 pointer-events-none">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
                     </div>
                 @endif
             @elseif ($modelName === 'Subject')
                 <div class="md:col-span-1">
-                    <label for="is_active_filter" class="block text-sm font-medium text-gray-700">Filter Aktif:</label>
-                    <select wire:model.live="is_active_filter" id="is_active_filter"
-                        class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                        <option value="">Semua</option>
-                        <option value="1">Aktif</option>
-                        <option value="0">Nonaktif</option>
-                    </select>
+                    {{-- Label untuk filter --}}
+                    <label for="is_active_filter" class="block text-sm font-medium text-gray-700">
+                        Filter Status
+                    </label>
+
+                    {{-- Wrapper untuk posisi ikon --}}
+                    <div class="relative mt-1">
+                        <select wire:model.live="is_active_filter" id="is_active_filter"
+                            class="block w-full px-3 py-2 pr-10 text-base bg-white border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Semua</option>
+                            <option value="1">Aktif</option>
+                            <option value="0">Nonaktif</option>
+                        </select>
+
+                        {{-- Ikon panah dropdown kustom --}}
+                        <div
+                            class="absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 pointer-events-none">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M10 3a.75.75 0 01.53.22l3.5 3.5a.75.75 0 01-1.06 1.06L10 4.81 6.53 8.28a.75.75 0 01-1.06-1.06l3.5-3.5A.75.75 0 0110 3zm-3.72 9.28a.75.75 0 011.06 0L10 15.19l2.67-2.91a.75.75 0 111.06 1.06l-3.5 3.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 010-1.06z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </div>
                 </div>
             @endif
         </div>
@@ -77,16 +131,16 @@
     </div>
 
     {{-- Data Table --}}
-    <div class="p-6 bg-white rounded-lg shadow-md">
+    <div class="p-6 bg-white border shadow-md">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
-                    <tr>
+                    <tr class="border ">
                         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">ID
                         </th>
                         @if ($modelName === 'User')
                             <th wire:click="sortBy('name')"
-                                class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                                class="px-6 py-3 text-xs font-bold tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                                 Nama Lengkap
                                 @if ($sortBy === 'name')
                                     <i class="fas {{ $sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down' }}"></i>
@@ -160,11 +214,12 @@
                                 @endif
                             </th>
                         @endif
-                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Aksi
+                        <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">
+                            Aksi
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-white border divide-y divide-gray-200">
                     @forelse ($records as $index => $record)
                         <tr class="{{ $loop->even ? 'bg-gray-50' : 'bg-white' }}">
                             <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
