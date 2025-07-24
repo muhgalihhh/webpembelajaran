@@ -41,11 +41,8 @@ class ManageMaterials extends Component
     #[Computed]
     public function materials()
     {
-        $teacherId = Auth::id();
-        $subjectIds = Subject::where('teacher_id', $teacherId)->pluck('id');
 
         return Material::with('subject')
-            ->whereIn('subject_id', $subjectIds)
             ->where('title', 'like', '%' . $this->search . '%')
             ->when($this->subjectFilter, function ($query) {
                 $query->where('subject_id', $this->subjectFilter);

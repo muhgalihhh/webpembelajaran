@@ -33,9 +33,9 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:guru'])->group(function () {
         Route::get('/guru', \App\Livewire\Teacher\Index::class)->name('teacher.index');
         Route::get('/guru/dashboard', \App\Livewire\Teacher\Dashboard::class)->name('teacher.dashboard');
-        Route::get('/guru/materials', ManageMaterials::class)->name('materials');
-        Route::get('/guru/materials/create', MaterialForm::class)->name('teacher.materials.create');
-        Route::get('/guru/materials/{material}/edit', MaterialForm::class)->name('teacher.materials.edit');
+        Route::get('/guru/materials', \App\Livewire\Teacher\ManageMaterials::class)->name('materials');
+        Route::get('/guru/materials/create', \App\Livewire\Teacher\MaterialForm::class)->name('materials.create');
+        Route::get('/guru/materials/{material}/edit', \App\Livewire\Teacher\MaterialForm::class)->name('materials.edit');
     });
 
     // Rute untuk Admin (hanya bisa diakses oleh user dengan role 'admin')

@@ -88,7 +88,7 @@
 
             {{-- Tombol Aksi --}}
             <div class="flex justify-end pt-6 mt-6 border-t">
-                <a href="{{ route('teacher.materials') }}" wire:navigate
+                <a href="{{ route('materials') }}" wire:navigate
                     class="px-4 py-2 font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</a>
                 <button type="submit"
                     class="px-4 py-2 ml-4 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">

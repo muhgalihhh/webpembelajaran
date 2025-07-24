@@ -52,7 +52,8 @@ class MaterialForm extends Component
 
     public function getSubjectsProperty()
     {
-        return Subject::where('teacher_id', Auth::id())->orderBy('name')->get();
+        // Mengambil semua mata pelajaran yang tersedia
+        return Subject::orderBy('name')->get();
     }
 
     public function save()
@@ -60,6 +61,7 @@ class MaterialForm extends Component
         $validatedData = $this->validate();
 
         if ($this->uploadedFile) {
+            // Hapus file lama jika ada saat update
             if ($this->material?->file_path) {
                 Storage::disk('public')->delete($this->material->file_path);
             }
@@ -72,6 +74,8 @@ class MaterialForm extends Component
             $this->material->update($validatedData);
             $message = 'Materi berhasil diperbarui.';
         } else {
+            // Tambahkan teacher_id dari user yang sedang login saat membuat materi baru
+            $validatedData['teacher_id'] = Auth::id();
             Material::create($validatedData);
             $message = 'Materi berhasil ditambahkan.';
         }

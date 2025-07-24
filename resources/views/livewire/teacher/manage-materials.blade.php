@@ -24,7 +24,7 @@
                 </select>
             </div>
             <div class="flex items-end justify-end md:col-span-1">
-                <a href="{{ route('teacher.materials.create') }}" wire:navigate
+                <a href="{{ route('materials.create') }}" wire:navigate
                     class="px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
                     <i class="mr-2 fa-solid fa-plus"></i> Tambah Materi
                 </a>
@@ -71,7 +71,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                            <a href="{{ route('teacher.materials.edit', $material) }}" wire:navigate
+                            <a href="{{ route('materials.edit', $material) }}" wire:navigate
                                 class="text-indigo-600 hover:text-indigo-900">Edit</a>
                             <button wire:click="confirmDelete({{ $material->id }})"
                                 class="ml-4 text-red-600 hover:text-red-900">Hapus</button>
