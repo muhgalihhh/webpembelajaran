@@ -82,7 +82,7 @@ class MaterialForm extends Component
 
         // Menggunakan session flash karena kita akan redirect
         session()->flash('success', $message);
-        return $this->redirectRoute('teacher.materials', navigate: true);
+        return $this->redirectRoute('materials', navigate: true);
     }
 
     #[Title('Form Materi')]

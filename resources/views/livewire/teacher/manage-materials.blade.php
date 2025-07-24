@@ -24,7 +24,7 @@
                 </select>
             </div>
             <div class="flex items-end justify-end md:col-span-1">
-                <a href="{{ route('materials.create') }}" wire:navigate
+                <a href="{{ route('teacher.materials.create') }}" wire:navigate
                     class="px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
                     <i class="mr-2 fa-solid fa-plus"></i> Tambah Materi
                 </a>

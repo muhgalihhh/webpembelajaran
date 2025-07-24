@@ -41,8 +41,8 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('materials') }}" wire:navigate title="Materi Pembelajaran"
-                    class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('materials') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
+                <a href="{{ route('teacher.materials') }}" wire:navigate title="Materi Pembelajaran"
+                    class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.materials') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-book-open"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Materi Pembelajaran</span>
