@@ -4,7 +4,6 @@
             {{ $material ? 'Edit Materi Pembelajaran' : 'Tambah Materi Pembelajaran' }}
         </h2>
     </x-slot:pageHeader>
-
     <div class="p-6 bg-white rounded-lg shadow-md">
         <form wire:submit.prevent="save">
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">

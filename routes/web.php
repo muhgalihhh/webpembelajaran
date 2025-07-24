@@ -4,8 +4,6 @@ use App\Livewire\Admin\ManageClasses;
 use App\Livewire\Admin\ManageStudents;
 use App\Livewire\Admin\ManageSubjects;
 use App\Livewire\Admin\ManageTeachers;
-use App\Livewire\Teacher\ManageMaterials;
-use App\Livewire\Teacher\MaterialForm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -38,14 +36,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Rute untuk Guru
     Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->group(function () {
-        Route::get('/', \App\Livewire\Admin\Index::class)->name('index');
+        Route::get('/', \App\Livewire\Teacher\Index::class)->name('index');
         Route::get('/dashboard', \App\Livewire\Teacher\Dashboard::class)->name('dashboard');
-
         Route::get('/materials', \App\Livewire\Teacher\ManageMaterials::class)->name('materials');
-
         Route::get('/materials/create', \App\Livewire\Teacher\MaterialForm::class)->name('materials.create');
-
-        Route::get('/materials/{material}/edit', \App\Livewire\Teacher\MaterialForm::class)->name('materials.edit');
     });
 
     // Rute untuk Siswa (contoh)
