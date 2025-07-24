@@ -25,7 +25,7 @@
                 @endrole
 
                 @role('guru')
-                    <a href="#" wire:navigate
+                    <a href="{{ route('teacher.dashboard') }}" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Dashboard</a>
                     <a href="#" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Upload Materi</a>

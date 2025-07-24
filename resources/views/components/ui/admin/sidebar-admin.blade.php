@@ -9,7 +9,7 @@
         '-translate-x-full': !mobileSidebarOpen
     }">
 
-    {{-- Logo dan Tombol Collapse --}}
+
     <div class="flex items-center p-2 bg-blue-950" :class="sidebarCollapsed ? 'justify-center' : 'justify-between'">
         <div x-show="!sidebarCollapsed" class="flex flex-col items-start space-x-2 text-white">
             <div class="flex items-center mb-2 space-x-2">
@@ -27,7 +27,6 @@
         </button>
     </div>
 
-    {{-- Menu Navigasi --}}
     <nav class="flex-grow">
         <a href="{{ route('admin.dashboard') }}" wire:navigate title="Dashboard"
             class="flex items-center border border-black p-3 my-2 text-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"

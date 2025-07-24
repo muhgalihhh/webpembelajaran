@@ -1,6 +1,9 @@
 <div>
     {{-- Header Halaman --}}
     <x-slot:pageHeader>
+        <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
+            <i class="text-xl fa-solid fa-bars"></i>
+        </button>
         <h2 class="text-2xl font-bold text-gray-800">Manajemen Siswa</h2>
     </x-slot:pageHeader>
 

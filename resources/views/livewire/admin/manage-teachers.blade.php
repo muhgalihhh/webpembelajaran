@@ -1,6 +1,9 @@
 <div>
 
     <x-slot:pageHeader>
+        <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
+            <i class="text-xl fa-solid fa-bars"></i>
+        </button>
         <h2 class="text-2xl font-bold text-gray-800">Manajemen Guru</h2>
     </x-slot:pageHeader>
     <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
