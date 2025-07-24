@@ -9,12 +9,21 @@
         integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdn.tiny.cloud/1/ts549a373wgru0rr8l21ho2j0dg7ssrr4bcebrftnk5d4oun/tinymce/8/tinymce.min.js"
+        referrerpolicy="origin" crossorigin="anonymous"></script>
     @livewireStyles
 </head>
 
 <body class="font-sans bg-gray-100">
     <div x-data="{ sidebarCollapsed: false, mobileSidebarOpen: false }" @keydown.escape.window="mobileSidebarOpen = false" class="flex flex-col h-screen">
+
+        @if (session()->has('success'))
+            <x-ui.alert-popup type="success" :message="session('success')" />
+        @endif
+
+        @if (session()->has('error'))
+            <x-ui.alert-popup type="error" :message="session('error')" />
+        @endif
 
 
         <x-ui.teacher.navbar />

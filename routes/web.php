@@ -40,6 +40,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', \App\Livewire\Teacher\Dashboard::class)->name('dashboard');
         Route::get('/materials', \App\Livewire\Teacher\ManageMaterials::class)->name('materials');
         Route::get('/materials/create', \App\Livewire\Teacher\MaterialForm::class)->name('materials.create');
+        Route::get('/materials/{material}/edit', \App\Livewire\Teacher\MaterialForm::class)->name('materials.edit');
     });
 
     // Rute untuk Siswa (contoh)

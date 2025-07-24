@@ -3,64 +3,123 @@
 namespace App\Livewire\Teacher;
 
 use App\Models\Material;
+use App\Models\Subject;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+#[Layout('layouts.teacher')]
+#[Title('Manajemen Materi')]
 class ManageMaterials extends Component
 {
     use WithPagination;
 
-    public $search = '';
-    protected $paginationTheme = 'bootstrap';
+    public string $search = '';
+    public string $filterSubject = '';
+    public string $filterPublished = '';
+    public $confirmingDeletion = false;
+    public $materialToDelete = null; // Add this property to store material ID
 
-    public function render()
+    /**
+     * Mengambil daftar mata pelajaran dari database untuk filter.
+     */
+    #[Computed]
+    public function subjects()
     {
-        // Menampilkan SEMUA materi dari semua guru, dengan relasi yang benar
-        $materials = Material::query()
-            ->where('title', 'like', '%' . $this->search . '%')
-            ->with('subject', 'uploader') // Menggunakan relasi 'uploader'
-            ->latest()
-            ->paginate(10);
-
-        return view('livewire.teacher.manage-materials', [
-            'materials' => $materials,
-        ])->layout('layouts.teacher');
+        return Subject::orderBy('name')->get();
     }
 
     /**
-     * Mengubah status publikasi materi.
+     * Mengambil data materi dengan filter dan paginasi.
      */
-    public function togglePublish(Material $material)
+    #[Computed]
+    public function materials()
     {
-        // Otorisasi: Hanya pemilik yang bisa mengubah status
-        if ($material->user_id !== Auth::id()) {
-            session()->flash('error', 'Anda tidak diizinkan mengubah status materi ini.');
-            return;
-        }
-
-        $material->is_published = !$material->is_published;
-        $material->published_at = $material->is_published ? now() : null;
-        $material->save();
-
-        session()->flash('message', 'Status publikasi materi berhasil diubah.');
+        return Material::query()
+            ->with(['subject', 'uploader']) // Menggunakan relasi 'uploader'
+            ->where('user_id', Auth::id())
+            ->when($this->search, function ($query) {
+                $query->where('title', 'like', '%' . $this->search . '%');
+            })
+            ->when($this->filterSubject, function ($query) {
+                $query->where('subject_id', $this->filterSubject);
+            })
+            ->when($this->filterPublished !== '', function ($query) {
+                $query->where('is_published', $this->filterPublished);
+            })
+            ->latest()
+            ->paginate(10);
     }
 
-
-    public function delete(Material $material)
+    /**
+     * Confirm deletion of material
+     */
+    public function confirmDelete($materialId)
     {
+        $material = Material::find($materialId);
 
-        if ($material->user_id !== Auth::id()) {
-            session()->flash('error', 'Anda tidak diizinkan menghapus materi ini.');
+        if (!$material || $material->user_id !== Auth::id()) {
+            session()->flash('flash-message', [
+                'message' => 'Anda tidak diizinkan untuk menghapus materi ini.',
+                'type' => 'error'
+            ]);
             return;
         }
 
+        $this->materialToDelete = $materialId;
+        $this->confirmingDeletion = true;
+    }
+
+    /**
+     * Menghapus materi.
+     */
+    public function delete()
+    {
+        if (!$this->materialToDelete) {
+            return;
+        }
+
+        $material = Material::find($this->materialToDelete);
+
+        if (!$material || $material->user_id !== Auth::id()) {
+            session()->flash('flash-message', [
+                'message' => 'Anda tidak diizinkan untuk menghapus materi ini.',
+                'type' => 'error'
+            ]);
+            $this->closeConfirmModal();
+            return;
+        }
+
+        // Hapus file jika ada
         if ($material->file_path) {
             Storage::disk('public')->delete($material->file_path);
         }
 
         $material->delete();
-        session()->flash('message', 'Materi berhasil dihapus.');
+
+        session()->flash('flash-message', [
+            'message' => 'Materi berhasil dihapus.',
+            'type' => 'success'
+        ]);
+
+        $this->closeConfirmModal();
+    }
+
+    /**
+     * Close confirmation modal
+     */
+    public function closeConfirmModal()
+    {
+        $this->confirmingDeletion = false;
+        $this->materialToDelete = null;
+    }
+
+    public function render()
+    {
+        return view('livewire.teacher.manage-materials');
     }
 }

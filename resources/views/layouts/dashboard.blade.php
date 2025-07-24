@@ -15,13 +15,8 @@
 <body class="font-sans bg-gray-100">
 
     <div x-data="{ sidebarCollapsed: false, mobileSidebarOpen: false }" @keydown.escape.window="mobileSidebarOpen = false" class="flex flex-col h-screen">
-
-
         <x-ui.admin.navbar />
-
-
         <div class="flex flex-1 overflow-hidden">
-
             <x-ui.admin.sidebar-admin />
             <div class="flex flex-col flex-1">
                 <main class="flex-1 overflow-y-auto">
@@ -36,7 +31,6 @@
                         {{ $slot }}
                     </div>
                 </main>
-
 
                 <footer class="p-4 text-sm font-bold text-center text-white bg-[#4A90E2]">
                     © 2025 MEDPEM-DIGITAL™ BY RAHMAT ALFAJRI

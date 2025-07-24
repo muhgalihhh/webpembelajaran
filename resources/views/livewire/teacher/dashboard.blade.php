@@ -6,7 +6,6 @@
         <h2 class="text-2xl font-bold text-gray-800">Dashboard Aktivitas Siswa</h2>
     </x-slot:pageHeader>
 
-    {{-- Kartu Statistik --}}
     <div class="grid grid-cols-1 gap-6 mb-6 md:grid-cols-2 lg:grid-cols-3">
         <div class="p-6 bg-white rounded-lg shadow-md">
             <h3 class="text-sm font-medium text-gray-500 uppercase">Total Siswa Aktif</h3>
@@ -21,8 +20,6 @@
             <p class="text-3xl font-bold text-gray-900">{{ $stats['averageScore'] }}</p>
         </div>
     </div>
-
-    {{-- Area Filter --}}
     <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
@@ -58,7 +55,7 @@
         </div>
     </div>
 
-    {{-- Tabel Hasil Kuis Siswa --}}
+
     <div class="overflow-x-auto bg-white rounded-lg shadow-md">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
