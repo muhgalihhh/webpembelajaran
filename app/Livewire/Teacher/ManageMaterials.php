@@ -3,99 +3,64 @@
 namespace App\Livewire\Teacher;
 
 use App\Models\Material;
-use App\Models\Subject;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
-use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Layout('layouts.teacher')]
-#[Title('Materi Pembelajaran')]
 class ManageMaterials extends Component
 {
     use WithPagination;
 
-    // Properti untuk state & filter
-    #[Url(as: 'q', history: true)]
     public $search = '';
-
-    #[Url(history: true)]
-    public $subjectFilter = '';
-
-    #[Url(history: true)]
-    public $sortBy = 'created_at';
-
-    #[Url(history: true)]
-    public $sortDirection = 'desc';
-
-    public $perPage = 10;
-
-    // Properti untuk konfirmasi hapus
-    public $confirmingDeletion = false;
-    public $itemToDeleteId = null;
-
-    #[Computed]
-    public function materials()
-    {
-
-        return Material::with('subject')
-            ->where('title', 'like', '%' . $this->search . '%')
-            ->when($this->subjectFilter, function ($query) {
-                $query->where('subject_id', $this->subjectFilter);
-            })
-            ->orderBy($this->sortBy, $this->sortDirection)
-            ->paginate($this->perPage);
-    }
-
-    #[Computed]
-    public function subjects()
-    {
-        return Subject::orderBy('name')->get();
-    }
+    protected $paginationTheme = 'bootstrap';
 
     public function render()
     {
-        return view('livewire.teacher.manage-materials');
+        // Menampilkan SEMUA materi dari semua guru, dengan relasi yang benar
+        $materials = Material::query()
+            ->where('title', 'like', '%' . $this->search . '%')
+            ->with('subject', 'uploader') // Menggunakan relasi 'uploader'
+            ->latest()
+            ->paginate(10);
+
+        return view('livewire.teacher.manage-materials', [
+            'materials' => $materials,
+        ])->layout('layouts.teacher');
     }
 
-    public function sortBy($field)
+    /**
+     * Mengubah status publikasi materi.
+     */
+    public function togglePublish(Material $material)
     {
-        if ($this->sortBy === $field) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortDirection = 'asc';
+        // Otorisasi: Hanya pemilik yang bisa mengubah status
+        if ($material->user_id !== Auth::id()) {
+            session()->flash('error', 'Anda tidak diizinkan mengubah status materi ini.');
+            return;
         }
-        $this->sortBy = $field;
+
+        $material->is_published = !$material->is_published;
+        $material->published_at = $material->is_published ? now() : null;
+        $material->save();
+
+        session()->flash('message', 'Status publikasi materi berhasil diubah.');
     }
 
-    public function confirmDelete($id)
-    {
-        $this->itemToDeleteId = $id;
-        $this->confirmingDeletion = true;
-    }
 
-    public function closeConfirmModal()
+    public function delete(Material $material)
     {
-        $this->confirmingDeletion = false;
-        $this->itemToDeleteId = null;
-    }
 
-    public function delete()
-    {
-        $material = Material::findOrFail($this->itemToDeleteId);
+        if ($material->user_id !== Auth::id()) {
+            session()->flash('error', 'Anda tidak diizinkan menghapus materi ini.');
+            return;
+        }
 
         if ($material->file_path) {
             Storage::disk('public')->delete($material->file_path);
         }
 
         $material->delete();
-
-        $this->dispatch('flash-message', message: 'Materi berhasil dihapus.', type: 'success');
-        $this->closeConfirmModal();
-        $this->resetPage();
+        session()->flash('message', 'Materi berhasil dihapus.');
     }
 }

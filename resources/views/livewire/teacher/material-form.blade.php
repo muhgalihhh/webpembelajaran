@@ -4,6 +4,7 @@
             {{ $material ? 'Edit Materi Pembelajaran' : 'Tambah Materi Pembelajaran' }}
         </h2>
     </x-slot:pageHeader>
+
     <div class="p-6 bg-white rounded-lg shadow-md">
         <form wire:submit.prevent="save">
             <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -34,9 +35,7 @@
                             <label for="subject_id">Mata Pelajaran</label>
                             <select id="subject_id" wire:model="subject_id" class="w-full p-2 mt-1 border rounded-md">
                                 <option value="">Pilih Mapel</option>
-                                @foreach ($this->subjects as $subject)
-                                    <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                                @endforeach
+                                \
                             </select>
                             @error('subject_id')
                                 <span class="text-sm text-red-500">{{ $message }}</span>
@@ -68,18 +67,11 @@
                                 class="w-full p-2 mt-1 border rounded-md">
                             <div wire:loading wire:target="uploadedFile" class="mt-1 text-sm text-blue-500">Uploading...
                             </div>
-                            @if ($uploadedFile)
-                                <p class="mt-1 text-sm text-green-600">File siap diupload:
-                                    {{ $uploadedFile->getClientOriginalName() }}</p>
-                            @endif
-                            @if ($material?->file_path && !$uploadedFile)
-                                <p class="mt-1 text-sm text-gray-500">File saat ini: <a
-                                        href="{{ Storage::url($material->file_path) }}" target="_blank"
-                                        class="text-blue-600 hover:underline">Lihat File</a></p>
-                            @endif
-                            @error('uploadedFile')
-                                <span class="text-sm text-red-500">{{ $message }}</span>
-                            @enderror
+
+                            <p class="mt-1 text-sm text-green-600">File siap diupload:
+                            </p>
+
+
                         </div>
                     </div>
                 </div>
