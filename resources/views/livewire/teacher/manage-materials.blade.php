@@ -71,7 +71,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                            <a href="{{ route('materials.edit', $material) }}" wire:navigate
+                            <a href="{{ route('teacher.materials.edit', $material) }}" wire:navigate
                                 class="text-indigo-600 hover:text-indigo-900">Edit</a>
                             <button wire:click="confirmDelete({{ $material->id }})"
                                 class="ml-4 text-red-600 hover:text-red-900">Hapus</button>

@@ -13,6 +13,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 
 #[Layout('layouts.teacher')]
+#[Title('Form Materi Pembelajaran')]
 class MaterialForm extends Component
 {
     use WithFileUploads;
@@ -82,7 +83,7 @@ class MaterialForm extends Component
 
         // Menggunakan session flash karena kita akan redirect
         session()->flash('success', $message);
-        return $this->redirectRoute('materials', navigate: true);
+        return $this->redirectRoute('teacher.materials', navigate: true);
     }
 
     #[Title('Form Materi')]

@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Rute untuk Admin
     Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('', \App\Livewire\Admin\Index::class)->name('index');
         Route::get('/dashboard', \App\Livewire\Admin\Dashboard::class)->name('dashboard');
         Route::get('/manage-teachers', ManageTeachers::class)->name('manage-teachers');
         Route::get('/manage-students', ManageStudents::class)->name('manage-students');
@@ -40,11 +41,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', \App\Livewire\Admin\Index::class)->name('index');
         Route::get('/dashboard', \App\Livewire\Teacher\Dashboard::class)->name('dashboard');
 
-        Route::get('/materials', ManageMaterials::class)->name('materials');
+        Route::get('/materials', \App\Livewire\Teacher\ManageMaterials::class)->name('materials');
 
-        Route::get('/materials/create', MaterialForm::class)->name('materials.create');
+        Route::get('/materials/create', \App\Livewire\Teacher\MaterialForm::class)->name('materials.create');
 
-        Route::get('/materials/{material}/edit', MaterialForm::class)->name('materials.edit');
+        Route::get('/materials/{material}/edit', \App\Livewire\Teacher\MaterialForm::class)->name('materials.edit');
     });
 
     // Rute untuk Siswa (contoh)
