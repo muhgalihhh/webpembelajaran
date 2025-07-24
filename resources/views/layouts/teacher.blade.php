@@ -17,15 +17,6 @@
 <body class="font-sans bg-gray-100">
     <div x-data="{ sidebarCollapsed: false, mobileSidebarOpen: false }" @keydown.escape.window="mobileSidebarOpen = false" class="flex flex-col h-screen">
 
-        @if (session()->has('success'))
-            <x-ui.alert-popup type="success" :message="session('success')" />
-        @endif
-
-        @if (session()->has('error'))
-            <x-ui.alert-popup type="error" :message="session('error')" />
-        @endif
-
-
         <x-ui.teacher.navbar />
 
         <div class="flex flex-1 overflow-hidden">
@@ -50,6 +41,7 @@
             </div>
         </div>
     </div>
+    <x-ui.alert-popup />
     <x-ui.globab-loading-indicator />
     <x-ui.logout-confirmation />
     @livewireScripts

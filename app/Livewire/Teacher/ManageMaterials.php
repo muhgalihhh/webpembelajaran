@@ -11,6 +11,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('layouts.teacher')]
 #[Title('Manajemen Materi')]
@@ -22,7 +23,11 @@ class ManageMaterials extends Component
     public string $filterSubject = '';
     public string $filterPublished = '';
     public $confirmingDeletion = false;
-    public $materialToDelete = null; // Add this property to store material ID
+    public $materialToDelete = null;
+
+
+    public string $sortBy = 'title';
+    public string $sortDirection = 'asc';
 
     /**
      * Mengambil daftar mata pelajaran dari database untuk filter.
@@ -34,32 +39,43 @@ class ManageMaterials extends Component
     }
 
     /**
-     * Mengambil data materi dengan filter dan paginasi.
+     * Mengambil data materi dengan filter, sorting, dan paginasi.
      */
     #[Computed]
     public function materials()
     {
         return Material::query()
-            ->with(['subject', 'uploader']) // Menggunakan relasi 'uploader'
+            ->with(['subject', 'uploader'])
             ->where('user_id', Auth::id())
-            ->when($this->search, function ($query) {
-                $query->where('title', 'like', '%' . $this->search . '%');
-            })
-            ->when($this->filterSubject, function ($query) {
-                $query->where('subject_id', $this->filterSubject);
-            })
-            ->when($this->filterPublished !== '', function ($query) {
-                $query->where('is_published', $this->filterPublished);
-            })
+            ->when($this->search, fn($query) => $query->where('title', 'like', '%' . $this->search . '%'))
+            ->when($this->filterSubject, fn($query) => $query->where('subject_id', $this->filterSubject))
+            ->when($this->filterPublished !== '', fn($query) => $query->where('is_published', $this->filterPublished))
+            ->orderBy($this->sortBy, $this->sortDirection) // Sorting berdasarkan kolom yang dipilih
             ->latest()
             ->paginate(10);
     }
 
     /**
-     * Confirm deletion of material
+     * Method untuk mengubah kolom sorting.
+     */
+    public function sortBy(string $field): void
+    {
+        if ($this->sortBy === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+
+        $this->sortBy = $field;
+        $this->resetPage(); // Reset paginasi setelah sorting
+    }
+
+    /**
+     * Konfirmasi sebelum menghapus materi.
      */
     public function confirmDelete($materialId)
     {
+        // ... (logika konfirmasi hapus tetap sama)
         $material = Material::find($materialId);
 
         if (!$material || $material->user_id !== Auth::id()) {
@@ -79,6 +95,7 @@ class ManageMaterials extends Component
      */
     public function delete()
     {
+
         if (!$this->materialToDelete) {
             return;
         }
@@ -110,13 +127,33 @@ class ManageMaterials extends Component
     }
 
     /**
-     * Close confirmation modal
+     * Menutup modal konfirmasi hapus.
      */
     public function closeConfirmModal()
     {
         $this->confirmingDeletion = false;
         $this->materialToDelete = null;
     }
+
+    /**
+     * Mengunduh file materi.
+     */
+    public function download(int $materialId): ?StreamedResponse
+    {
+        $material = Material::find($materialId);
+
+        // Pastikan materi ada dan pengguna berhak mengakses
+        if (!$material || $material->user_id !== Auth::id() || !$material->file_path) {
+            session()->flash('flash-message', [
+                'message' => 'File tidak ditemukan atau Anda tidak memiliki izin untuk mengunduh.',
+                'type' => 'error'
+            ]);
+            return null;
+        }
+
+        return Storage::disk('public')->download($material->file_path);
+    }
+
 
     public function render()
     {

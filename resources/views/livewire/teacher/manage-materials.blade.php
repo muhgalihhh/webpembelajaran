@@ -1,9 +1,9 @@
 <div>
     <x-slot:pageHeader>
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <h2 class="text-2xl font-bold text-gray-800">Manajemen Materi Pembelajaran</h2>
             <a href="{{ route('teacher.materials.create') }}" wire:navigate
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                class="flex items-center justify-center w-full px-4 py-2 mt-2 text-sm font-medium text-white bg-blue-600 rounded-md shadow-sm sm:w-auto sm:mt-0 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 <i class="mr-2 fa-solid fa-plus"></i>
                 Tambah Materi Baru
             </a>
@@ -11,7 +11,7 @@
     </x-slot:pageHeader>
 
     {{-- CARD 1: UNTUK FILTER --}}
-    <div class="p-6 bg-white rounded-lg shadow-md">
+    <div class="p-6 mb-6 bg-white rounded-lg shadow-md">
         <h3 class="text-lg font-medium leading-6 text-gray-900">Filter Pencarian</h3>
         <div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-3">
             {{-- Filter Mata Pelajaran --}}
@@ -47,30 +47,47 @@
     </div>
 
     {{-- CARD 2: UNTUK TABEL DATA --}}
-    <div class="mt-6 bg-white rounded-lg shadow-md">
-
+    <div class="bg-white rounded-lg shadow-md">
         <div class="overflow-x-auto rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th scope="col" wire:click="sortBy('title')"
+                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                            Judul Materi
+                            @if ($sortBy === 'title')
+                                <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
+                            @endif
+                        </th>
+                        <th scope="col" wire:click="sortBy('subject_id')"
+                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                            Mata Pelajaran
+                            @if ($sortBy === 'subject_id')
+                                <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
+                            @endif
+                        </th>
+                        <th scope="col" wire:click="sortBy('chapter')"
+                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                            BAB
+                            @if ($sortBy === 'chapter')
+                                <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
+                            @endif
+                        </th>
                         <th scope="col"
                             class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                            Judul Materi</th>
+                            Pembuat
+                        </th>
+                        <th scope="col" wire:click="sortBy('is_published')"
+                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                            Status
+                            @if ($sortBy === 'is_published')
+                                <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
+                            @endif
+                        </th>
                         <th scope="col"
                             class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                            Mata Pelajaran</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                            BAB</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                            Pembuat</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                            Status</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                            File</th>
+                            File
+                        </th>
                         <th scope="col" class="relative px-6 py-3"><span class="sr-only">Aksi</span></th>
                     </tr>
                 </thead>
@@ -98,16 +115,25 @@
                                         class="inline-flex px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">Draft</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-sm text-blue-500 whitespace-nowrap">
-                                @if ($material->file_path)
-                                    <a href="{{ Storage::url($material->file_path) }}" target="_blank"
-                                        class="hover:underline">Lihat File</a>
-                                @elseif($material->youtube_url)
-                                    <a href="{{ $material->youtube_url }}" target="_blank" class="hover:underline">Lihat
-                                        Video</a>
-                                @else
-                                    -
-                                @endif
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center space-x-2 text-sm">
+                                    @if ($material->file_path)
+                                        <a href="{{ Storage::url($material->file_path) }}" target="_blank"
+                                            class="text-blue-500 hover:underline">
+                                            <i class="fa-solid fa-file"></i>
+                                            {{ $material->file_name }}
+                                        </a>
+                                        <button wire:click="download('{{ $material->id }}')"
+                                            class="text-blue-500 hover:underline">
+                                            <i class="fa-solid fa-download"></i>
+                                        </button>
+                                    @elseif($material->youtube_url)
+                                        <a href="{{ $material->youtube_url }}" target="_blank"
+                                            class="text-blue-500 hover:underline">Lihat Video</a>
+                                    @else
+                                        <span>-</span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
                                 <a href="{{ route('teacher.materials.edit', $material) }}" wire:navigate
@@ -129,7 +155,7 @@
         </div>
 
         {{-- Paginasi --}}
-        <div class="mt-4">
+        <div class="p-4">
             {{ $this->materials->links() }}
         </div>
     </div>
