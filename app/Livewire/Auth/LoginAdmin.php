@@ -28,7 +28,6 @@ class LoginAdmin extends Component
         $this->validate();
 
         if (!Auth::attempt(['username' => $this->username, 'password' => $this->password])) {
-            // 3. Panggil method dari Trait untuk menampilkan error
             return;
         }
 

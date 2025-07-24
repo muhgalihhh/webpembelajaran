@@ -87,7 +87,7 @@ class Register extends Component
         if ($assignedRole === 'siswa') {
             return redirect()->intended(route('student.index'))->with('success', 'Akun siswa Anda berhasil dibuat!');
         } elseif ($assignedRole === 'guru') {
-            return redirect()->intended(route('guru.index'))->with('success', 'Akun guru Anda berhasil dibuat!');
+            return redirect()->intended(route('teacher.index'))->with('success', 'Akun guru Anda berhasil dibuat!');
         }
     }
 

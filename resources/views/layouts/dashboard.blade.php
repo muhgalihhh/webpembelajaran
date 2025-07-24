@@ -13,40 +13,40 @@
 </head>
 
 <body class="font-sans bg-gray-100">
+
     <div x-data="{ sidebarCollapsed: false, mobileSidebarOpen: false }" @keydown.escape.window="mobileSidebarOpen = false" class="flex flex-col h-screen">
 
-        {{-- 1. Navbar di bagian paling atas --}}
+
         <x-ui.admin.navbar />
 
-        {{-- 2. Area di bawah Navbar --}}
-        <div class="flex flex-1 overflow-hidden">
-            {{-- Komponen Sidebar --}}
-            <x-ui.admin.sidebar-admin />
 
-            {{-- 3. Konten utama di sebelah Sidebar --}}
+        <div class="flex flex-1 overflow-hidden">
+
+            <x-ui.admin.sidebar-admin />
             <div class="flex flex-col flex-1">
                 <main class="flex-1 overflow-y-auto">
-                    {{-- Header Halaman (diisi dari setiap view) --}}
+
                     @if (isset($pageHeader))
                         <div class="p-4 bg-white border-b border-gray-200 shadow-sm sm:p-6">
                             {{ $pageHeader }}
                         </div>
                     @endif
 
-                    {{-- Konten Utama Halaman --}}
                     <div class="p-4 sm:p-6">
                         {{ $slot }}
                     </div>
                 </main>
 
-                {{-- Footer --}}
+
                 <footer class="p-4 text-sm font-bold text-center text-white bg-[#4A90E2]">
                     © 2025 MEDPEM-DIGITAL™ BY RAHMAT ALFAJRI
                 </footer>
             </div>
         </div>
     </div>
-
+    <x-ui.alert-popup />
+    <x-ui.globab-loading-indicator />
+    <x-ui.logout-confirmation />
     @livewireScripts
 </body>
 

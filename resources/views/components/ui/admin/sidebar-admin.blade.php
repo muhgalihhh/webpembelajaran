@@ -74,15 +74,4 @@
             </li>
         </ul>
     </nav>
-
-    {{-- Tombol Logout --}}
-    <div>
-        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-            title="Logout" class="flex items-center p-3 text-red-500 hover:bg-red-100"
-            :class="{ 'justify-center': sidebarCollapsed }">
-            <i class="w-6 text-center fa-solid fa-arrow-right-from-bracket"></i>
-            <span class="ml-3" x-show="!sidebarCollapsed">Logout</span>
-        </a>
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
-    </div>
 </aside>

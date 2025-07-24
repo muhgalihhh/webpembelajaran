@@ -1,13 +1,13 @@
 <div class="h-screen overflow-auto">
-    {{-- Bagian utama konten --}}
+
     <main class="relative flex items-center justify-center flex-grow px-6 py-8 md:py-12">
-        {{-- Div untuk logo latar belakang. Penting: posisinya di sini agar bisa diatur z-index di belakang konten. --}}
+
         <div class="bg-school-logo"></div>
 
         <div
             class="relative z-10 flex flex-col items-center justify-center w-full max-w-6xl lg:flex-row lg:items-center">
             <div class="flex flex-col items-center text-center lg:items-start lg:text-left lg:w-1/2 lg:pr-8">
-                <h1 class="text-2xl font-bold leading-tight text-gray-900  sm:text-3xl lg:text-4xl xl:text-5xl">
+                <h1 class="text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
                     HALOO BU {{ Auth::user()->name }}
                 </h1>
                 <h1 class="mb-4 text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
@@ -32,7 +32,7 @@
     </main>
 
     <section class="grid w-full grid-cols-1 gap-4 px-6 pb-6 mx-auto md:grid-cols-3 max-w-7xl">
-        {{-- Kartu Materi Lengkap --}}
+
         <a href=""
             class="flex flex-col items-center p-4 text-center bg-white shadow-md feature-card-link rounded-xl">
             <div class="bg-[#EBF3FF] rounded-full p-3 mb-3 icon-blue">

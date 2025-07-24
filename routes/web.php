@@ -1,6 +1,5 @@
 <?php
 
-use App\Livewire\Admin\CrudTable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -38,10 +37,11 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin', \App\Livewire\Admin\Index::class)->name('admin.index');
         Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
-        Route::get('/admin/teachers', CrudTable::class)->name('admin.manage-teachers');
-        Route::get('/admin/students', CrudTable::class)->name('admin.manage-students');
-        Route::get('/admin/classes', CrudTable::class)->name('admin.manage-classes');
-        Route::get('/admin/subjects', CrudTable::class)->name('admin.manage-subjects');
+        Route::get('/admin/teachers', \App\Livewire\Admin\ManageTeachers::class)->name('admin.manage-teachers');
+        Route::get('/admin/students', \App\Livewire\Admin\ManageStudents::class)->name('admin.manage-students');
+        Route::get('/admin/classes', \App\Livewire\Admin\ManageClasses::class)->name('admin.manage-classes');
+        Route::get('/manage-subjects', \App\Livewire\Admin\ManageSubjects::class)->name('admin.manage-subjects');
+
     });
 
     Route::post('/logout', function (Request $request) {
