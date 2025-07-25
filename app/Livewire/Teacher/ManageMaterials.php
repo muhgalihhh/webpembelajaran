@@ -55,9 +55,7 @@ class ManageMaterials extends Component
             ->paginate(10);
     }
 
-    /**
-     * Method untuk mengubah kolom sorting.
-     */
+
     public function sortBy(string $field): void
     {
         if ($this->sortBy === $field) {
@@ -70,12 +68,9 @@ class ManageMaterials extends Component
         $this->resetPage(); // Reset paginasi setelah sorting
     }
 
-    /**
-     * Konfirmasi sebelum menghapus materi.
-     */
     public function confirmDelete($materialId)
     {
-        // ... (logika konfirmasi hapus tetap sama)
+
         $material = Material::find($materialId);
 
         if (!$material || $material->user_id !== Auth::id()) {
@@ -85,6 +80,7 @@ class ManageMaterials extends Component
             ]);
             return;
         }
+
 
         $this->materialToDelete = $materialId;
         $this->confirmingDeletion = true;
@@ -116,12 +112,13 @@ class ManageMaterials extends Component
             Storage::disk('public')->delete($material->file_path);
         }
 
-        $material->delete();
-
         session()->flash('flash-message', [
             'message' => 'Materi berhasil dihapus.',
             'type' => 'success'
         ]);
+
+        $material->delete();
+
 
         $this->closeConfirmModal();
     }

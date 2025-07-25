@@ -39,7 +39,6 @@ class LoginAdmin extends Component
         }
         session()->regenerate();
 
-        // Flash
 
         session()->flash('success', 'Selamat datang, ' . $user->name . '!');
 
