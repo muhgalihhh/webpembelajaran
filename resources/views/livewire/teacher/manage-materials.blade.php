@@ -10,40 +10,27 @@
         </div>
     </x-slot:pageHeader>
 
-    {{-- CARD 1: UNTUK FILTER --}}
-    <div class="p-6 mb-6 bg-white rounded-lg shadow-md">
-        <h3 class="text-lg font-medium leading-6 text-gray-900">Filter Pencarian</h3>
-        <div class="grid grid-cols-1 gap-6 mt-4 md:grid-cols-3">
-            {{-- Filter Mata Pelajaran --}}
-            <div>
-                <label for="filterSubject" class="block text-sm font-medium text-gray-700">Mata Pelajaran</label>
-                <select id="filterSubject" wire:model.live="filterSubject"
-                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option value="">Semua Mata Pelajaran</option>
-                    @foreach ($this->subjects as $subject)
-                        <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                    @endforeach
-                </select>
-            </div>
+    {{-- Filter Container --}}
+    <div class="flex flex-col gap-4 mt-4 md:flex-row md:items-end">
 
-            {{-- Filter Status --}}
-            <div>
-                <label for="filterPublished" class="block text-sm font-medium text-gray-700">Status</label>
-                <select id="filterPublished" wire:model.live="filterPublished"
-                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option value="">Semua Status</option>
-                    <option value="1">Published</option>
-                    <option value="0">Draft</option>
-                </select>
-            </div>
-
-            {{-- Input Pencarian Judul --}}
-            <div>
-                <label for="search" class="block text-sm font-medium text-gray-700">Judul Materi</label>
-                <input id="search" type="text" wire:model.live.debounce.300ms="search" placeholder="Cari judul..."
-                    class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
+        {{-- Filter 1: Mata Pelajaran --}}
+        <div class="flex-1">
+            <x-form.select-group label="Mata Pelajaran" id="filterSubject" wireModel="filterSubject" :options="$this->subjects"
+                name="mata_pelajaran" />
         </div>
+
+        {{-- Filter 3: (Contoh lain) --}}
+        <div class="flex-1">
+            <x-form.select-group label="Status" id="filterStatus" wireModel="filterStatus" :options="['published' => 'Published', 'draft' => 'Draft']"
+                name="status" />
+        </div>
+
+        {{-- Input Pencarian --}}
+        <div class="flex-1">
+            <x-form.input-group type="text" id="search" wireModel="search" placeholder="Cari Judul Materi..."
+                label="Pencarian" icon="fa-solid fa-magnifying-glass" />
+        </div>
+
     </div>
 
     {{-- CARD 2: UNTUK TABEL DATA --}}
@@ -138,6 +125,8 @@
                             <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
                                 <a href="{{ route('teacher.materials.edit', $material) }}" wire:navigate
                                     class="text-indigo-600 hover:text-indigo-900">Edit</a>
+
+
                                 <button wire:click="confirmDelete({{ $material->id }})"
                                     class="ml-4 text-red-600 hover:text-red-900">
                                     Hapus</button>

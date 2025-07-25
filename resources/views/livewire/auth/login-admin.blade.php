@@ -12,21 +12,11 @@
 
     <form wire:submit="authenticate" class="mt-6">
         <x-form.input-group type="text" id="username" placeholder="Masukkan Username" wireModel="username"
-            icon="fa fa-user" required autofocus />
-        @error('username')
-            <span class="mt-1 text-sm text-red-500">{{ $message }}</span>
-        @enderror
+            icon="fa fa-user" autofocus />
+        <x-form.input-group type="password" id="password" placeholder="Masukkan Kata Sandi" wireModel="password"
+            icon="fa fa-lock" passwordToggle />
 
-        <x-form.input-group type="{{ $showPassword ? 'text' : 'password' }}" id="password"
-            placeholder="Masukkan Kata Sandi" wireModel="password" icon="fa fa-lock" required>
-            <button type="button" wire:click="togglePassword"
-                class="absolute text-gray-500 transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-700">
-                <i class="fa {{ $showPassword ? 'fa-eye-slash' : 'fa-eye' }}"></i>
-            </button>
-        </x-form.input-group>
-        @error('password')
-            <span class="mt-1 text-sm text-red-500">{{ $message }}</span>
-        @enderror
+
 
         <div class="flex justify-between mb-6 gap-x-3">
             <button type="submit"

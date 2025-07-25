@@ -41,7 +41,7 @@
     <x-ui.alert-popup />
     <x-ui.globab-loading-indicator />
     <x-ui.logout-confirmation />
-    <x-form.password-toggle />
+
 
     <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
 

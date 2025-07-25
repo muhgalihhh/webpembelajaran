@@ -72,6 +72,7 @@ class ManageMaterials extends Component
     {
 
         $material = Material::find($materialId);
+        dd($material);
 
         if (!$material || $material->user_id !== Auth::id()) {
             session()->flash('flash-message', [
@@ -123,18 +124,13 @@ class ManageMaterials extends Component
         $this->closeConfirmModal();
     }
 
-    /**
-     * Menutup modal konfirmasi hapus.
-     */
+
     public function closeConfirmModal()
     {
         $this->confirmingDeletion = false;
         $this->materialToDelete = null;
     }
 
-    /**
-     * Mengunduh file materi.
-     */
     public function download(int $materialId): ?StreamedResponse
     {
         $material = Material::find($materialId);

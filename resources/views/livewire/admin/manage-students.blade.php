@@ -109,52 +109,21 @@
     </div>
 
     <div class="mt-4">{{ $this->students->links() }}</div>
-
-    {{-- Modal Form --}}
     <x-ui.modal id="student-form-modal">
         <h2 class="text-2xl font-bold">{{ $isEditing ? 'Edit' : 'Tambah' }} Siswa</h2>
         <form wire:submit.prevent="save" class="mt-4 space-y-4">
-            <div><label>Nama Lengkap</label><input type="text" wire:model="name" class="w-full p-2 border rounded">
-                @error('name')
-                    <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
-            <div><label>Username</label><input type="text" wire:model="username" class="w-full p-2 border rounded">
-                @error('username')
-                    <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
-            <div><label>Email</label><input type="email" wire:model="email" class="w-full p-2 border rounded">
-                @error('email')
-                    <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
-            <div><label>Password {{ $isEditing ? '(Kosongkan jika tidak diubah)' : '' }}</label><input type="password"
-                    wire:model="password" class="w-full p-2 border rounded">
-                @error('password')
-                    <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
-            <div><label>Konfirmasi Password</label><input type="password" wire:model="password_confirmation"
-                    class="w-full p-2 border rounded"></div>
-            <div><label>Kelas</label>
-                <select wire:model="class_id" class="w-full p-2 border rounded">
-                    <option value="">Pilih Kelas</option>
-                    {{-- PERBAIKAN: Menggunakan $classes bukan $this->classes --}}
-                    @foreach ($classes as $class)
-                        <option value="{{ $class->id }}">{{ $class->name }}</option>
-                    @endforeach
-                </select>
-                @error('class_id')
-                    <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
-            <div><label>Status</label>
-                <select wire:model="status" class="w-full p-2 border rounded">
-                    <option value="active">Aktif</option>
-                    <option value="inactive">Nonaktif</option>
-                </select>
-            </div>
+            <x-form.input-group label="Nama" type="text" wireModel="name" id="name" name="name" />
+            <x-form.input-group label="Username" type="text" wireModel="username" id="username" name="username" />
+            <x-form.input-group label="Email" type="email" wireModel="email" id="email" name="email" />
+            <x-form.input-group label="Password" type="password" wireModel="password" id="password" passwordToggle
+                name="password" id="password" />
+            <x-form.input-group label="Konfirmasi Password" type="password" wireModel="password_confirmation"
+                passwordToggle name="password_confirmation" id="password_confirmation" />
+            <x-form.select-group label="Kelas" wireModel="class_id" id="class_id" name="class_id"
+                :options="$classes" optionValue="id" optionLabel="name" placeholder="Pilih Kelas" />
+            <x-form.select-group label="Status" wireModel="status" id="status" name="status"
+                :options="['active' => 'Aktif', 'inactive' => 'Nonaktif']" />
+
             <div class="flex justify-end pt-4 space-x-4">
                 <button type="button" @click="$dispatch('close-modal')"
                     class="px-4 py-2 font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
@@ -164,7 +133,6 @@
         </form>
     </x-ui.modal>
 
-    {{-- Modal Konfirmasi Delete --}}
     <x-ui.confirm-modal :show="$confirmingDeletion" title="Hapus Siswa" message="Anda yakin ingin menghapus data siswa ini?"
         wireConfirmAction="delete" wireCancelAction="closeConfirmModal" />
 </div>

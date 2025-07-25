@@ -1,5 +1,4 @@
 <div>
-
     <x-slot:pageHeader>
         <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
             <i class="text-xl fa-solid fa-bars"></i>
@@ -71,9 +70,7 @@
                                 <i class="mr-1 fa-solid fa-pencil-alt"></i>
                                 Edit</button>
                             <button wire:click="confirmDelete({{ $teacher->id }})"
-                                class="ml-4 text-red-600 hover:text-red-900">
-                                <i class="mr-1 fa-solid fa-trash"></i>
-                                Hapus</button>
+                                class="ml-4 text-red-600 hover:text-red-900">Hapus</button>
                         </td>
                     </tr>
                 @empty
@@ -84,20 +81,17 @@
             </tbody>
         </table>
     </div>
-
     <div class="mt-4">{{ $this->teachers->links() }}</div>
-
-    {{-- Modal Form --}}
     <x-ui.modal id="teacher-form-modal">
         <h2 class="text-2xl font-bold">{{ $isEditing ? 'Edit Guru' : 'Tambah Guru' }}</h2>
         <form wire:submit.prevent="save" class="mt-4 space-y-4">
-            <x-form.input-group label="Nama" type="text" wireModel="name" required />
-            <x-form.input-group label="Username" type="text" wireModel="username" required />
-            <x-form.input-group label="Email" type="email" wireModel="email" required />
-            <x-form.input-group label="Password" type="password" wireModel="password" :required="!$isEditing" />
+            <x-form.input-group label="Nama" type="text" wireModel="name" id="name" />
+            <x-form.input-group label="Username" type="text" wireModel="username" id="username" />
+            <x-form.input-group label="Email" type="email" wireModel="email" id="email" />
+            <x-form.input-group label="Password" type="password" wireModel="password" passwordToggle id="password" />
             <x-form.input-group label="Konfirmasi Password" type="password" wireModel="password_confirmation"
-                :required="!$isEditing" />
-            <x-form.select-group label="Status" wireModel="status" :options="[['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]" required name="status" />
+                passwordToggle id="password_confirmation" />
+            <x-form.select-group label="Status" wireModel="status" :options="['active' => 'Aktif', 'inactive' => 'Nonaktif']" name="status" />
             <div class="flex justify-end pt-4 space-x-4">
                 <button type="button" @click="$dispatch('close-modal')"
                     class="px-4 py-2 font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
@@ -106,7 +100,6 @@
             </div>
         </form>
     </x-ui.modal>
-
-    {{-- Modal Konfirmasi Delete --}}
-    <x-ui.confirm-modal :show="$confirmingDeletion" />
+    <x-ui.confirm-modal :show="$confirmingDeletion" title="Hapus Guru" message="Anda yakin ingin menghapus data Guru ini?"
+        wireConfirmAction="delete" wireCancelAction="closeConfirmModal" />
 </div>
