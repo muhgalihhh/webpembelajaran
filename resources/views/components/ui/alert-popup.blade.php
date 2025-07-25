@@ -11,7 +11,6 @@
     ];
 @endphp
 
-<!-- Alert untuk Livewire Event (realtime) -->
 <div x-data="{ show: false, message: '', type: 'success' }"
     x-on:{{ $on }}.window="
         console.log('Event received:', $event.detail);
@@ -52,7 +51,6 @@
     </div>
 </div>
 
-<!-- Alert untuk Session Flash Messages (setelah redirect) -->
 @if (session()->has('flash-message'))
     @php
         $flashData = session('flash-message');

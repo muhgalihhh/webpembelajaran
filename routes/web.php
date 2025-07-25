@@ -45,7 +45,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Rute untuk Siswa (contoh)
     Route::middleware(['auth', 'role:siswa'])->prefix('student')->name('student.')->group(function () {
-        // Route::get('/dashboard', StudentDashboard::class)->name('dashboard');
+
+        Route::get('/', \App\Livewire\Student\Index::class)->name('index');
+        Route::get('/dashboard', \App\Livewire\Student\Dashboard::class)->name('dashboard');
     });
 
 

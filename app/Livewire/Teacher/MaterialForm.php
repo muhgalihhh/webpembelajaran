@@ -120,22 +120,21 @@ class MaterialForm extends Component
 
             $message = $this->material->wasRecentlyCreated ? 'Materi berhasil ditambahkan.' : 'Materi berhasil diperbarui.';
 
-            // --- PERUBAHAN DARI SESSION KE DISPATCH ---
-            $this->dispatch('flash-message', [
+            // --- PERUBAHAN UTAMA: Gunakan session()->flash() ---
+            session()->flash('flash-message', [
                 'message' => $message,
                 'type' => 'success'
             ]);
 
-
+            // Redirect ke halaman daftar materi
             $this->redirectRoute('teacher.materials');
 
         } catch (\Exception $e) {
-
+            // Jika terjadi error, tampilkan pesan error
             $this->dispatch('flash-message', [
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
                 'type' => 'error'
             ]);
-
         }
     }
 

@@ -91,35 +91,13 @@
     <x-ui.modal id="teacher-form-modal">
         <h2 class="text-2xl font-bold">{{ $isEditing ? 'Edit Guru' : 'Tambah Guru' }}</h2>
         <form wire:submit.prevent="save" class="mt-4 space-y-4">
-            <div><label>Nama Lengkap</label><input type="text" wire:model="name" class="w-full p-2 border rounded">
-                @error('name')
-                    <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
-            <div><label>Username</label><input type="text" wire:model="username" class="w-full p-2 border rounded">
-                @error('username')
-                    <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
-            <div><label>Email</label><input type="email" wire:model="email" class="w-full p-2 border rounded">
-                @error('email')
-                    <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
-            <div><label>Password {{ $isEditing ? '(Kosongkan jika tidak diubah)' : '' }}</label><input type="password"
-                    wire:model="password" class="w-full p-2 border rounded">
-                @error('password')
-                    <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
-            <div><label>Konfirmasi Password</label><input type="password" wire:model="password_confirmation"
-                    class="w-full p-2 border rounded"></div>
-            <div><label>Status</label>
-                <select wire:model="status" class="w-full p-2 border rounded">
-                    <option value="active">Aktif</option>
-                    <option value="inactive">Nonaktif</option>
-                </select>
-            </div>
+            <x-form.input-group label="Nama" type="text" wireModel="name" required />
+            <x-form.input-group label="Username" type="text" wireModel="username" required />
+            <x-form.input-group label="Email" type="email" wireModel="email" required />
+            <x-form.input-group label="Password" type="password" wireModel="password" :required="!$isEditing" />
+            <x-form.input-group label="Konfirmasi Password" type="password" wireModel="password_confirmation"
+                :required="!$isEditing" />
+            <x-form.select-group label="Status" wireModel="status" :options="[['value' => 'active', 'label' => 'Aktif'], ['value' => 'inactive', 'label' => 'Nonaktif']]" required name="status" />
             <div class="flex justify-end pt-4 space-x-4">
                 <button type="button" @click="$dispatch('close-modal')"
                     class="px-4 py-2 font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>

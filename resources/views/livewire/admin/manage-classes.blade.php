@@ -61,17 +61,12 @@
 
     <div class="mt-4">{{ $this->classes->links() }}</div>
 
-    {{-- Modal Form --}}
+
     <x-ui.modal id="class-form-modal">
         <h2 class="text-2xl font-bold">{{ $isEditing ? 'Edit' : 'Tambah' }} Kelas</h2>
         <form wire:submit.prevent="save" class="mt-4 space-y-4">
-            <div>
-                <label for="name">Nama Kelas</label>
-                <input type="text" id="name" wire:model="name" class="w-full p-2 border rounded">
-                @error('name')
-                    <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
+            <x-form.input-group type="text" id="name" placeholder="Masukkan Nama Kelas" wireModel="name"
+                icon="fa-solid fa-chalkboard-teacher" required />
             <div>
                 <label for="description">Deskripsi (Opsional)</label>
                 <textarea id="description" wire:model="description" class="w-full p-2 border rounded" rows="3"></textarea>
@@ -88,7 +83,6 @@
         </form>
     </x-ui.modal>
 
-    {{-- Modal Konfirmasi Delete --}}
     <x-ui.confirm-modal :show="$confirmingDeletion" title="Hapus Kelas" message="Anda yakin ingin menghapus data kelas ini?"
         wireConfirmAction="delete" wireCancelAction="closeConfirmModal" />
 </div>

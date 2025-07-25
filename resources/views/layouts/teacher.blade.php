@@ -8,17 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
         integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdn.tiny.cloud/1/ts549a373wgru0rr8l21ho2j0dg7ssrr4bcebrftnk5d4oun/tinymce/8/tinymce.min.js"
-        referrerpolicy="origin" crossorigin="anonymous"></script>
     @livewireStyles
 </head>
 
 <body class="font-sans bg-gray-100">
     <div x-data="{ sidebarCollapsed: false, mobileSidebarOpen: false }" @keydown.escape.window="mobileSidebarOpen = false" class="flex flex-col h-screen">
-
         <x-ui.teacher.navbar />
-
         <div class="flex flex-1 overflow-hidden">
 
             <x-ui.teacher.sidebar-teacher />
@@ -44,6 +41,10 @@
     <x-ui.alert-popup />
     <x-ui.globab-loading-indicator />
     <x-ui.logout-confirmation />
+    <x-form.password-toggle />
+
+    <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
+
     @livewireScripts
 </body>
 
