@@ -20,8 +20,6 @@
 </head>
 
 <body>
-
-    {{-- **TAMBAHKAN BLOK KODE INI** --}}
     @if (session()->has('success'))
         <x-ui.alert-popup type="success" :message="session('success')" />
     @endif

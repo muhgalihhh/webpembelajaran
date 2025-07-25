@@ -1,6 +1,9 @@
 <?php
 
-use App\Livewire\Admin\CrudTable;
+use App\Livewire\Admin\ManageClasses;
+use App\Livewire\Admin\ManageStudents;
+use App\Livewire\Admin\ManageSubjects;
+use App\Livewire\Admin\ManageTeachers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -21,29 +24,30 @@ Route::middleware('guest.custom')->group(function () {
 Route::middleware(['auth'])->group(function () {
 
 
-
-    // Rute untuk Siswa (hanya bisa diakses oleh user dengan role 'siswa')
-    Route::middleware(['role:siswa'])->group(function () {
-        Route::get('/siswa', \App\Livewire\Student\Index::class)->name('student.index');
-        Route::get('/siswa/dashboard', \App\Livewire\Student\Dashboard::class)->name('student.dashboard');
-        Route::get('/siswa/materi', \App\Livewire\Student\Materi::class)->name('student.materi');
+    // Rute untuk Admin
+    Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('', \App\Livewire\Admin\Index::class)->name('index');
+        Route::get('/dashboard', \App\Livewire\Admin\Dashboard::class)->name('dashboard');
+        Route::get('/manage-teachers', ManageTeachers::class)->name('manage-teachers');
+        Route::get('/manage-students', ManageStudents::class)->name('manage-students');
+        Route::get('/manage-classes', ManageClasses::class)->name('manage-classes');
+        Route::get('/manage-subjects', ManageSubjects::class)->name('manage-subjects');
     });
 
-    // Rute untuk Guru (hanya bisa diakses oleh user dengan role 'guru')
-    Route::middleware(['role:guru'])->group(function () {
-        Route::get('/guru', \App\Livewire\Teacher\Index::class)->name('teacher.index');
-        Route::get('/guru/dashboard', \App\Livewire\Teacher\Dashboard::class)->name('teacher.dashboard');
+    // Rute untuk Guru
+    Route::middleware(['auth', 'role:guru'])->prefix('teacher')->name('teacher.')->group(function () {
+        Route::get('/', \App\Livewire\Teacher\Index::class)->name('index');
+        Route::get('/dashboard', \App\Livewire\Teacher\Dashboard::class)->name('dashboard');
+        Route::get('/materials', \App\Livewire\Teacher\ManageMaterials::class)->name('materials');
+        Route::get('/materials/create', \App\Livewire\Teacher\MaterialForm::class)->name('materials.create');
+        Route::get('/materials/{material}/edit', \App\Livewire\Teacher\MaterialForm::class)->name('materials.edit');
     });
 
-    // Rute untuk Admin (hanya bisa diakses oleh user dengan role 'admin')
-    Route::middleware(['role:admin'])->group(function () {
-        Route::get('/admin', \App\Livewire\Admin\Index::class)->name('admin.index');
-        Route::get('/admin/dashboard', \App\Livewire\Admin\Dashboard::class)->name('admin.dashboard');
-        Route::get('/admin/teachers', CrudTable::class)->name('admin.manage-teachers');
-        Route::get('/admin/students', CrudTable::class)->name('admin.manage-students');
-        Route::get('/admin/classes', CrudTable::class)->name('admin.manage-classes');
-        Route::get('/admin/subjects', CrudTable::class)->name('admin.manage-subjects');
+    // Rute untuk Siswa (contoh)
+    Route::middleware(['auth', 'role:siswa'])->prefix('student')->name('student.')->group(function () {
+        // Route::get('/dashboard', StudentDashboard::class)->name('dashboard');
     });
+
 
     Route::post('/logout', function (Request $request) {
         Auth::logout();

@@ -5,13 +5,13 @@ namespace App\Livewire\Admin;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use App\Models\User; // To count users
-use App\Models\Classes; // To count classes
-use App\Models\Subject; // To count subjects
-use App\Models\Quiz; // To count quizzes
-use App\Models\Task; // To count tasks
+use App\Models\User;
+use App\Models\Classes;
+use App\Models\Subject;
+use App\Models\Quiz;
+use App\Models\Task;
 
-#[Layout('layouts.dashboard')] // Use the new admin layout
+#[Layout('layouts.dashboard')]
 #[Title('Admin Dashboard - Metrics')]
 class Dashboard extends Component
 {

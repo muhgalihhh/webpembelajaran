@@ -1,6 +1,5 @@
 <div class="flex items-center">
-    {{-- Logo (Selalu Terlihat) --}}
-    <a href="{{ route('admin.index') }}" class="flex-shrink-0">
+    <a href="" class="flex-shrink-0">
         <img src="{{ asset('images/logo sd.png') }}" alt="Logo" class="h-10">
     </a>
 

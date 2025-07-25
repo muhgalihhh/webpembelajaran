@@ -22,7 +22,6 @@
     @if (session()->has('success'))
         <x-ui.alert-popup type="success" :message="session('success')" />
     @endif
-
     @if (session()->has('error'))
         <x-ui.alert-popup type="error" :message="session('error')" />
     @endif

@@ -9,7 +9,7 @@
         '-translate-x-full': !mobileSidebarOpen
     }">
 
-    {{-- Logo dan Tombol Collapse --}}
+
     <div class="flex items-center p-2 bg-blue-950" :class="sidebarCollapsed ? 'justify-center' : 'justify-between'">
         <div x-show="!sidebarCollapsed" class="flex flex-col items-start space-x-2 text-white">
             <div class="flex items-center mb-2 space-x-2">
@@ -27,7 +27,6 @@
         </button>
     </div>
 
-    {{-- Menu Navigasi --}}
     <nav class="flex-grow">
         <a href="{{ route('admin.dashboard') }}" wire:navigate title="Dashboard"
             class="flex items-center border border-black p-3 my-2 text-gray-700 {{ request()->routeIs('admin.dashboard') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
@@ -74,15 +73,4 @@
             </li>
         </ul>
     </nav>
-
-    {{-- Tombol Logout --}}
-    <div>
-        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-            title="Logout" class="flex items-center p-3 text-red-500 hover:bg-red-100"
-            :class="{ 'justify-center': sidebarCollapsed }">
-            <i class="w-6 text-center fa-solid fa-arrow-right-from-bracket"></i>
-            <span class="ml-3" x-show="!sidebarCollapsed">Logout</span>
-        </a>
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">@csrf</form>
-    </div>
 </aside>
