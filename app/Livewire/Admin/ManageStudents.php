@@ -41,11 +41,10 @@ class ManageStudents extends Component
     public $name, $username, $email, $password, $password_confirmation, $status;
     public $class_id; // Properti untuk kelas siswa
 
-    // Properti untuk state modal & data
     public $isEditing = false;
     public ?User $editingUser = null;
-    public $confirmingDeletion = false;
     public $itemToDeleteId = null;
+    // public $confirmingDeletion = false; // TIDAK DIGUNAKAN LAGI
 
     protected function rules()
     {
@@ -87,10 +86,7 @@ class ManageStudents extends Component
 
     public function render()
     {
-        return view('livewire.admin.manage-students', [
-            'students' => $this->students(),
-            'classes' => $this->availableClasses(),
-        ]);
+        return view('livewire.admin.manage-students');
     }
 
     public function sortBy($field)
@@ -156,20 +152,19 @@ class ManageStudents extends Component
     public function confirmDelete($id)
     {
         $this->itemToDeleteId = $id;
-        $this->confirmingDeletion = true;
-    }
-
-    public function closeConfirmModal()
-    {
-        $this->confirmingDeletion = false;
-        $this->itemToDeleteId = null;
+        // Kirim event untuk membuka modal konfirmasi
+        $this->dispatch('open-confirm-modal');
     }
 
     public function delete()
     {
-        User::findOrFail($this->itemToDeleteId)->delete();
-        $this->dispatch('flash-message', message: 'Data siswa berhasil dihapus.', type: 'success');
-        $this->closeConfirmModal();
+        if ($this->itemToDeleteId) {
+            User::findOrFail($this->itemToDeleteId)->delete();
+            $this->dispatch('flash-message', message: 'Data siswa berhasil dihapus.', type: 'success');
+        }
+        // Kirim event untuk menutup modal
+        $this->dispatch('close-confirm-modal');
+        $this->itemToDeleteId = null;
         $this->resetPage();
     }
 }

@@ -11,16 +11,13 @@
     <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
         <div class="flex flex-col justify-between space-y-4 md:flex-row md:space-y-0">
             <div class="w-full md:w-1/3">
-                <label for="search" class="block text-sm font-medium text-gray-700">Pencarian</label>
-                <input wire:model.live.debounce.300ms="search" id="search" type="search"
-                    placeholder="Cari nama kelas..."
-                    class="w-full px-3 py-2 mt-1 bg-white border-gray-300 rounded-md shadow-sm">
+                <x-form.input-group type="search" id="search" placeholder="Cari nama kelas..." wireModel="search"
+                    icon="fa-solid fa-search" label="Pencarian Kelas" />
             </div>
             <div class="flex items-end">
-                <button wire:click="create"
-                    class="px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-                    <i class="mr-2 fa-solid fa-plus"></i> Tambah Kelas
-                </button>
+                <x-form.button type="button" variant="primary" icon="fa-solid fa-plus" wireClick="create">
+                    Tambah Kelas
+                </x-form.button>
             </div>
         </div>
     </div>
@@ -61,19 +58,16 @@
 
     <div class="mt-4">{{ $this->classes->links() }}</div>
 
+    <x-ui.confirm-modal title="Hapus Kelas" message="Anda yakin ingin menghapus data kelas ini?"
+        wireConfirmAction="delete" />
 
     <x-ui.modal id="class-form-modal">
         <h2 class="text-2xl font-bold">{{ $isEditing ? 'Edit' : 'Tambah' }} Kelas</h2>
         <form wire:submit.prevent="save" class="mt-4 space-y-4">
             <x-form.input-group type="text" id="name" placeholder="Masukkan Nama Kelas" wireModel="name"
                 icon="fa-solid fa-chalkboard-teacher" required />
-            <div>
-                <label for="description">Deskripsi (Opsional)</label>
-                <textarea id="description" wire:model="description" class="w-full p-2 border rounded" rows="3"></textarea>
-                @error('description')
-                    <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
+            <x-form.textarea-group label="Deskripsi" name="description" wireModel="description"
+                placeholder="Masukkan Deskripsi Kelas" rows="3" />
             <div class="flex justify-end pt-4 space-x-4">
                 <button type="button" @click="$dispatch('close-modal')"
                     class="px-4 py-2 font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
@@ -82,7 +76,4 @@
             </div>
         </form>
     </x-ui.modal>
-
-    <x-ui.confirm-modal :show="$confirmingDeletion" title="Hapus Kelas" message="Anda yakin ingin menghapus data kelas ini?"
-        wireConfirmAction="delete" wireCancelAction="closeConfirmModal" />
 </div>

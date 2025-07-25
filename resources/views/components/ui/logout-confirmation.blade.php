@@ -3,7 +3,7 @@
     x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
     class="fixed inset-0 z-[9999] flex items-center justify-center">
 
-    {{-- Background Overlay Transparan - Menggunakan style inline sebagai fallback --}}
+
     <div class="absolute inset-0 bg-black bg-opacity-50" style="background-color: rgba(0, 0, 0, 0.5);"
         @click="show = false"></div>
     <div x-show="show" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95"

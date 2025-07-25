@@ -35,7 +35,6 @@ class ManageClasses extends Component
     // Properti untuk state modal & data
     public $isEditing = false;
     public ?Classes $editingClass = null;
-    public $confirmingDeletion = false;
     public $itemToDeleteId = null;
 
     protected function rules()
@@ -57,9 +56,7 @@ class ManageClasses extends Component
 
     public function render()
     {
-        return view('livewire.admin.manage-classes', [
-            'classes' => $this->classes(),
-        ]);
+        return view('livewire.admin.manage-classes');
     }
 
     public function sortBy($field)
@@ -114,20 +111,18 @@ class ManageClasses extends Component
     public function confirmDelete($id)
     {
         $this->itemToDeleteId = $id;
-        $this->confirmingDeletion = true;
-    }
-
-    public function closeConfirmModal()
-    {
-        $this->confirmingDeletion = false;
-        $this->itemToDeleteId = null;
+        $this->dispatch('open-confirm-modal');
     }
 
     public function delete()
     {
-        Classes::findOrFail($this->itemToDeleteId)->delete();
-        $this->dispatch('flash-message', message: 'Data kelas berhasil dihapus.', type: 'success');
-        $this->closeConfirmModal();
+        if ($this->itemToDeleteId) {
+            Classes::findOrFail($this->itemToDeleteId)->delete();
+            $this->dispatch('flash-message', message: 'Data kelas berhasil dihapus.', type: 'success');
+        }
+
+        $this->dispatch('close-confirm-modal');
+        $this->itemToDeleteId = null;
         $this->resetPage();
     }
 }

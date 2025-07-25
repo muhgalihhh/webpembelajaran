@@ -1,5 +1,4 @@
 <div>
-    {{-- Header Halaman --}}
     <x-slot:pageHeader>
         <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
             <i class="text-xl fa-solid fa-bars"></i>
@@ -7,58 +6,21 @@
         <h2 class="text-2xl font-bold text-gray-800">Manajemen Siswa</h2>
     </x-slot:pageHeader>
 
-    {{-- Area Filter dan Tombol Aksi --}}
+    {{-- Filter Section --}}
     <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-            <div class="md:col-span-1">
-                <label for="search" class="block text-sm font-medium text-gray-700">Pencarian</label>
-                <input wire:model.live.debounce.300ms="search" id="search" type="search"
-                    placeholder="Cari nama atau email..."
-                    class="w-full px-3 py-2 mt-1 bg-white border-gray-300 rounded-md shadow-sm">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div>
+                <x-form.input-group type="search" id="search" placeholder="Cari nama atau email..." wireModel="search"
+                    icon="fa-solid fa-search" label="Pencarian Siswa" />
             </div>
-            <div class="md:col-span-1">
-                <label for="class_filter" class="block text-sm font-medium text-gray-700">Filter Kelas</label>
-                <div class="relative mt-1">
-                    <select wire:model.live="class_filter" id="class_filter"
-                        class="block w-full px-3 py-2 pr-10 text-base bg-white border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Semua Kelas</option>
-                        {{-- PERBAIKAN: Menggunakan $classes bukan $this->classes --}}
-                        @foreach ($classes as $class)
-                            <option value="{{ $class->id }}">{{ $class->name }}</option>
-                        @endforeach
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 pointer-events-none">
-                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M10 3a.75.75 0 01.53.22l3.5 3.5a.75.75 0 01-1.06 1.06L10 4.81 6.53 8.28a.75.75 0 01-1.06-1.06l3.5-3.5A.75.75 0 0110 3zm-3.72 9.28a.75.75 0 011.06 0L10 15.19l2.67-2.91a.75.75 0 111.06 1.06l-3.5 3.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 010-1.06z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                </div>
+            <div>
+                <x-form.select-group label="Filter Kelas" name="class_id" wireModel="class_id" :options="$this->availableClasses"
+                    placeholder="Semua Kelas" />
             </div>
-            <div class="md:col-span-1">
-                <label for="status_filter" class="block text-sm font-medium text-gray-700">Filter Status</label>
-                <div class="relative mt-1">
-                    <select wire:model.live="status_filter" id="status_filter"
-                        class="block w-full px-3 py-2 pr-10 text-base bg-white border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="all">Semua Status</option>
-                        <option value="active">Aktif</option>
-                        <option value="inactive">Nonaktif</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center px-2 text-gray-500 pointer-events-none">
-                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M10 3a.75.75 0 01.53.22l3.5 3.5a.75.75 0 01-1.06 1.06L10 4.81 6.53 8.28a.75.75 0 01-1.06-1.06l3.5-3.5A.75.75 0 0110 3zm-3.72 9.28a.75.75 0 011.06 0L10 15.19l2.67-2.91a.75.75 0 111.06 1.06l-3.5 3.5a.75.75 0 01-1.06 0l-3.5-3.5a.75.75 0 010-1.06z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-            <div class="flex items-end justify-end md:col-span-1">
-                <button wire:click="create"
-                    class="px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-                    <i class="mr-2 fa-solid fa-plus"></i> Tambah Siswa
-                </button>
+            <div class="flex items-end justify-end ">
+                <x-form.button type="button" variant="primary" icon="fa-solid fa-plus" wireClick="create">
+                    Tambah Siswa
+                </x-form.button>
             </div>
         </div>
     </div>
@@ -89,8 +51,11 @@
                         <td class="px-6 py-4 whitespace-nowrap">{{ $student->name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $student->email }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $student->class->name ?? 'N/A' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap"><span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $student->status == 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">{{ ucfirst($student->status) }}</span>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $student->status == 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                {{ ucfirst($student->status) }}
+                            </span>
                         </td>
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                             <button wire:click="edit({{ $student->id }})"
@@ -109,20 +74,22 @@
     </div>
 
     <div class="mt-4">{{ $this->students->links() }}</div>
+
+    <x-ui.confirm-modal title="Hapus Siswa" message="Anda yakin ingin menghapus data siswa ini?"
+        wireConfirmAction="delete" />
+
     <x-ui.modal id="student-form-modal">
         <h2 class="text-2xl font-bold">{{ $isEditing ? 'Edit' : 'Tambah' }} Siswa</h2>
         <form wire:submit.prevent="save" class="mt-4 space-y-4">
-            <x-form.input-group label="Nama" type="text" wireModel="name" id="name" name="name" />
-            <x-form.input-group label="Username" type="text" wireModel="username" id="username" name="username" />
-            <x-form.input-group label="Email" type="email" wireModel="email" id="email" name="email" />
-            <x-form.input-group label="Password" type="password" wireModel="password" id="password" passwordToggle
-                name="password" id="password" />
+            <x-form.input-group label="Nama" type="text" wireModel="name" id="name" />
+            <x-form.input-group label="Username" type="text" wireModel="username" id="username" />
+            <x-form.input-group label="Email" type="email" wireModel="email" id="email" />
+            <x-form.select-group label="Kelas" name="class_id" wireModel="class_id" :options="$this->availableClasses" />
+            <x-form.input-group label="Password" type="password" wireModel="password" id="password" :required="!$isEditing"
+                passwordToggle />
             <x-form.input-group label="Konfirmasi Password" type="password" wireModel="password_confirmation"
-                passwordToggle name="password_confirmation" id="password_confirmation" />
-            <x-form.select-group label="Kelas" wireModel="class_id" id="class_id" name="class_id"
-                :options="$classes" optionValue="id" optionLabel="name" placeholder="Pilih Kelas" />
-            <x-form.select-group label="Status" wireModel="status" id="status" name="status"
-                :options="['active' => 'Aktif', 'inactive' => 'Nonaktif']" />
+                id="password_confirmation" passwordToggle :required="!$isEditing" />
+            <x-form.select-group label="Status" name="status" wireModel="status" :options="['active' => 'Aktif', 'inactive' => 'Nonaktif']" />
 
             <div class="flex justify-end pt-4 space-x-4">
                 <button type="button" @click="$dispatch('close-modal')"
@@ -133,6 +100,4 @@
         </form>
     </x-ui.modal>
 
-    <x-ui.confirm-modal :show="$confirmingDeletion" title="Hapus Siswa" message="Anda yakin ingin menghapus data siswa ini?"
-        wireConfirmAction="delete" wireCancelAction="closeConfirmModal" />
 </div>

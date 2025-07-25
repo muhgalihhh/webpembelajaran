@@ -1,6 +1,6 @@
 @props(['label', 'name', 'wireModel', 'options', 'error' => '', 'required' => false])
 
-<div class="mb-4">
+<div>
     <label for="{{ $name }}" class="block text-sm font-medium text-gray-700">
         {{ $label }}
         @if ($required)

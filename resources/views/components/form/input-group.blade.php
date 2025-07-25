@@ -8,7 +8,7 @@
     'passwordToggle' => false,
 ])
 
-<div class="mb-5">
+<div>
     @if ($label)
         <label for="{{ $id }}" class="mr-3 text-sm font-medium text-gray-700">{{ $label }}</label>
     @endif
