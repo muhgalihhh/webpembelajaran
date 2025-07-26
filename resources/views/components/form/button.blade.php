@@ -3,6 +3,7 @@
     'variant' => 'primary',
     'icon' => '',
     'wireClick' => '',
+    'name' => '',
 ])
 
 @php

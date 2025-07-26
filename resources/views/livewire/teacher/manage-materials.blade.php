@@ -1,154 +1,111 @@
 <div>
     <x-slot:pageHeader>
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <h2 class="text-2xl font-bold text-gray-800">Manajemen Materi Pembelajaran</h2>
-            <a href="{{ route('teacher.materials.create') }}" wire:navigate
-                class="flex items-center justify-center w-full px-4 py-2 mt-2 text-sm font-medium text-white bg-blue-600 rounded-md shadow-sm sm:w-auto sm:mt-0 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                <i class="mr-2 fa-solid fa-plus"></i>
-                Tambah Materi Baru
-            </a>
-        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Manajemen Materi Pembelajaran</h2>
     </x-slot:pageHeader>
 
-    {{-- Filter Container --}}
-    <div class="flex flex-col gap-4 mt-4 md:flex-row md:items-end">
-
-        {{-- Filter 1: Mata Pelajaran --}}
-        <div class="flex-1">
-            <x-form.select-group label="Mata Pelajaran" id="filterSubject" wireModel="filterSubject" :options="$this->subjects"
-                name="mata_pelajaran" />
+    {{-- Area Filter dan Tombol Aksi --}}
+    <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
+        <div class="grid items-end grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <x-form.input-group label="Pencarian Materi" type="search" wireModel="search" id="search"
+                placeholder="Cari judul materi..." />
+            <x-form.select-group label="Filter Mata Pelajaran" name="filterSubject" wireModel="filterSubject"
+                :options="$this->subjects" />
+            <x-form.select-group label="Filter Kelas" name="filterClass" wireModel="filterClass" :options="$this->classes"
+                optionLabel="class" />
+            <x-form.select-group label="Filter Status" name="filterPublished" wireModel="filterPublished"
+                :options="['' => 'Semua Status', '1' => 'Published', '0' => 'Draft']" />
+            <div class="lg:col-start-4">
+                <a href="{{ route('teacher.materials.create') }}" wire:navigate
+                    class="inline-flex items-center justify-center w-full px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                    <i class="mr-2 fa-solid fa-plus"></i> Tambah Materi
+                </a>
+            </div>
         </div>
-
-        {{-- Filter 3: (Contoh lain) --}}
-        <div class="flex-1">
-            <x-form.select-group label="Status" id="filterStatus" wireModel="filterStatus" :options="['published' => 'Published', 'draft' => 'Draft']"
-                name="status" />
-        </div>
-
-        {{-- Input Pencarian --}}
-        <div class="flex-1">
-            <x-form.input-group type="text" id="search" wireModel="search" placeholder="Cari Judul Materi..."
-                label="Pencarian" icon="fa-solid fa-magnifying-glass" />
-        </div>
-
     </div>
 
-    {{-- CARD 2: UNTUK TABEL DATA --}}
-    <div class="bg-white rounded-lg shadow-md">
-        <div class="overflow-x-auto rounded-lg">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col" wire:click="sortBy('title')"
-                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
-                            Judul Materi
-                            @if ($sortBy === 'title')
-                                <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
+    {{-- Tabel Data Materi --}}
+    <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th wire:click="sortBy('title')"
+                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                        Judul
+                        @if ($sortBy === 'title')
+                            <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
+                        @endif
+                    </th>
+                    <th wire:click="sortBy('subject_id')"
+                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                        Mapel
+                        @if ($sortBy === 'subject_id')
+                            <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
+                        @endif
+                    </th>
+                    <th wire:click="sortBy('class_id')"
+                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                        Kelas
+                        @if ($sortBy === 'class_id')
+                            <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
+                        @endif
+                    </th>
+                    <th wire:click="sortBy('is_published')"
+                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                        Status
+                        @if ($sortBy === 'is_published')
+                            <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
+                        @endif
+                    </th>
+                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @forelse ($this->materials as $material)
+                    <tr class="hover:bg-gray-100">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ $material->title }}</div>
+                            <div class="text-sm text-gray-500">{{ Str::limit($material->description, 50) }}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                            {{ $material->subject?->name ?? 'N/A' }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                            {{ $material->class?->class ?? 'N/A' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $material->is_published ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                {{ $material->is_published ? 'Published' : 'Draft' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
+                            <button wire:click="view({{ $material->id }})"
+                                class="text-green-600 hover:text-green-900">Lihat</button>
+                            <a href="{{ route('teacher.materials.edit', $material) }}" wire:navigate
+                                class="ml-4 text-indigo-600 hover:text-indigo-900">Edit</a>
+                            <button wire:click="confirmDelete({{ $material->id }})"
+                                class="ml-4 text-red-600 hover:text-red-900">Hapus</button>
+                            @if ($material->file_path)
+                                <button wire:click="download({{ $material->id }})"
+                                    class="ml-4 text-blue-600 hover:text-blue-900">Download</button>
                             @endif
-                        </th>
-                        <th scope="col" wire:click="sortBy('subject_id')"
-                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
-                            Mata Pelajaran
-                            @if ($sortBy === 'subject_id')
-                                <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
-                            @endif
-                        </th>
-                        <th scope="col" wire:click="sortBy('chapter')"
-                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
-                            BAB
-                            @if ($sortBy === 'chapter')
-                                <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
-                            @endif
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                            Pembuat
-                        </th>
-                        <th scope="col" wire:click="sortBy('is_published')"
-                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
-                            Status
-                            @if ($sortBy === 'is_published')
-                                <i class="fa-solid fa-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
-                            @endif
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                            File
-                        </th>
-                        <th scope="col" class="relative px-6 py-3"><span class="sr-only">Aksi</span></th>
+                        </td>
                     </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse ($this->materials as $material)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ $material->title }}</div>
-                                <div class="text-sm text-gray-500">{{ Str::limit($material->description, 50) }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                {{ $material->subject?->name ?? 'Mapel Dihapus' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                {{ $material->chapter ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                                {{ $material->uploader?->name ?? 'User Dihapus' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @if ($material->is_published)
-                                    <span
-                                        class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">Published</span>
-                                @else
-                                    <span
-                                        class="inline-flex px-2 text-xs font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">Draft</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center space-x-2 text-sm">
-                                    @if ($material->file_path)
-                                        <a href="{{ Storage::url($material->file_path) }}" target="_blank"
-                                            class="text-blue-500 hover:underline">
-                                            <i class="fa-solid fa-file"></i>
-                                            {{ $material->file_name }}
-                                        </a>
-                                        <button wire:click="download('{{ $material->id }}')"
-                                            class="text-blue-500 hover:underline">
-                                            <i class="fa-solid fa-download"></i>
-                                        </button>
-                                    @elseif($material->youtube_url)
-                                        <a href="{{ $material->youtube_url }}" target="_blank"
-                                            class="text-blue-500 hover:underline">Lihat Video</a>
-                                    @else
-                                        <span>-</span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm font-medium text-right whitespace-nowrap">
-                                <a href="{{ route('teacher.materials.edit', $material) }}" wire:navigate
-                                    class="text-indigo-600 hover:text-indigo-900">Edit</a>
-
-
-                                <button wire:click="confirmDelete({{ $material->id }})"
-                                    class="ml-4 text-red-600 hover:text-red-900">
-                                    Hapus</button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="py-4 text-center text-gray-500">
-                                Tidak ada materi yang ditemukan.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        {{-- Paginasi --}}
-        <div class="p-4">
-            {{ $this->materials->links() }}
-        </div>
+                @empty
+                    <tr>
+                        <td colspan="5" class="py-4 text-center text-gray-500">Tidak ada materi ditemukan.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
-    <x-ui.confirm-modal :show="$confirmingDeletion" title="Hapus Materi Pembelajaran"
-        message="Anda yakin ingin menghapus materi pembelajaran ini? File yang terlampir juga akan ikut terhapus."
-        wireConfirmAction="delete" wireCancelAction="closeConfirmModal" />
+
+    <div class="mt-4">{{ $this->materials->links() }}</div>
+
+    {{-- Modal Konfirmasi Delete --}}
+    <x-ui.confirm-modal title="Hapus Materi"
+        message="Anda yakin ingin menghapus materi ini? File yang terlampir juga akan dihapus."
+        wireConfirmAction="delete" />
+
+    {{-- Pemanggilan komponen modal preview --}}
+    <x-ui.teacher.material-preview-modal :title="$viewingMaterial?->title" :description="$viewingMaterial?->description" :content="$viewingMaterial?->content" :subject="$viewingMaterial?->subject?->name"
+        :class="$viewingMaterial?->class?->class" />
 </div>

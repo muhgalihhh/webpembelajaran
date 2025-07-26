@@ -17,31 +17,32 @@ class ManageClasses extends Component
 {
     use WithPagination;
 
-    // Properti untuk state & filter
     #[Url(as: 'q', history: true)]
     public $search = '';
-
     #[Url(history: true)]
-    public $sortBy = 'name';
-
+    public $sortBy = 'class'; // Default sort by 'class'
     #[Url(history: true)]
     public $sortDirection = 'asc';
-
     public $perPage = 10;
 
-    // Properti Form
-    public $name, $description;
+    // Properti Form disederhanakan
+    public $class;
+    public $description;
 
-    // Properti untuk state modal & data
     public $isEditing = false;
     public ?Classes $editingClass = null;
     public $itemToDeleteId = null;
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
     protected function rules()
     {
-        $classId = $this->editingClass?->id;
+        $classId = $this->editingClass ? $this->editingClass->id : null;
         return [
-            'name' => ['required', 'string', 'max:255', Rule::unique('classes')->ignore($classId)],
+            'class' => ['required', 'string', 'max:10', Rule::unique('classes')->ignore($classId)],
             'description' => 'nullable|string',
         ];
     }
@@ -49,7 +50,7 @@ class ManageClasses extends Component
     #[Computed]
     public function classes()
     {
-        return Classes::where('name', 'like', '%' . $this->search . '%')
+        return Classes::where('class', 'like', '%' . $this->search . '%')
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->perPage);
     }
@@ -71,7 +72,7 @@ class ManageClasses extends Component
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingClass', 'name', 'description']);
+        $this->reset(['isEditing', 'editingClass', 'class', 'description']);
         $this->resetValidation();
     }
 
@@ -84,10 +85,9 @@ class ManageClasses extends Component
 
     public function edit(Classes $class)
     {
-        usleep(500000); // Simulasi loading
         $this->isEditing = true;
         $this->editingClass = $class;
-        $this->name = $class->name;
+        $this->class = $class->class;
         $this->description = $class->description;
         $this->dispatch('open-modal', id: 'class-form-modal');
     }
@@ -95,7 +95,6 @@ class ManageClasses extends Component
     public function save()
     {
         $validatedData = $this->validate();
-
         if ($this->isEditing) {
             $this->editingClass->update($validatedData);
             $message = 'Data kelas berhasil diperbarui.';
@@ -103,7 +102,6 @@ class ManageClasses extends Component
             Classes::create($validatedData);
             $message = 'Data kelas berhasil ditambahkan.';
         }
-
         $this->dispatch('flash-message', message: $message, type: 'success');
         $this->dispatch('close-modal');
     }
@@ -120,7 +118,6 @@ class ManageClasses extends Component
             Classes::findOrFail($this->itemToDeleteId)->delete();
             $this->dispatch('flash-message', message: 'Data kelas berhasil dihapus.', type: 'success');
         }
-
         $this->dispatch('close-confirm-modal');
         $this->itemToDeleteId = null;
         $this->resetPage();

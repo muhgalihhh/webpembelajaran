@@ -18,32 +18,36 @@ class ManageTeachers extends Component
 {
     use WithPagination;
 
-    // Properti untuk state & filter, disinkronkan dengan URL
+    // Properti untuk state & filter
     #[Url(as: 'q', history: true)]
     public $search = '';
-
     #[Url(history: true)]
     public $status_filter = 'all';
-
     #[Url(history: true)]
     public $sortBy = 'name';
-
     #[Url(history: true)]
     public $sortDirection = 'asc';
-
     public $perPage = 10;
 
-    // Properti untuk Form
-    public $name, $username, $email, $password, $password_confirmation, $status;
+    // Properti Form
+    public $name, $username, $email, $phone_number, $password, $password_confirmation, $status;
 
-    // Properti untuk state modal & data yang sedang diolah
+    // Properti untuk state modal & data
     public $isEditing = false;
     public ?User $editingUser = null;
+    public ?User $viewingUser = null;
     public $itemToDeleteId = null;
 
-    /**
-     * Aturan validasi dinamis.
-     */
+    // Lifecycle hooks untuk reset paginasi
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+    public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
+
     protected function rules()
     {
         $userId = $this->editingUser?->id;
@@ -51,35 +55,30 @@ class ManageTeachers extends Component
             'name' => 'required|string|max:255',
             'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($userId)],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($userId)],
+            'phone_number' => ['nullable', 'string', 'max:20', Rule::unique('users')->ignore($userId)],
             'password' => $this->isEditing ? 'nullable|min:8|same:password_confirmation' : 'required|min:8|same:password_confirmation',
             'status' => 'required|in:active,inactive',
         ];
     }
 
-    /**
-     * Mengambil data guru dengan caching per request.
-     */
     #[Computed]
     public function teachers()
     {
         return User::role('guru')
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%');
+                    ->orWhere('email', 'like', '%' . $this->search . '%')
+                    ->orWhere('phone_number', 'like', '%' . $this->search . '%');
             })
-            ->when($this->status_filter !== 'all', function ($query) {
-                $query->where('status', $this->status_filter);
-            })
+            ->when($this->status_filter !== 'all', fn($q) => $q->where('status', $this->status_filter))
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->perPage);
     }
-
 
     public function render()
     {
         return view('livewire.admin.manage-teachers');
     }
-
 
     public function sortBy($field)
     {
@@ -90,12 +89,12 @@ class ManageTeachers extends Component
         }
         $this->sortBy = $field;
     }
+
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingUser', 'name', 'username', 'email', 'password', 'password_confirmation', 'status']);
+        $this->reset(['isEditing', 'editingUser', 'name', 'username', 'email', 'phone_number', 'password', 'password_confirmation', 'status']);
         $this->resetValidation();
     }
-
 
     public function create()
     {
@@ -105,17 +104,15 @@ class ManageTeachers extends Component
         $this->dispatch('open-modal', id: 'teacher-form-modal');
     }
 
-
     public function edit(User $user)
     {
-
         $this->isEditing = true;
         $this->editingUser = $user;
         $this->name = $user->name;
         $this->username = $user->username;
         $this->email = $user->email;
+        $this->phone_number = $user->phone_number;
         $this->status = $user->status;
-
         $this->dispatch('open-modal', id: 'teacher-form-modal');
     }
 
@@ -145,7 +142,6 @@ class ManageTeachers extends Component
     public function confirmDelete($id)
     {
         $this->itemToDeleteId = $id;
-        // Kirim event ke browser untuk membuka modal konfirmasi
         $this->dispatch('open-confirm-modal');
     }
 
@@ -155,9 +151,14 @@ class ManageTeachers extends Component
             User::findOrFail($this->itemToDeleteId)->delete();
             $this->dispatch('flash-message', message: 'Data guru berhasil dihapus.', type: 'success');
         }
-
         $this->dispatch('close-confirm-modal');
         $this->itemToDeleteId = null;
         $this->resetPage();
+    }
+
+    public function view(User $user)
+    {
+        $this->viewingUser = $user;
+        $this->dispatch('open-user-detail-modal');
     }
 }

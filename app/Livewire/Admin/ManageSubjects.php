@@ -39,8 +39,19 @@ class ManageSubjects extends Component
     // Properti untuk state modal & data
     public $isEditing = false;
     public ?Subject $editingSubject = null;
-    public $confirmingDeletion = false;
     public $itemToDeleteId = null;
+
+    // --- PERBAIKAN: Lifecycle Hooks untuk Reset Paginasi ---
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
+    // --- AKHIR PERBAIKAN ---
 
     protected function rules()
     {
@@ -65,9 +76,7 @@ class ManageSubjects extends Component
 
     public function render()
     {
-        return view('livewire.admin.manage-subjects', [
-            'subjects' => $this->subjects(),
-        ]);
+        return view('livewire.admin.manage-subjects');
     }
 
     public function sortBy($field)
@@ -124,20 +133,18 @@ class ManageSubjects extends Component
     public function confirmDelete($id)
     {
         $this->itemToDeleteId = $id;
-        $this->confirmingDeletion = true;
-    }
-
-    public function closeConfirmModal()
-    {
-        $this->confirmingDeletion = false;
-        $this->itemToDeleteId = null;
+        $this->dispatch('open-confirm-modal');
     }
 
     public function delete()
     {
-        Subject::findOrFail($this->itemToDeleteId)->delete();
-        $this->dispatch('flash-message', message: 'Data mata pelajaran berhasil dihapus.', type: 'success');
-        $this->closeConfirmModal();
+        if ($this->itemToDeleteId) {
+            Subject::findOrFail($this->itemToDeleteId)->delete();
+            $this->dispatch('flash-message', message: 'Data mata pelajaran berhasil dihapus.', type: 'success');
+        }
+
+        $this->dispatch('close-confirm-modal');
+        $this->itemToDeleteId = null;
         $this->resetPage();
     }
 }

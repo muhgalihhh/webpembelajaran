@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->foreignId('class_id')->nullable()->constrained('classes')->onDelete('set null'); // Hanya untuk siswa
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->string('profile_picture')->nullable();
-            // Spatie HasRoles trait akan mengelola role_id melalui tabel pivot
+            $table->string('phone_number')->nullable();
         });
     }
 

@@ -25,6 +25,7 @@ class User extends Authenticatable
         'class_id', // Nullable, jadi bisa diisi jika siswa
         'status',
         'profile_picture',
+        'phone_number',
     ];
 
     /**
