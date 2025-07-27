@@ -49,19 +49,27 @@
                 </a>
             </li>
             <li>
-                <a href="#" wire:navigate title="Kuis / Ujian"
-                    class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.quizzes') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
+                <a href="{{ route('teacher.quizzes') }}" wire:navigate title="Kuis / Ujian"
+                    class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.quizzes*') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-file-signature"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Kuis / Ujian</span>
                 </a>
             </li>
             <li>
-                <a href="#" wire:navigate title="Tugas"
+                <a href="{{ route('teacher.tasks') }}" wire:navigate title="Tugas"
                     class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.tasks') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-clipboard-list"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Tugas</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('teacher.scores.tasks') }}" wire:navigate title="Tugas"
+                    class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.scores.tasks') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
+                    :class="{ 'justify-center': sidebarCollapsed }">
+                    <i class="w-6 text-center fa-solid fa-clipboard-list"></i>
+                    <span class="ml-3" x-show="!sidebarCollapsed">Beri Nilai Tugas</span>
                 </a>
             </li>
             <li>

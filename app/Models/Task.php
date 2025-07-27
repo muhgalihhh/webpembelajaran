@@ -18,6 +18,7 @@ class Task extends Model
         'title',
         'description',
         'subject_id',
+        'class_id', // Relasi ke kelas
         'user_id',
         'due_date',
         'due_time',
@@ -43,6 +44,10 @@ class Task extends Model
     public function subject()
     {
         return $this->belongsTo(Subject::class, 'subject_id');
+    }
+    public function class()
+    {
+        return $this->belongsTo(Classes::class, 'class_id');
     }
 
     public function creator()

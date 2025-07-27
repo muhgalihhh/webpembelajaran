@@ -41,6 +41,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/materials', \App\Livewire\Teacher\ManageMaterials::class)->name('materials');
         Route::get('/materials/create', \App\Livewire\Teacher\MaterialForm::class)->name('materials.create');
         Route::get('/materials/{material}/edit', \App\Livewire\Teacher\MaterialForm::class)->name('materials.edit');
+        Route::get('/quizzes', \App\Livewire\Teacher\ManageQuizzes::class)->name('quizzes');
+        Route::get('/quizzes/{quiz}/questions', \App\Livewire\Teacher\QuizQuestions::class)->name('quizzes.questions');
+        Route::get('/task', \App\Livewire\Teacher\ManageTasks::class)->name('tasks');
+        Route::get('/scores/tasks', \App\Livewire\Teacher\ScoreTaskList::class)->name('scores.tasks');
+        Route::get('/scores/tasks/{task}/submissions', \App\Livewire\Teacher\ScoreTaskSubmissions::class)->name('scores.submissions');
     });
 
     // Rute untuk Siswa (contoh)
