@@ -46,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/task', \App\Livewire\Teacher\ManageTasks::class)->name('tasks');
         Route::get('/scores/tasks', \App\Livewire\Teacher\ScoreTaskList::class)->name('scores.tasks');
         Route::get('/scores/tasks/{task}/submissions', \App\Livewire\Teacher\ScoreTaskSubmissions::class)->name('scores.submissions');
+        Route::get('/games', \App\Livewire\Teacher\ManageEducationalGames::class)->name('games');
     });
 
     // Rute untuk Siswa (contoh)

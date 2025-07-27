@@ -24,13 +24,14 @@ class ScoreTaskSubmissions extends Component
     public ?TaskSubmission $scoringSubmission = null;
 
     // Properti Form
+    // --- PERBAIKAN: Mengganti 'integer' menjadi 'numeric' ---
     #[Rule('required|numeric|min:0|max:100', as: 'Nilai')]
     public $score = 0;
 
     #[Rule('nullable|string', as: 'Umpan Balik')]
     public $feedback = '';
 
-    #[Rule('required|in:submitted,late,graded', as: 'Status')]
+    // Aturan validasi untuk status tidak lagi diperlukan di sini karena tidak diubah oleh user di form ini
     public $status = 'submitted';
 
     public function mount(Task $task)
@@ -43,7 +44,7 @@ class ScoreTaskSubmissions extends Component
     {
         return TaskSubmission::with('student')
             ->where('task_id', $this->task->id)
-            ->orderBy('submission_date', 'desc') // Disesuaikan dengan model
+            ->orderBy('submission_date', 'desc')
             ->paginate(10);
     }
 
@@ -53,18 +54,19 @@ class ScoreTaskSubmissions extends Component
         $this->resetValidation();
     }
 
-    public function score(TaskSubmission $submission)
+    public function scoreTask(TaskSubmission $submission)
     {
         $this->isScoring = true;
         $this->scoringSubmission = $submission;
         $this->score = $submission->score ?? 0;
         $this->feedback = $submission->feedback ?? '';
-        $this->status = $submission->status; // Mengisi status saat ini
+        $this->status = $submission->status;
         $this->dispatch('open-modal', id: 'score-form-modal');
     }
 
     public function saveScore()
     {
+        // Sekarang validate() hanya akan memeriksa 'score' dan 'feedback'
         $this->validate();
 
         if ($this->scoringSubmission) {
@@ -77,6 +79,12 @@ class ScoreTaskSubmissions extends Component
             $this->dispatch('flash-message', message: 'Nilai berhasil disimpan.', type: 'success');
             $this->dispatch('close-modal');
         }
+    }
+
+    public function closeModal()
+    {
+        $this->resetForm();
+        $this->dispatch('close-modal');
     }
 
     public function render()

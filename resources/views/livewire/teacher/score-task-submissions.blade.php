@@ -51,7 +51,7 @@
                             {{ $submission->score ?? 'Belum Dinilai' }}
                         </td>
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                            <button wire:click="score({{ $submission->id }})"
+                            <button wire:click="scoreTask({{ $submission->id }})"
                                 class="text-indigo-600 hover:text-indigo-900">
                                 {{ $submission->score ? 'Edit Nilai' : 'Beri Nilai' }}
                             </button>
@@ -78,8 +78,12 @@
                 <x-form.textarea-group label="Umpan Balik (Opsional)" name="feedback" wireModel="feedback" />
             </div>
             <div class="flex justify-end pt-4 mt-4 space-x-4 border-t">
-                <button type="button" @click="$dispatch('close-modal')" class="btn btn-secondary">Batal</button>
-                <button type="submit" class="btn btn-primary">Simpan Nilai</button>
+                <x-form.button type="button" class="btn btn-secondary" wireClick="closeModal" variant="secondary">
+                    <i class="mr-1 fa-solid fa-xmark"></i> Tutup
+                </x-form.button>
+                <x-form.button type="submit" class="btn btn-primary">
+                    <i class="mr-1 fa-solid fa-check"></i> Simpan Nilai
+                </x-form.button>
             </div>
         </form>
     </x-ui.modal>

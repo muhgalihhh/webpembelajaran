@@ -34,7 +34,7 @@
         <ul class="space-y-2">
             <li>
                 <a href="{{ route('teacher.dashboard') }}" wire:navigate title="Dashboard"
-                    class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.dashboard') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
+                    class="flex bg-gray-500 items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.dashboard') ? 'bg-gray-700 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-chart-line"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Aktivitas Siswa</span>
@@ -42,7 +42,7 @@
             </li>
             <li>
                 <a href="{{ route('teacher.materials') }}" wire:navigate title="Materi Pembelajaran"
-                    class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.materials*') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
+                    class="flex bg-gray-500 items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.materials*') ? 'bg-gray-700 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-book-open"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Materi Pembelajaran</span>
@@ -50,7 +50,7 @@
             </li>
             <li>
                 <a href="{{ route('teacher.quizzes') }}" wire:navigate title="Kuis / Ujian"
-                    class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.quizzes*') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
+                    class="flex bg-gray-500 items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.quizzes*') ? 'bg-gray-700 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-file-signature"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Kuis / Ujian</span>
@@ -58,7 +58,7 @@
             </li>
             <li>
                 <a href="{{ route('teacher.tasks') }}" wire:navigate title="Tugas"
-                    class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.tasks') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
+                    class="flex bg-gray-500 items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.tasks') ? 'bg-gray-700 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-clipboard-list"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Tugas</span>
@@ -66,15 +66,15 @@
             </li>
             <li>
                 <a href="{{ route('teacher.scores.tasks') }}" wire:navigate title="Tugas"
-                    class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.scores.tasks') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
+                    class="flex bg-gray-500 items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.scores*') ? 'bg-gray-700 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-clipboard-list"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Beri Nilai Tugas</span>
                 </a>
             </li>
             <li>
-                <a href="#" wire:navigate title="Game Edukatif"
-                    class="flex items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.games') ? 'bg-gray-500 text-white font-bold' : 'hover:bg-gray-300' }}"
+                <a href="{{ route('teacher.games') }}" wire:navigate title="Game Edukatif"
+                    class="flex bg-gray-500 items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.games') ? 'bg-gray-700 text-white font-bold' : 'hover:bg-gray-300' }}"
                     :class="{ 'justify-center': sidebarCollapsed }">
                     <i class="w-6 text-center fa-solid fa-gamepad"></i>
                     <span class="ml-3" x-show="!sidebarCollapsed">Game Edukatif</span>

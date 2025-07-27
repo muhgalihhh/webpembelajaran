@@ -133,7 +133,7 @@ class QuizQuestions extends Component
 
         $this->updateQuestionCount();
 
-        // --- PERBAIKAN: Menggunakan dispatch event untuk notifikasi ---
+
         $this->dispatch('flash-message', message: $message, type: 'success');
         $this->dispatch('close-modal');
     }
@@ -163,6 +163,11 @@ class QuizQuestions extends Component
         $this->itemToDeleteId = null;
     }
 
+    public function closeModal()
+    {
+        $this->resetForm();
+        $this->dispatch('close-modal');
+    }
     public function render()
     {
         $questions = $this->quiz->questions()->orderBy('question_number')->get();
