@@ -33,7 +33,11 @@
                     <tr class="hover:bg-gray-100">
                         <td class="px-6 py-4 whitespace-nowrap">{{ $submission->student->name }}</td>
                         <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                            {{ $submission->submitted_at->format('d M Y, H:i') }}</td>
+                            {{ $submission->submission_date->format('d M Y, H:i') }}
+                            @if ($submission->submission_date > $task->due_time)
+                                <span class="ml-2 text-xs text-red-600">(Terlambat)</span>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if ($submission->file_path)
                                 <a href="{{ Storage::url($submission->file_path) }}" target="_blank"
@@ -65,7 +69,6 @@
 
     <div class="mt-4">{{ $this->submissions->links() }}</div>
 
-    {{-- Modal Form Penilaian --}}
     <x-ui.modal id="score-form-modal">
         <h2 class="text-2xl font-bold">Beri Nilai Tugas</h2>
         <p class="text-sm text-gray-600">Siswa: {{ $scoringSubmission?->student->name }}</p>

@@ -45,8 +45,7 @@ class ScoreTaskList extends Component
     public function tasks()
     {
         return Task::with(['subject', 'class', 'submissions'])
-            ->where('user_id', Auth::id())
-            ->where('status', '!=', 'draft') // Hanya tampilkan tugas yang sudah di-publish atau ditutup
+            ->where('status', '!=', 'draft')
             ->when($this->search, fn($q) => $q->where('title', 'like', '%' . $this->search . '%'))
             ->when($this->subjectFilter, fn($q) => $q->where('subject_id', $this->subjectFilter))
             ->when($this->classFilter, fn($q) => $q->where('class_id', $this->classFilter))

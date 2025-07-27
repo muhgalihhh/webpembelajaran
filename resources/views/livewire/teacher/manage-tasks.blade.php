@@ -32,6 +32,9 @@
                     <th wire:click="sortBy('subject_id')"
                         class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                         Mapel & Kelas</th>
+                    <th wire:click="sortBy('user_id')"
+                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                        Pembuat Tugas</th>
                     <th wire:click="sortBy('due_time')"
                         class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                         Tenggat</th>
@@ -53,6 +56,9 @@
                         <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                             <div>{{ $task->subject?->name ?? 'N/A' }}</div>
                             <div class="text-xs">Kelas {{ $task->class?->class ?? 'N/A' }}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                            {{ $task->creator?->name ?? 'N/A' }}
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                             {{ $task->due_time ? $task->due_time->format('d M Y, H:i') : '-' }}

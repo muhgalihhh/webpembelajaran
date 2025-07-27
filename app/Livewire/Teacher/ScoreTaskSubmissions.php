@@ -24,11 +24,14 @@ class ScoreTaskSubmissions extends Component
     public ?TaskSubmission $scoringSubmission = null;
 
     // Properti Form
-    #[Rule('required|integer|min:0|max:100', as: 'Nilai')]
+    #[Rule('required|numeric|min:0|max:100', as: 'Nilai')]
     public $score = 0;
 
     #[Rule('nullable|string', as: 'Umpan Balik')]
     public $feedback = '';
+
+    #[Rule('required|in:submitted,late,graded', as: 'Status')]
+    public $status = 'submitted';
 
     public function mount(Task $task)
     {
@@ -40,13 +43,13 @@ class ScoreTaskSubmissions extends Component
     {
         return TaskSubmission::with('student')
             ->where('task_id', $this->task->id)
-            ->orderBy('submitted_at', 'desc')
+            ->orderBy('submission_date', 'desc') // Disesuaikan dengan model
             ->paginate(10);
     }
 
     private function resetForm()
     {
-        $this->reset(['isScoring', 'scoringSubmission', 'score', 'feedback']);
+        $this->reset(['isScoring', 'scoringSubmission', 'score', 'feedback', 'status']);
         $this->resetValidation();
     }
 
@@ -56,6 +59,7 @@ class ScoreTaskSubmissions extends Component
         $this->scoringSubmission = $submission;
         $this->score = $submission->score ?? 0;
         $this->feedback = $submission->feedback ?? '';
+        $this->status = $submission->status; // Mengisi status saat ini
         $this->dispatch('open-modal', id: 'score-form-modal');
     }
 
@@ -67,6 +71,7 @@ class ScoreTaskSubmissions extends Component
             $this->scoringSubmission->update([
                 'score' => $this->score,
                 'feedback' => $this->feedback,
+                'status' => 'graded', // Otomatis set status menjadi 'graded' setelah dinilai
             ]);
 
             $this->dispatch('flash-message', message: 'Nilai berhasil disimpan.', type: 'success');
