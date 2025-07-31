@@ -12,9 +12,9 @@
 
     <form wire:submit="authenticate" class="mt-6">
         <x-form.input-group type="text" id="username" placeholder="Masukkan Username" wireModel="username"
-            icon="fa fa-user" autofocus />
+            icon="fa fa-user" autofocus label="Username" />
         <x-form.input-group type="password" id="password" placeholder="Masukkan Kata Sandi" wireModel="password"
-            icon="fa fa-lock" passwordToggle />
+            icon="fa fa-lock" passwordToggle label="Kata Sandi" />
 
 
 

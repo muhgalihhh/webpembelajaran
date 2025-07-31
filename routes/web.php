@@ -4,6 +4,7 @@ use App\Livewire\Admin\ManageClasses;
 use App\Livewire\Admin\ManageStudents;
 use App\Livewire\Admin\ManageSubjects;
 use App\Livewire\Admin\ManageTeachers;
+use App\Livewire\Admin\ProfileAdmin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/manage-students', ManageStudents::class)->name('manage-students');
         Route::get('/manage-classes', ManageClasses::class)->name('manage-classes');
         Route::get('/manage-subjects', ManageSubjects::class)->name('manage-subjects');
+        Route::get('/profile', ProfileAdmin::class)->name('profile');
     });
 
     // Rute untuk Guru
@@ -47,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/scores/tasks', \App\Livewire\Teacher\ScoreTaskList::class)->name('scores.tasks');
         Route::get('/scores/tasks/{task}/submissions', \App\Livewire\Teacher\ScoreTaskSubmissions::class)->name('scores.submissions');
         Route::get('/games', \App\Livewire\Teacher\ManageEducationalGames::class)->name('games');
+        Route::get('/profile', \App\Livewire\Teacher\ProfileGuru::class)->name('profile');
     });
 
     // Rute untuk Siswa (contoh)
@@ -54,6 +57,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/', \App\Livewire\Student\Index::class)->name('index');
         Route::get('/dashboard', \App\Livewire\Student\Dashboard::class)->name('dashboard');
+        Route::get('/subjects', action: \App\Livewire\Student\SubjectList::class)->name('subjects');
     });
 
 

@@ -13,6 +13,11 @@
 </head>
 
 <body class="font-sans bg-gray-100">
+    <div wire:loading.class.remove="opacity-0 pointer-events-none" wire:loading.remove.class="opacity-100"
+        class="fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 bg-gray-100 bg-opacity-75 opacity-0 pointer-events-none">
+        <div class="w-16 h-16 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+    </div>
+
 
     <div x-data="{ sidebarCollapsed: false, mobileSidebarOpen: false }" @keydown.escape.window="mobileSidebarOpen = false" class="flex flex-col h-screen">
         <x-ui.admin.navbar />
@@ -39,7 +44,6 @@
         </div>
     </div>
     <x-ui.alert-popup />
-    <x-ui.globab-loading-indicator />
     <x-ui.logout-confirmation />
     @livewireScripts
 </body>

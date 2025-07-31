@@ -18,7 +18,7 @@
 </head>
 
 <body x-data="{ pageLoaded: false }" x-init="setTimeout(() => pageLoaded = true, 100)" x-show="pageLoaded" x-transition.opacity.duration.500ms
-    class="bg-[#EBF3FF] text-gray-900 h-screen">
+    class="bg-[#EBF3FF] text-gray-900 min-h-screen flex flex-col">
 
     @if (session()->has('success'))
         <x-ui.alert-popup type="success" :message="session('success')" />
@@ -36,7 +36,8 @@
         </div>
     </div>
 
-    <div class="w-full h-full" x-data="{
+    <!-- Main content wrapper yang akan grow -->
+    <div class="flex flex-col flex-1" x-data="{
         loaded: false,
         init() {
             // Delay sedikit untuk memastikan DOM siap
@@ -47,15 +48,20 @@
     }" x-cloak>
 
         <x-ui.landing-nav />
-        {{ $slot }}
 
-        <footer class="w-full py-4 mx-auto text-xs font-bold text-center text-white bg-[#4A90E2] rounded-t-lg">
-            &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
-        </footer>
+        <!-- Content area yang akan mengambil sisa ruang -->
+        <main class="flex-1">
+            {{ $slot }}
+        </main>
+
     </div>
 
-    @livewireScripts
+    <!-- Footer yang akan selalu di bawah -->
+    <footer class="w-full py-4 mx-auto text-xs font-bold text-center text-white bg-[#4A90E2] rounded-t-lg mt-auto">
+        &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
+    </footer>
 
+    @livewireScripts
     <x-ui.logout-confirmation />
     @vite(['resources/js/app.js'])
 </body>

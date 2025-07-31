@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class user-detail-modals extends Component
+class user-detail-modal extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class user-detail-modals extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ui.user-detail-modals');
+        return view('components.ui.user-detail-modal');
     }
 }

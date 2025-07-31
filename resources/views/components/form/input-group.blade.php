@@ -9,7 +9,7 @@
 ])
 
 {{-- Wrapper utama tanpa margin atau lebar tetap --}}
-<div {{ $attributes->except('class') }}>
+<div {{ $attributes->except('class') }} class="mb-2">
     @if ($label)
         <label for="{{ $id }}" class="block text-sm font-medium text-gray-700">{{ $label }}</label>
     @endif
@@ -34,6 +34,6 @@
     </div>
 
     @error($wireModel)
-        <span class="block mt-2 text-sm text-red-500">{{ $message }}</span>
+        <span class="block mb-1 text-sm text-red-500">{{ $message }}</span>
     @enderror
 </div>
