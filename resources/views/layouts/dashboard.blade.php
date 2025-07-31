@@ -38,7 +38,6 @@
             </div>
         </div>
     </div>
-    <x-form.password-toggle />
     <x-ui.alert-popup />
     <x-ui.globab-loading-indicator />
     <x-ui.logout-confirmation />

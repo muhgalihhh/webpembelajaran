@@ -10,10 +10,9 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('classes', function (Blueprint $table) {
-            $table->id();
-            $table->text('description')->nullable();
-            $table->timestamps();
+        Schema::table('classes', function (Blueprint $table) {
+            // Kolom 'class' untuk tingkatan (misal: 'I', 'II', 'VI')
+            $table->string('class')->after('id');
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('classes');
+        Schema::table('classes', function (Blueprint $table) {
+            $table->dropColumn('class');
+        });
     }
 };

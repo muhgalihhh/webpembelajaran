@@ -22,30 +22,38 @@ class ManageStudents extends Component
     // Properti untuk state & filter
     #[Url(as: 'q', history: true)]
     public $search = '';
-
     #[Url(history: true)]
     public $status_filter = 'all';
-
     #[Url(history: true)]
-    public $class_filter = ''; // Filter untuk kelas
-
+    public $class_filter = '';
     #[Url(history: true)]
     public $sortBy = 'name';
-
     #[Url(history: true)]
     public $sortDirection = 'asc';
-
     public $perPage = 10;
 
     // Properti Form
-    public $name, $username, $email, $password, $password_confirmation, $status;
-    public $class_id; // Properti untuk kelas siswa
+    public $name, $username, $email, $phone_number, $password, $password_confirmation, $status;
+    public $class_id;
 
-    // Properti untuk state modal & data
     public $isEditing = false;
     public ?User $editingUser = null;
-    public $confirmingDeletion = false;
+    public ?User $viewingUser = null;
     public $itemToDeleteId = null;
+
+    // Lifecycle hooks
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+    public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
+    public function updatingClassFilter()
+    {
+        $this->resetPage();
+    }
 
     protected function rules()
     {
@@ -54,9 +62,10 @@ class ManageStudents extends Component
             'name' => 'required|string|max:255',
             'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($userId)],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($userId)],
+            'phone_number' => ['nullable', 'string', 'max:20', Rule::unique('users')->ignore($userId)],
             'password' => $this->isEditing ? 'nullable|min:8|same:password_confirmation' : 'required|min:8|same:password_confirmation',
             'status' => 'required|in:active,inactive',
-            'class_id' => 'required|exists:classes,id', // Validasi untuk class_id
+            'class_id' => 'required|exists:classes,id',
         ];
     }
 
@@ -64,17 +73,14 @@ class ManageStudents extends Component
     public function students()
     {
         return User::role('siswa')
-            ->with('class') // Eager load relasi kelas
+            ->with('class')
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%');
+                    ->orWhere('email', 'like', '%' . $this->search . '%')
+                    ->orWhere('phone_number', 'like', '%' . $this->search . '%'); // Tambahkan pencarian no. telp
             })
-            ->when($this->status_filter !== 'all', function ($query) {
-                $query->where('status', $this->status_filter);
-            })
-            ->when($this->class_filter, function ($query) {
-                $query->where('class_id', $this->class_filter);
-            })
+            ->when($this->status_filter !== 'all', fn($q) => $q->where('status', $this->status_filter))
+            ->when($this->class_filter, fn($q) => $q->where('class_id', $this->class_filter))
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->perPage);
     }
@@ -82,15 +88,12 @@ class ManageStudents extends Component
     #[Computed]
     public function availableClasses()
     {
-        return Classes::orderBy('name')->get();
+        return Classes::orderBy('class', 'asc')->get();
     }
 
     public function render()
     {
-        return view('livewire.admin.manage-students', [
-            'students' => $this->students(),
-            'classes' => $this->availableClasses(),
-        ]);
+        return view('livewire.admin.manage-students');
     }
 
     public function sortBy($field)
@@ -105,7 +108,7 @@ class ManageStudents extends Component
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingUser', 'name', 'username', 'email', 'password', 'password_confirmation', 'status', 'class_id']);
+        $this->reset(['isEditing', 'editingUser', 'name', 'username', 'email', 'phone_number', 'password', 'password_confirmation', 'status', 'class_id']);
         $this->resetValidation();
     }
 
@@ -119,12 +122,12 @@ class ManageStudents extends Component
 
     public function edit(User $user)
     {
-        usleep(500000);
         $this->isEditing = true;
         $this->editingUser = $user;
         $this->name = $user->name;
         $this->username = $user->username;
         $this->email = $user->email;
+        $this->phone_number = $user->phone_number;
         $this->status = $user->status;
         $this->class_id = $user->class_id;
         $this->dispatch('open-modal', id: 'student-form-modal');
@@ -156,20 +159,23 @@ class ManageStudents extends Component
     public function confirmDelete($id)
     {
         $this->itemToDeleteId = $id;
-        $this->confirmingDeletion = true;
-    }
-
-    public function closeConfirmModal()
-    {
-        $this->confirmingDeletion = false;
-        $this->itemToDeleteId = null;
+        $this->dispatch('open-confirm-modal');
     }
 
     public function delete()
     {
-        User::findOrFail($this->itemToDeleteId)->delete();
-        $this->dispatch('flash-message', message: 'Data siswa berhasil dihapus.', type: 'success');
-        $this->closeConfirmModal();
+        if ($this->itemToDeleteId) {
+            User::findOrFail($this->itemToDeleteId)->delete();
+            $this->dispatch('flash-message', message: 'Data siswa berhasil dihapus.', type: 'success');
+        }
+        $this->dispatch('close-confirm-modal');
+        $this->itemToDeleteId = null;
         $this->resetPage();
+    }
+
+    public function view(User $user)
+    {
+        $this->viewingUser = $user;
+        $this->dispatch('open-user-detail-modal');
     }
 }

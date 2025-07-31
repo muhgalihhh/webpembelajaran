@@ -5,7 +5,7 @@
             <h1 class="text-2xl font-bold text-gray-800">
                 {{ $material->exists ? 'Edit Materi' : 'Tambah Materi Baru' }}
             </h1>
-            <a href="{{ route('teacher.materials') }}" class="btn btn-sm">
+            <a href="{{ route('teacher.materials') }}" wire:navigate class="btn btn-sm">
                 <i class="fa-solid fa-arrow-left"></i>
                 Kembali
             </a>
@@ -29,8 +29,11 @@
                     {{-- Trix Editor untuk Konten Lengkap --}}
                     <div wire:ignore x-data="{
                         value: @entangle('content'),
+                        isFocused: false,
                         init() {
                             let trixEditor = this.$refs.trix;
+                            trixEditor.addEventListener('trix-focus', () => this.isFocused = true);
+                            trixEditor.addEventListener('trix-blur', () => this.isFocused = false);
                             trixEditor.addEventListener('trix-change', (e) => {
                                 this.value = e.target.value;
                             });
@@ -39,19 +42,23 @@
                         <label for="content" class="block text-sm font-medium text-gray-700">Konten Lengkap
                             Materi</label>
                         <input id="content" type="hidden" :value="value">
-                        <trix-editor x-ref="trix" input="content" class="trix-content"></trix-editor>
+                        <trix-editor x-ref="trix" input="content" :class="{ 'trix-content-focused': isFocused }"
+                            class="trix-content"></trix-editor>
                         @error('content')
                             <span class="mt-2 text-sm text-red-600">{{ $message }}</span>
                         @enderror
                     </div>
 
-                    {{-- Mata Pelajaran & Bab --}}
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    {{-- Mata Pelajaran, Kelas & Bab --}}
+                    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
                         <x-form.select-group label="Mata Pelajaran" name="subject_id" wireModel="subject_id"
                             :options="$this->subjects" error="{{ $errors->first('subject_id') }}" />
 
+                        <x-form.select-group label="Kelas" name="class_id" wireModel="class_id" :options="$this->classes"
+                            optionLabel="class" error="{{ $errors->first('class_id') }}" />
+
                         <x-form.input-group label="Bab / Topik" name="chapter" wireModel="chapter"
-                            placeholder="Contoh: Bab 1: Aljabar" error="{{ $errors->first('chapter') }}" />
+                            placeholder="Contoh: Bab 1" error="{{ $errors->first('chapter') }}" />
                     </div>
 
                     <x-form.input-group label="URL Video Youtube (Opsional)" name="url" wireModel="url"
@@ -94,7 +101,7 @@
 
                 {{-- Tombol Aksi --}}
                 <div class="flex justify-end pt-8 mt-8 border-t">
-                    <a href="{{ route('teacher.materials') }}" class="mr-3 btn">Batal</a>
+                    <a href="{{ route('teacher.materials') }}" wire:navigate class="mr-3 btn">Batal</a>
                     <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
                         <span wire:loading.remove wire:target="save">Simpan Materi</span>
                         <span wire:loading wire:target="save">Menyimpan...</span>
@@ -106,32 +113,26 @@
 
     {{-- Kustomisasi Styling untuk Trix Editor --}}
     <style>
-        /* Sembunyikan tombol upload file bawaan Trix, karena kita sudah punya input sendiri */
         .trix-button-group--file-tools {
             display: none !important;
         }
 
-        /* Buat area editor konsisten dengan input lain */
         .trix-content {
             min-height: 250px;
             background-color: #fff;
             border-color: #d1d5db;
-            /* Tailwind gray-300 */
             border-radius: 0.375rem;
-            /* rounded-md */
             box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            /* shadow-sm */
             padding: 0.75rem;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
 
-        .trix-content:focus {
+        .trix-content.trix-content-focused {
             outline: 2px solid transparent;
             outline-offset: 2px;
             --tw-ring-color: #4338ca;
-            /* Tailwind indigo-700 */
             box-shadow: 0 0 0 2px var(--tw-ring-color);
             border-color: #6366f1;
-            /* Tailwind indigo-500 */
         }
     </style>
 </div>

@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Classes extends Model
 {
     use HasFactory;
-
-    // Nama tabel secara eksplisit jika tidak mengikuti konvensi jamak
     protected $table = 'classes';
 
     /**
@@ -18,7 +17,7 @@ class Classes extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'class',
         'description',
     ];
 
@@ -31,5 +30,16 @@ class Classes extends Model
     public function quizzes()
     {
         return $this->hasMany(Quiz::class, 'class_id');
+    }
+    public function materials()
+    {
+        return $this->hasMany(Material::class, 'class_id');
+    }
+
+    protected function fullName(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->class . ' ' . $this->name,
+        );
     }
 }

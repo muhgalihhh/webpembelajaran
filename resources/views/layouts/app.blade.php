@@ -43,7 +43,7 @@
     </div>
 
     @livewireScripts
-    <x-form.password-toggle />
+
 
     @vite(['resources/js/app.js'])
 </body>

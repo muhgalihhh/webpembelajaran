@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Teacher;
 
+use App\Models\Classes;
 use App\Models\Material;
 use App\Models\Subject;
 use Illuminate\Support\Facades\Auth;
@@ -25,12 +26,12 @@ class MaterialForm extends Component
     public string $title = '';
     public string $description = '';
     public $subject_id = '';
+    public $class_id = '';
     public string $chapter = '';
     public bool $is_published = false;
     public ?string $url = '';
     public $uploadedFile;
-
-    // Properti baru untuk menampilkan file yang sudah ada di view
+    public $content = '';
     public ?string $currentFileUrl = null;
 
     /**
@@ -43,25 +44,29 @@ class MaterialForm extends Component
         if ($this->material->exists) {
             $this->title = $this->material->title;
             $this->description = $this->material->description;
+            $this->content = $this->material->content;
             $this->subject_id = $this->material->subject_id;
+            $this->class_id = $this->material->class_id;
             $this->chapter = $this->material->chapter ?? '';
             $this->is_published = $this->material->is_published;
             $this->url = $this->material->youtube_url;
 
-            // Jika ada file, buat URL-nya untuk ditampilkan di view
             if ($this->material->file_path && Storage::disk('public')->exists($this->material->file_path)) {
                 $this->currentFileUrl = Storage::url($this->material->file_path);
             }
         }
     }
 
-    /**
-     * Mengambil daftar mata pelajaran.
-     */
     #[Computed]
     public function subjects()
     {
         return Subject::orderBy('name')->get();
+    }
+
+    #[Computed]
+    public function classes()
+    {
+        return Classes::orderBy('class')->get();
     }
 
     /**
@@ -73,7 +78,9 @@ class MaterialForm extends Component
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'subject_id' => 'required|exists:subjects,id',
+            'class_id' => 'required|exists:classes,id',
             'chapter' => 'nullable|string|max:100',
+            'content' => 'nullable|string',
             'is_published' => 'required|boolean',
             'url' => 'nullable|url',
             'uploadedFile' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,zip|max:10240',
@@ -85,7 +92,9 @@ class MaterialForm extends Component
             $dataToSave = [
                 'title' => $this->title,
                 'description' => $this->description,
+                'content' => $this->content,
                 'subject_id' => $this->subject_id,
+                'class_id' => $this->class_id,
                 'chapter' => $this->chapter,
                 'is_published' => $this->is_published,
                 'youtube_url' => $this->url,
@@ -104,11 +113,8 @@ class MaterialForm extends Component
                 $extension = $this->uploadedFile->getClientOriginalExtension();
                 $newFileName = "{$sanitizedChapter}_{$sanitizedSubjectName}_" . Str::random(10) . ".{$extension}";
 
-                $path = Storage::disk('public')->putFileAs(
-                    'materi',
-                    $this->uploadedFile,
-                    $newFileName
-                );
+                // --- PERBAIKAN UTAMA: Menggunakan cara yang benar untuk menyimpan file ---
+                $path = $this->uploadedFile->storeAs('materi', $newFileName, 'public');
 
                 $dataToSave['file_path'] = $path;
             }
@@ -120,17 +126,14 @@ class MaterialForm extends Component
 
             $message = $this->material->wasRecentlyCreated ? 'Materi berhasil ditambahkan.' : 'Materi berhasil diperbarui.';
 
-            // --- PERUBAHAN UTAMA: Gunakan session()->flash() ---
             session()->flash('flash-message', [
                 'message' => $message,
                 'type' => 'success'
             ]);
 
-            // Redirect ke halaman daftar materi
             $this->redirectRoute('teacher.materials');
 
         } catch (\Exception $e) {
-            // Jika terjadi error, tampilkan pesan error
             $this->dispatch('flash-message', [
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
                 'type' => 'error'

@@ -51,23 +51,5 @@
                 <i class="fas fa-book fa-2x"></i>
             </div>
         </div>
-        <div class="flex items-center justify-between p-6 bg-white border shadow-md">
-            <div>
-                <h3 class="text-sm font-medium text-gray-500 uppercase">Total Quizzes</h3>
-                <p class="text-3xl font-bold text-gray-900">{{ $totalQuizzes }}</p>
-            </div>
-            <div class="p-3 text-red-600 bg-red-100 rounded-full">
-                <i class="fas fa-question-circle fa-2x"></i>
-            </div>
-        </div>
-        <div class="flex items-center justify-between p-6 bg-white border shadow-md">
-            <div>
-                <h3 class="text-sm font-medium text-gray-500 uppercase">Total Tasks</h3>
-                <p class="text-3xl font-bold text-gray-900">{{ $totalTasks }}</p>
-            </div>
-            <div class="p-3 text-teal-600 bg-teal-100 rounded-full">
-                <i class="fas fa-tasks fa-2x"></i>
-            </div>
-        </div>
     </div>
 </div>

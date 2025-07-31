@@ -25,6 +25,7 @@ class Material extends Model
         'chapter',
         'is_published',
         'published_at',
+        'class_id',
     ];
 
     /**
@@ -45,6 +46,11 @@ class Material extends Model
 
     public function uploader()
     {
-        return $this->belongsTo(User::class, 'user_id'); // Guru yang mengunggah
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function class()
+    {
+        return $this->belongsTo(Classes::class, 'class_id');
     }
 }
