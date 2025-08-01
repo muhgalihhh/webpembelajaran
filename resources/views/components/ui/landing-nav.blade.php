@@ -1,5 +1,5 @@
 <header x-data="{ mobileMenuOpen: false, profileDropdownOpen: false }"
-    class="bg-[#4A90E2] text-white py-3 px-4 sm:px-6 flex justify-between items-center shadow-md w-full relative">
+    class="bg-[#4A90E2] text-white py-3 px-4 sm:px-6 flex justify-between items-center shadow-md w-full sticky top-0 z-50">
 
     {{-- Logo (diasumsikan dari komponen lain) --}}
     <x-ui.logo-nav />

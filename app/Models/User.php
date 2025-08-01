@@ -78,4 +78,22 @@ class User extends Authenticatable
     {
         return $this->hasMany(TaskSubmission::class, 'user_id');
     }
+
+    // Tambahkan ini di dalam class User
+    public function materialAccessLogs()
+    {
+        return $this->hasMany(MaterialAccessLog::class);
+    }
+
+    public function lastAccessedMaterials()
+    {
+        return $this->hasManyThrough(
+            Material::class,
+            MaterialAccessLog::class,
+            'user_id', // Foreign key on material_access_logs table...
+            'id', // Foreign key on materials table...
+            'id', // Local key on users table...
+            'material_id' // Local key on material_access_logs table...
+        )->latest('material_access_logs.accessed_at');
+    }
 }

@@ -53,4 +53,9 @@ class Material extends Model
     {
         return $this->belongsTo(Classes::class, 'class_id');
     }
+
+    public function accessLogs()
+    {
+        return $this->hasMany(MaterialAccessLog::class);
+    }
 }

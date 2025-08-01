@@ -39,8 +39,8 @@
                     @php
                         $color = $colors[$index % count($colors)];
                     @endphp
-                    <x-ui.student.subject-card :title="$subject->name" :link="'#'" buttonText="Lihat Materi"
-                        :bgColor="$color['bg']" :borderColor="$color['border']" />
+                    <x-ui.student.subject-card :title="$subject->name" link="{{ route('student.materials.index', $subject) }}"
+                        buttonText="Lihat Materi" :bgColor="$color['bg']" :borderColor="$color['border']" />
                 @endforeach
             </div>
         @else

@@ -53,6 +53,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', \App\Livewire\Student\Index::class)->name('index');
         Route::get('/dashboard', \App\Livewire\Student\Dashboard::class)->name('dashboard');
         Route::get('/subjects', action: \App\Livewire\Student\SubjectList::class)->name('subjects');
+        Route::get('/subjects/{subject}/materials', \App\Livewire\Student\MaterialList::class)->name('materials.index');
     });
 
 
