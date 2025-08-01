@@ -11,14 +11,72 @@
     ];
 @endphp
 
-<div x-data="{ show: false, message: '', type: 'success' }"
+<div x-data="{
+    show: false,
+    message: '',
+    type: 'success',
+    playNotificationSound(type = 'success') {
+        const audioContext = new(window.AudioContext || window.webkitAudioContext)();
+
+        let config = {};
+
+        switch (type) {
+            case 'success':
+                config = {
+                    frequencies: [523.25, 659.25, 783.99], // C-E-G major chord
+                    duration: 0.5,
+                    volume: 0.3
+                };
+                break;
+            case 'error':
+                config = {
+                    frequencies: [415.30, 466.16], // G#-A# (dissonant)
+                    duration: 0.8,
+                    volume: 0.4,
+                    type: 'sawtooth'
+                };
+                break;
+            case 'warning':
+                config = {
+                    frequencies: [440, 554.37], // A-C# (tritone)
+                    duration: 0.6,
+                    volume: 0.35
+                };
+                break;
+        }
+
+        config.frequencies.forEach((freq, index) => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+
+            oscillator.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.type = config.type || 'sine';
+            oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(3000, audioContext.currentTime);
+
+            // Envelope untuk suara yang smooth
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(config.volume, audioContext.currentTime + 0.02);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + config.duration);
+
+            oscillator.start(audioContext.currentTime + (index * 0.08));
+            oscillator.stop(audioContext.currentTime + config.duration + 0.1);
+        });
+    }
+}"
     x-on:{{ $on }}.window="
-        console.log('Event received:', $event.detail);
         message = $event.detail.message || $event.detail[0]?.message || '';
         type = $event.detail.type || $event.detail[0]?.type || 'success';
         show = true;
+        playNotificationSound(type); // Suara sesuai tipe notifikasi
         setTimeout(() => show = false, 5000)
-     "
+    "
     x-show="show" x-transition:enter="transform ease-out duration-300 transition"
     x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
     x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
@@ -50,39 +108,3 @@
         <button @click="show = false" class="ml-4 text-xl font-bold text-gray-500 hover:text-gray-700">&times;</button>
     </div>
 </div>
-
-@if (session()->has('flash-message'))
-    @php
-        $flashData = session('flash-message');
-        $flashType = $flashData['type'] ?? 'success';
-        $flashMessage = $flashData['message'] ?? '';
-    @endphp
-
-    <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 5000)" x-show="show"
-        x-transition:enter="transform ease-out duration-300 transition"
-        x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-        x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
-        x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-        class="fixed z-50 p-4 border-l-4 rounded-md shadow-lg top-5 right-5 {{ $colors[$flashType] }}" x-cloak>
-        <div class="flex items-start">
-            <div class="flex-1 py-1">
-                <div class="flex items-center mb-2">
-                    @if ($flashType === 'success')
-                        <i class="mr-2 text-green-600 fa-solid fa-check-circle"></i>
-                        <p class="text-sm font-bold">Berhasil</p>
-                    @elseif($flashType === 'error')
-                        <i class="mr-2 text-red-600 fa-solid fa-times-circle"></i>
-                        <p class="text-sm font-bold">Error</p>
-                    @else
-                        <i class="mr-2 text-yellow-600 fa-solid fa-exclamation-triangle"></i>
-                        <p class="text-sm font-bold">Peringatan</p>
-                    @endif
-                </div>
-                <p class="text-sm">{{ $flashMessage }}</p>
-            </div>
-            <button @click="show = false"
-                class="ml-4 text-xl font-bold text-gray-500 hover:text-gray-700">&times;</button>
-        </div>
-    </div>
-@endif

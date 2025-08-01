@@ -12,7 +12,7 @@
                 :options="$this->subjects" />
             <x-form.select-group label="Filter Kelas" name="classFilter" wireModel="classFilter" :options="$this->classes"
                 optionLabel="class" />
-            <x-form.select-group label="Filter Status" name="statusFilter" wireModel="statusFilter" :options="['' => 'Semua Status', 'published' => 'Published', 'draft' => 'Draft', 'archived' => 'Archived']" />
+            <x-form.select-group label="Filter Status" name="statusFilter" wireModel="statusFilter" :options="['' => 'Semua Status', 'publish' => 'Published', 'draft' => 'Draft']" />
             <div class="lg:col-start-4">
                 <x-form.button wireClick="create" icon="fa-solid fa-plus" class="w-full">
                     Tambah Kuis
@@ -69,7 +69,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span @class([
                                 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                                'bg-green-100 text-green-800' => $quiz->status == 'published',
+                                'bg-green-100 text-green-800' => $quiz->status == 'publish',
                                 'bg-yellow-100 text-yellow-800' => $quiz->status == 'draft',
                                 'bg-gray-100 text-gray-800' => $quiz->status == 'archived',
                             ])>
@@ -118,11 +118,9 @@
                     optionLabel="class" required />
                 <x-form.select-group label="Kategori" name="category" wireModel="category" :options="[
                     'Ulangan Harian' => 'Ulangan Harian',
-                    'UTS' => 'UTS',
-                    'UAS' => 'UAS',
                     'Latihan' => 'Latihan',
                 ]" required />
-                <x-form.select-group label="Status" name="status" wireModel="status" :options="['draft' => 'Draft', 'published' => 'Published', 'archived' => 'Archived']" required />
+                <x-form.select-group label="Status" name="status" wireModel="status" :options="['draft' => 'Draft', 'publish' => 'Published']" required />
                 <div class="md:col-span-2">
                     <x-form.textarea-group label="Deskripsi (Opsional)" name="description" wireModel="description" />
                 </div>

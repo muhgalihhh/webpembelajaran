@@ -61,7 +61,16 @@
                             {{ $task->creator?->name ?? 'N/A' }}
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                            {{ $task->due_time ? $task->due_time->format('d M Y, H:i') : '-' }}
+                            {{ $task->due_time ? $task->due_time->format('d M Y, H:i') : '-' }} <br>
+                            @if ($task->published_at)
+                                <span class="text-xs text-gray-400">Diterbitkan:
+                                    {{ $task->published_at->format('d M Y, H:i') }}</span> <br>
+                            @endif
+                            @if (date('Y-m-d H:i') > $task->due_time)
+                                <span class="text-xs text-red-500">Tenggat terlewat</span>
+                            @else
+                                <span class="text-xs text-green-500">Tenggat masih berlaku</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span @class([
@@ -73,7 +82,10 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                            <button class="text-blue-600 hover:text-blue-900">Pengumpulan</button>
+                            <a href="{{ route('teacher.scores.submissions', $task) }}" wire:navigate
+                                class="text-blue-600 hover:text-blue-900">
+                                Lihat Pengumpulan
+                            </a>
                             <button wire:click="edit({{ $task->id }})"
                                 class="ml-4 text-indigo-600 hover:text-indigo-900">Edit</button>
                             <button wire:click="confirmDelete({{ $task->id }})"

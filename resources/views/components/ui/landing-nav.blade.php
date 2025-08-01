@@ -19,12 +19,7 @@
                         class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.quiz') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Kuis</a>
                     <a href="#" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Game Edukatif</a>
-                    <a href="#" wire:navigate
-                        class="relative px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">
-                        <i class="fas fa-bell"></i>
-                        <span class="absolute block w-2 h-2 bg-red-500 rounded-full top-1 right-1 animate-ping"></span>
-                        <span class="absolute block w-2 h-2 bg-red-500 rounded-full top-1 right-1"></span>
-                    </a>
+                    @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
                 @endrole
 
                 @role('guru')

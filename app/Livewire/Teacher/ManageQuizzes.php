@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Teacher;
 
+use App\Events\QuizCreated;
 use App\Models\Classes;
 use App\Models\Quiz;
 use App\Models\Subject;
@@ -76,7 +77,7 @@ class ManageQuizzes extends Component
             'shuffle_options' => 'required|boolean',
             'start_time' => 'nullable|date',
             'end_time' => 'nullable|date|after_or_equal:start_time',
-            'status' => 'required|in:draft,published,archived',
+            'status' => 'required|in:draft,publish',
         ];
     }
 
@@ -154,17 +155,16 @@ class ManageQuizzes extends Component
         // Validasi kustom: Kuis tidak boleh di-publish jika tidak ada soal
         Validator::make($validatedData, [])->after(function ($validator) {
             $questionCount = $this->isEditing ? $this->editingQuiz->questions()->count() : 0;
-            if ($this->status === 'published' && $questionCount === 0) {
+            if ($this->status === 'publish' && $questionCount === 0) {
                 $validator->errors()->add(
                     'status',
-                    'Kuis tidak dapat dipublikasikan karena belum memiliki soal.'
+                    'Kuis tidak dapat dipublikasikan karena belum ada soal yang ditambahkan.'
                 );
             }
         })->validate();
 
         $validatedData['user_id'] = Auth::id();
 
-        // --- PERBAIKAN: Menambahkan start_date dan end_date ---
         $validatedData['start_date'] = $this->start_time ? date('Y-m-d', strtotime($this->start_time)) : null;
         $validatedData['end_date'] = $this->end_time ? date('Y-m-d', strtotime($this->end_time)) : null;
 
@@ -176,7 +176,15 @@ class ManageQuizzes extends Component
             $validatedData['total_questions'] = 0;
             $validatedData['score_weight'] = 100;
 
-            Quiz::create($validatedData);
+            // FIX: 1. Buat instance kuis dan simpan ke variabel
+            $newQuiz = Quiz::create($validatedData);
+
+            // FIX: 2. Kirim event broadcast HANYA jika statusnya 'publish'
+            if ($newQuiz->status === 'publish') {
+                // FIX: 3. Kirim instance model Quiz, bukan array
+                broadcast(new QuizCreated($newQuiz))->toOthers();
+            }
+
             $message = 'Kuis berhasil ditambahkan.';
         }
         $this->dispatch('flash-message', ['message' => $message, 'type' => 'success']);

@@ -25,10 +25,10 @@ return new class extends Migration {
             $table->integer('passing_score')->default(70);
             $table->boolean('shuffle_questions')->default(false);
             $table->boolean('shuffle_options')->default(false);
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->time('start_time');
-            $table->time('end_time');
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
             $table->enum('status', ['draft', 'publish'])->default('draft');
             $table->timestamps();
         });

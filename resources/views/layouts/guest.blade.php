@@ -19,7 +19,7 @@
     @livewireStyles
 </head>
 
-<body>
+<body class="font-sans antialiased text-gray-900 bg-gray-100">
     @if (session()->has('success'))
         <x-ui.alert-popup type="success" :message="session('success')" />
     @endif
@@ -29,7 +29,7 @@
     @endif
     {{-- **SELESAI** --}}
     <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center">
-        <div class="flex items-center p-6 space-x-3 bg-white rounded-lg">
+        <div class="flex items-center space-x-3 bg-white rounded-lg">
             <div class="w-6 h-6 border-2 border-blue-600 rounded-full animate-spin border-t-transparent"></div>
             <span class="text-gray-700">Loading...</span>
         </div>

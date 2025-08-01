@@ -14,6 +14,9 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\NotificationStudent;
+
 #[Layout('layouts.teacher')]
 #[Title('Form Materi')]
 class MaterialForm extends Component
@@ -124,12 +127,28 @@ class MaterialForm extends Component
                 $dataToSave
             );
 
-            $message = $this->material->wasRecentlyCreated ? 'Materi berhasil ditambahkan.' : 'Materi berhasil diperbarui.';
+            $wasRecentlyCreated = $this->material->wasRecentlyCreated;
+
+            $message = $wasRecentlyCreated ? 'Materi berhasil ditambahkan.' : 'Materi berhasil diperbarui.';
+
 
             session()->flash('flash-message', [
                 'message' => $message,
                 'type' => 'success'
             ]);
+
+            if ($wasRecentlyCreated && $this->is_published) {
+                $class = Classes::find($this->class_id);
+                if ($class) {
+                    $students = $class->users()->whereHas('roles', function ($query) {
+                        $query->where('name', 'siswa');
+                    })->get();
+
+                    if ($students->isNotEmpty()) {
+                        Notification::send($students, new NotificationStudent($this->material));
+                    }
+                }
+            }
 
             $this->redirectRoute('teacher.materials');
 

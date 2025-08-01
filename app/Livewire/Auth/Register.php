@@ -2,93 +2,122 @@
 
 namespace App\Livewire\Auth;
 
-use Livewire\Attributes\Title;
-use Livewire\Component;
+use App\Models\Classes;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\On; // Import untuk #[On]
-use Livewire\Attributes\Rule as LivewireRule; // Import untuk #[Rule]
+use Livewire\Attributes\Title;
+use Livewire\Component;
 
-
-
-#[Title("Registrasi Siswa atau Guru")]
-#[Layout("layouts.app")]
-
-
+#[Layout('layouts.guest')]
+#[Title('Daftar Akun')]
 class Register extends Component
 {
-
-
-    #[LivewireRule('required|string|max:255')]
+    // Properti Form
     public string $name = '';
-
-    #[LivewireRule('required|string|max:255|unique:users')]
     public string $username = '';
-
-    #[LivewireRule('required|string|email|max:255|unique:users')]
     public string $email = '';
-
-    #[LivewireRule('required|string|min:8|confirmed')]
+    public string $phone_number = ''; // Kolom baru
     public string $password = '';
     public string $password_confirmation = '';
+    public $class_id = ''; // Kolom baru untuk siswa
 
-    // Properti untuk loading state
-    public bool $isRegisteringStudent = false;
-    public bool $isRegisteringTeacher = false;
+    // Properti untuk mengontrol tab
+    public string $activeTab = 'siswa';
 
-
-
-    public function registerStudent()
+    /**
+     * Mengambil daftar kelas untuk dropdown.
+     */
+    #[Computed]
+    public function classes()
     {
-        $this->isRegisteringStudent = true;
-        try {
-            $this->validate(); // Lakukan validasi penuh saat submit
-            $this->registerUser('siswa');
-        } finally {
-            $this->isRegisteringStudent = false;
+        return Classes::orderBy('class')->get();
+    }
+
+    /**
+     * Mengganti tab aktif.
+     */
+    public function setTab(string $tab)
+    {
+        $this->activeTab = $tab;
+        $this->resetValidation(); // Hapus error validasi saat ganti tab
+    }
+
+    /**
+     * Metode utama yang dipanggil saat form disubmit.
+     */
+    public function register()
+    {
+        // Memanggil metode registrasi yang sesuai berdasarkan tab aktif
+        if ($this->activeTab === 'siswa') {
+            $this->registerStudent();
+        } else {
+            $this->registerTeacher();
         }
     }
 
-    public function registerTeacher()
+    /**
+     * Logika untuk mendaftarkan siswa.
+     */
+    private function registerStudent()
     {
-        $this->isRegisteringTeacher = true;
-        try {
-            $this->validate(); // Lakukan validasi penuh saat submit
-            $this->registerUser('guru');
-        } finally {
-            $this->isRegisteringTeacher = false;
-        }
-    }
-
-    private function registerUser(string $assignedRole)
-    {
-        $role = Role::where('name', $assignedRole)->first();
-        if (!$role) {
-            session()->flash('error', "Role '{$assignedRole}' tidak ditemukan. Mohon hubungi administrator.");
-            return;
-        }
-
-        $user = User::create([
-            'name' => $this->name,
-            'username' => $this->username,
-            'email' => $this->email, // <-- Gunakan properti email
-            'password' => Hash::make($this->password),
-            'status' => 'active',
+        $validated = $this->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'phone_number' => 'required|string|max:15|unique:users,phone_number',
+            'password' => 'required|string|min:8|confirmed',
+            'class_id' => 'required|exists:classes,id', // Wajib untuk siswa
         ]);
 
-        $user->assignRole($role->name);
+        $user = User::create([
+            'name' => $validated['name'],
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+            'phone_number' => $validated['phone_number'],
+            'class_id' => $validated['class_id'],
+            'password' => Hash::make($validated['password']),
+        ]);
 
-        Auth::login($user);
+        $user->assignRole('siswa');
+        auth()->login($user);
+        $this->dispatch('message', [
+            'type' => 'success',
+            'message' => 'Registrasi berhasil! Selamat datang, ' . $user->name,
+        ]);
+        return $this->redirect(route('student.dashboard'), navigate: true);
+    }
 
-        if ($assignedRole === 'siswa') {
-            return redirect()->intended(route('student.index'))->with('success', 'Akun siswa Anda berhasil dibuat!');
-        } elseif ($assignedRole === 'guru') {
-            return redirect()->intended(route('teacher.index'))->with('success', 'Akun guru Anda berhasil dibuat!');
-        }
+    /**
+     * Logika untuk mendaftarkan guru.
+     */
+    private function registerTeacher()
+    {
+        $validated = $this->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'phone_number' => 'required|string|max:15|unique:users,phone_number',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+            'phone_number' => $validated['phone_number'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        $user->assignRole('guru');
+        auth()->login($user);
+        $this->dispatch('message', [
+            'type' => 'success',
+            'message' => 'Registrasi berhasil! Selamat Datang!' . $user->name,
+        ]);
+
+        return $this->redirect(route('teacher.dashboard'), navigate: true);
     }
 
     public function render()
