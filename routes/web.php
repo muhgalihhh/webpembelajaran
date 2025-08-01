@@ -19,12 +19,8 @@ Route::middleware('guest.custom')->group(function () {
     Route::get('/admin/login', \App\Livewire\Auth\LoginAdmin::class)->name('admin.login');
 });
 
-
-
 // Route Auth Group Spatie
 Route::middleware(['auth'])->group(function () {
-
-
     // Rute untuk Admin
     Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('', \App\Livewire\Admin\Index::class)->name('index');
@@ -54,7 +50,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Rute untuk Siswa (contoh)
     Route::middleware(['auth', 'role:siswa'])->prefix('student')->name('student.')->group(function () {
-
         Route::get('/', \App\Livewire\Student\Index::class)->name('index');
         Route::get('/dashboard', \App\Livewire\Student\Dashboard::class)->name('dashboard');
         Route::get('/subjects', action: \App\Livewire\Student\SubjectList::class)->name('subjects');
