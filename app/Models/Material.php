@@ -19,6 +19,7 @@ class Material extends Model
         'subject_id',
         'user_id',
         'description',
+        'page_count',
         'file_path',
         'content',
         'youtube_url',
