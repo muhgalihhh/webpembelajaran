@@ -3,7 +3,7 @@
         {{-- Posisi header diatur dari sini --}}
         <div class="flex justify-center">
             <div
-                class="inline-flex items-center p-3 space-x-2 bg-yellow-400 border-2 border-black rounded-lg shadow-xl sm:p-4 sm:space-x-3">
+                class="inline-flex items-center p-3 space-x-2 bg-yellow-400 border-black rounded-lg shadow-xl border-1 sm:p-4 sm:space-x-3">
 
                 {{-- Ikon --}}
                 <div

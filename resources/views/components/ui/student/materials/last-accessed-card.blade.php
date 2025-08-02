@@ -21,6 +21,7 @@
             <h4 class="font-semibold text-gray-900">{{ $material->title }}</h4>
             <p class="text-sm text-gray-500">
                 Diakses
+
                 {{ \Carbon\Carbon::parse($material->pivot->accessed_at ?? $material->accessed_at)->locale('id')->diffForHumans() }}
             </p>
         </div>
