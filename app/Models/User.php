@@ -87,13 +87,8 @@ class User extends Authenticatable
 
     public function lastAccessedMaterials()
     {
-        return $this->hasManyThrough(
-            Material::class,
-            MaterialAccessLog::class,
-            'user_id', // Foreign key on material_access_logs table...
-            'id', // Foreign key on materials table...
-            'id', // Local key on users table...
-            'material_id' // Local key on material_access_logs table...
-        )->latest('material_access_logs.accessed_at');
+        return $this->belongsToMany(Material::class, 'material_access_logs')
+            ->withPivot('accessed_at')
+            ->orderByPivot('accessed_at', 'desc');
     }
 }

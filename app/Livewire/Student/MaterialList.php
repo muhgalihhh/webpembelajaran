@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Student;
 
+use App\Models\MaterialAccessLog;
 use App\Models\Subject;
 use App\Models\Material;
-use App\Models\MaterialAccessLog;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -12,31 +12,53 @@ use Livewire\Component;
 
 #[Title('Daftar Materi')]
 #[Layout('layouts.landing')]
-
 class MaterialList extends Component
 {
     public Subject $subject;
     public $activeTab = 'text';
-
-    public function mount(Subject $subject)
-    {
-        $this->subject = $subject;
-    }
+    public $selectedMaterial = null;
 
     public function setTab($tab)
     {
         $this->activeTab = $tab;
     }
 
-    public function recordAccess($materialId)
+    /**
+     * Menangani klik pada materi video.
+     * Fungsi ini sekarang menjadi pusat untuk interaksi video.
+     */
+    public function selectMaterial($materialId)
     {
-        // Mencatat akses tanpa redirect agar komponen bisa me-refresh.
-        MaterialAccessLog::updateOrCreate(
-            ['user_id' => Auth::id(), 'material_id' => $materialId],
-            ['accessed_at' => now()]
-        );
+        $this->selectedMaterial = Material::find($materialId);
+
+        if ($this->selectedMaterial) {
+            // Logika dari recordAccess() dipindahkan ke sini.
+            // Mencatat akses langsung saat video dipilih.
+            $this->selectedMaterial->accessLogs()->updateOrCreate(
+                ['user_id' => Auth::id(), 'material_id' => $materialId],
+                ['accessed_at' => now()]
+            );
+        }
     }
 
+    public function extractYoutubeId($url)
+    {
+        preg_match('/(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $url, $matches);
+        return $matches[2] ?? null;
+    }
+
+    public function recordAccess($materialId)
+    {
+        $user = Auth::user();
+        $material = Material::find($materialId);
+
+        if ($material) {
+            MaterialAccessLog::updateOrCreate(
+                ['user_id' => $user->id, 'material_id' => $materialId],
+                ['accessed_at' => now()]
+            );
+        }
+    }
     public function render()
     {
         $user = Auth::user();
@@ -46,21 +68,15 @@ class MaterialList extends Component
             ->where('is_published', true)
             ->get();
 
-        $textMaterials = $allMaterials->filter(fn($m) => !empty($m->content) || !empty($m->file_path));
-        $videoMaterials = $allMaterials->filter(fn($m) => !empty($m->youtube_url));
-
-
         $lastAccessed = $user->lastAccessedMaterials()
-            ->where('subject_id', $this->subject->id)
+            ->where('materials.subject_id', $this->subject->id)
             ->distinct()
-            ->latest('material_access_logs.accessed_at')
             ->take(5)
             ->get();
 
-
         return view('livewire.student.material-list', [
-            'textMaterials' => $textMaterials,
-            'videoMaterials' => $videoMaterials,
+            'textMaterials' => $allMaterials->filter(fn($m) => !empty($m->content) || !empty($m->file_path)),
+            'videoMaterials' => $allMaterials->filter(fn($m) => !empty($m->youtube_url)),
             'lastAccessed' => $lastAccessed,
         ]);
     }
