@@ -13,9 +13,9 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\NotificationStudent;
+use Spatie\PdfToText\Pdf; // <-- [1] Impor pustaka PDF
 
 #[Layout('layouts.teacher')]
 #[Title('Form Materi')]
@@ -36,6 +36,7 @@ class MaterialForm extends Component
     public $uploadedFile;
     public $content = '';
     public ?string $currentFileUrl = null;
+    public ?int $page_count = null; // <-- [2] Properti baru untuk jumlah halaman
 
     /**
      * Mount dijalankan saat komponen di-load.
@@ -53,12 +54,41 @@ class MaterialForm extends Component
             $this->chapter = $this->material->chapter ?? '';
             $this->is_published = $this->material->is_published;
             $this->url = $this->material->youtube_url;
+            $this->page_count = $this->material->page_count; // <-- Ambil data page_count yang ada
 
             if ($this->material->file_path && Storage::disk('public')->exists($this->material->file_path)) {
                 $this->currentFileUrl = Storage::url($this->material->file_path);
             }
         }
     }
+
+    /**
+     * [3] Metode baru untuk menangani unggahan file dan menghitung halaman PDF.
+     * Dijalankan secara otomatis saat file diunggah.
+     */
+    public function updatedUploadedFile($file)
+    {
+        $this->validateOnly('uploadedFile', [
+            'uploadedFile' => 'nullable|file|mimes:pdf|max:10240', // Pastikan hanya PDF yang dihitung
+        ]);
+
+        if ($file && $file->getClientOriginalExtension() === 'pdf') {
+            try {
+                // Gunakan pustaka untuk mendapatkan jumlah halaman dari file yang diunggah
+                $this->page_count = (new Pdf())
+                    ->setPdf($file->getRealPath())
+                    ->getNumberOfPages();
+            } catch (\Exception $e) {
+                // Tangani jika terjadi error saat membaca PDF
+                $this->page_count = null;
+                $this->addError('uploadedFile', 'Gagal menghitung halaman PDF. File mungkin rusak atau tidak valid.');
+            }
+        } else {
+            // Reset jumlah halaman jika file bukan PDF atau dibatalkan
+            $this->page_count = null;
+        }
+    }
+
 
     #[Computed]
     public function subjects()
@@ -102,6 +132,7 @@ class MaterialForm extends Component
                 'is_published' => $this->is_published,
                 'youtube_url' => $this->url,
                 'user_id' => Auth::id(),
+                'page_count' => $this->page_count, // <-- [4] Sertakan jumlah halaman saat menyimpan
             ];
 
             if ($this->uploadedFile) {
@@ -116,9 +147,7 @@ class MaterialForm extends Component
                 $extension = $this->uploadedFile->getClientOriginalExtension();
                 $newFileName = "{$sanitizedChapter}_{$sanitizedSubjectName}_" . Str::random(10) . ".{$extension}";
 
-                // --- PERBAIKAN UTAMA: Menggunakan cara yang benar untuk menyimpan file ---
                 $path = $this->uploadedFile->storeAs('materi', $newFileName, 'public');
-
                 $dataToSave['file_path'] = $path;
             }
 
@@ -128,9 +157,7 @@ class MaterialForm extends Component
             );
 
             $wasRecentlyCreated = $this->material->wasRecentlyCreated;
-
             $message = $wasRecentlyCreated ? 'Materi berhasil ditambahkan.' : 'Materi berhasil diperbarui.';
-
 
             session()->flash('flash-message', [
                 'message' => $message,

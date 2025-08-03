@@ -71,7 +71,6 @@ class MaterialList extends Component
         $lastAccessed = $user->lastAccessedMaterials()
             ->where('materials.subject_id', $this->subject->id)
             ->distinct()
-            ->take(5)
             ->get();
 
         return view('livewire.student.material-list', [

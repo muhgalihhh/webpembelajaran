@@ -18,9 +18,9 @@
         x-transition:leave="transition ease-in duration-150 transform"
         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
         x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
-        class="absolute right-0 z-50 w-64 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg top-full">
+        class="absolute right-0 z-50 w-80 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg top-full">
 
-        <div class="px-4 py-2 font-bold text-gray-700 border-b">
+        <div class="px-4 py-2 font-bold text-gray-700 ">
             Notifikasi
         </div>
 

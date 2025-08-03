@@ -40,15 +40,17 @@ class Login extends Component
         }
 
         session()->regenerate();
-
-        // Redirect based on role
-        $redirectRoute = match($role) {
+        $redirectRoute = match ($role) {
             'siswa' => 'student.index',
             'guru' => 'teacher.index',
             'admin' => 'admin.index',
             default => 'dashboard'
         };
 
+        $this->dispatch('flash-message', [
+            'message' => 'Login berhasil sebagai ' . ucfirst($role) . '.',
+            'type' => 'success'
+        ]);
         $this->redirect(route($redirectRoute), navigate: true);
     }
 

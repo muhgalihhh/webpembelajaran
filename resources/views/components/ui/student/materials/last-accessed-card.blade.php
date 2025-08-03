@@ -37,7 +37,7 @@
         <div class="inline-flex items-center">
             <a href="" wire:navigate
                 class="px-3 py-2 text-sm font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300">
-                Lihat
+                Buka Lagi
             </a>
         </div>
     </div>

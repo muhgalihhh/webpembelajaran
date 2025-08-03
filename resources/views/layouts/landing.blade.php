@@ -20,13 +20,6 @@
 <body x-data="{ pageLoaded: false }" x-init="setTimeout(() => pageLoaded = true, 100)" x-show="pageLoaded" x-transition.opacity.duration.500ms
     class="bg-[#EBF3FF] text-gray-900 min-h-screen flex flex-col">
 
-    @if (session()->has('success'))
-        <x-ui.alert-popup type="success" :message="session('success')" />
-    @endif
-
-    @if (session()->has('error'))
-        <x-ui.alert-popup type="error" :message="session('error')" />
-    @endif
 
     <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center"
         x-transition.opacity.duration.300ms>
@@ -54,6 +47,7 @@
             {{ $slot }}
         </main>
 
+
     </div>
 
     <!-- Footer yang akan selalu di bawah -->
@@ -62,6 +56,7 @@
     </footer>
 
     @livewireScripts
+    <x-ui.alert-popup />
     <x-ui.logout-confirmation />
     @vite(['resources/js/app.js'])
 </body>

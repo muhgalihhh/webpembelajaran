@@ -13,7 +13,6 @@
         {{-- Tab Materi Teks/PDF --}}
         <div x-show="$wire.activeTab === 'text'" class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
             @forelse ($textMaterials as $material)
-                {{-- [FIX] Mengirim 'context' agar tampilan kartu sesuai --}}
                 <x-ui.student.materials.card :material="$material" context="text" wire:key="text-{{ $material->id }}" />
             @empty
                 <p class="py-12 text-center text-gray-600 col-span-full">Belum ada materi PDF untuk mata pelajaran ini.
@@ -24,7 +23,6 @@
         {{-- Tab Materi Video --}}
         <div x-show="$wire.activeTab === 'video'" class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
             @forelse ($videoMaterials as $material)
-                {{-- [FIX] Mengirim 'context' agar tampilan kartu sesuai --}}
                 <x-ui.student.materials.card :material="$material" context="video" wire:key="video-{{ $material->id }}" />
             @empty
                 <p class="py-12 text-center text-gray-600 col-span-full">Belum ada materi video untuk mata pelajaran
@@ -36,9 +34,11 @@
     @if ($lastAccessed->isNotEmpty())
         <div class="p-6 mt-8 bg-white rounded-lg" wire:poll.5s>
             <h2 class="mb-6 text-xl font-bold text-gray-900">Materi Terakhir Diakses</h2>
-            @foreach ($lastAccessed->take(1) as $material)
-                <x-ui.student.materials.last-accessed-card :material="$material" />
-            @endforeach
+            <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+                @foreach ($lastAccessed->take(5) as $material)
+                    <x-ui.student.materials.last-accessed-card :material="$material" />
+                @endforeach
+            </div>
         </div>
     @endif
 </div>

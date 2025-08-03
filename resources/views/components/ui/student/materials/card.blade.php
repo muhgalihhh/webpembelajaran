@@ -61,6 +61,8 @@
         <p class="text-sm text-gray-600">{{ $material->description }}</p>
         @if ($material->page_count)
             <p class="text-xs text-gray-500">{{ $material->page_count }} Halaman</p>
+        @else
+            <p class="text-xs text-gray-500">Jumlah halaman tidak tersedia</p>
         @endif
     </div>
 
