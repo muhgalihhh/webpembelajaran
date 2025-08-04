@@ -18,7 +18,8 @@
             passwordToggle label="Kata Sandi" icon="fa-solid fa-lock" />
 
         <div class="pr-4 mb-6 text-sm text-right text-gray-600">
-            Lupa Kata Sandi? <a href="#" class="font-bold text-blue-600 hover:underline">Ubah Kata Sandi</a>
+            Lupa Kata Sandi? <a href="{{ route('password.request') }}" class="font-bold text-blue-600 hover:underline"
+                wire:navigate>Ubah Kata Sandi</a>
         </div>
 
         <div class="flex justify-between mb-6 gap-x-3">

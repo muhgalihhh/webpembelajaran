@@ -17,6 +17,8 @@ Route::middleware('guest.custom')->group(function () {
     Route::get('/login', \App\Livewire\Auth\Login::class)->name('login');
     Route::get('/register', \App\Livewire\Auth\Register::class)->name('register');
     Route::get('/admin/login', \App\Livewire\Auth\LoginAdmin::class)->name('admin.login');
+    Route::get('/lupa-sandi', \App\Livewire\Auth\ForgotPassword::class)->name('password.request');
+    Route::get('/reset-sandi/{token}', \App\Livewire\Auth\ResetPassword::class)->name('password.reset');
 });
 
 // Route Auth Group Spatie

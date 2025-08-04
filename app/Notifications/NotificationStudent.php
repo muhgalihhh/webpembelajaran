@@ -2,50 +2,85 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Models\Material; // Import model Material
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use App\Models\Material;
+use App\Models\Task;
+use App\Models\Quiz;
 
 class NotificationStudent extends Notification
 {
-    use Queueable;
+    protected $model;
 
-    protected $material;
-
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct(Material $material)
+    public function __construct(object $model)
     {
-        $this->material = $material;
+        $this->model = $model;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
-        // Kita hanya akan menyimpannya di database untuk sekarang
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
+    public function toDatabase(object $notifiable): array
     {
-        // Data ini akan disimpan dalam format JSON di kolom 'data' pada tabel notifications
+        $type = 'Konten Baru';
+        $title = 'Konten Baru Ditambahkan!';
+        $link = '#';
+
+        if ($this->model instanceof Material) {
+            $type = 'Materi Baru';
+            $title = $this->model->title;
+            // $link = route('student.materials.show', $this->model->id);
+        } elseif ($this->model instanceof Task) {
+            $type = 'Tugas Baru';
+            $title = $this->model->title;
+            // $link = route('student.tasks.show', $this->model->id);
+        } elseif ($this->model instanceof Quiz) {
+            $type = 'Kuis Baru';
+            $title = $this->model->title;
+            //$link = route('student.quizzes.show', $this->model->id);
+        }
+
         return [
-            'title' => 'Materi Baru Ditambahkan!',
-            'message' => "Materi baru '{$this->material->title}' telah ditambahkan di kelas Anda.",
-            'link' => route('student.subjects.show', $this->material->id), // Contoh link ke detail materi
-            'material_id' => $this->material->id,
+            'type' => $type,
+            'title' => $title,
+            'link' => $link,
+            'subject_name' => $this->model->subject->name ?? 'Umum',
+            'class_id' => $this->model->class_id ?? null,
         ];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        $data = $this->toDatabase($notifiable);
+
+        // Tambahkan info tambahan untuk real-time
+        $data['notification_id'] = $this->id;
+        $data['user_id'] = $notifiable->id;
+
+        return new BroadcastMessage($data);
+    }
+
+    public function broadcastOn(): array
+    {
+        return [
+            'notifications', // Channel global
+            // Bisa juga tambahkan channel per kelas:
+            // 'class.' . $this->model->class_id,
+        ];
+    }
+
+    public function broadcastType(): string
+    {
+        if ($this->model instanceof Material) {
+            return 'material.created';
+        } elseif ($this->model instanceof Task) {
+            return 'task.created';
+        } elseif ($this->model instanceof Quiz) {
+            return 'quiz.created';
+        }
+
+        return 'content.created';
     }
 }

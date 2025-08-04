@@ -57,6 +57,7 @@
 
     @livewireScripts
     <x-ui.alert-popup />
+    <x-ui.flash-message />
     <x-ui.logout-confirmation />
     @vite(['resources/js/app.js'])
 </body>

@@ -43,6 +43,7 @@
             </div>
         </div>
     </div>
+    <x-ui.flash-message />
     <x-ui.alert-popup />
     <x-ui.logout-confirmation />
     @livewireScripts

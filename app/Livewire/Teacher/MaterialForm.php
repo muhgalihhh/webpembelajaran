@@ -5,7 +5,9 @@ namespace App\Livewire\Teacher;
 use App\Models\Classes;
 use App\Models\Material;
 use App\Models\Subject;
+use App\Notifications\NotificationStudent;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
@@ -13,9 +15,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Notification;
-use App\Notifications\NotificationStudent;
-use Spatie\PdfToText\Pdf; // <-- [1] Impor pustaka PDF
+use Spatie\PdfToText\Pdf;
 
 #[Layout('layouts.teacher')]
 #[Title('Form Materi')]
@@ -25,36 +25,25 @@ class MaterialForm extends Component
 
     public ?Material $material;
 
-    // Properti yang di-binding ke form
     public string $title = '';
     public string $description = '';
     public $subject_id = '';
     public $class_id = '';
     public string $chapter = '';
     public bool $is_published = false;
-    public ?string $url = '';
+    public ?string $url = null;
     public $uploadedFile;
     public $content = '';
     public ?string $currentFileUrl = null;
-    public ?int $page_count = null; // <-- [2] Properti baru untuk jumlah halaman
+    public ?int $page_count = null;
 
-    /**
-     * Mount dijalankan saat komponen di-load.
-     */
     public function mount(Material $material)
     {
         $this->material = $material;
 
         if ($this->material->exists) {
-            $this->title = $this->material->title;
-            $this->description = $this->material->description;
-            $this->content = $this->material->content;
-            $this->subject_id = $this->material->subject_id;
-            $this->class_id = $this->material->class_id;
-            $this->chapter = $this->material->chapter ?? '';
-            $this->is_published = $this->material->is_published;
-            $this->url = $this->material->youtube_url;
-            $this->page_count = $this->material->page_count; // <-- Ambil data page_count yang ada
+            $this->fill($this->material->toArray());
+            $this->url = $this->material->youtube_url; // Penyesuaian nama kolom
 
             if ($this->material->file_path && Storage::disk('public')->exists($this->material->file_path)) {
                 $this->currentFileUrl = Storage::url($this->material->file_path);
@@ -62,33 +51,21 @@ class MaterialForm extends Component
         }
     }
 
-    /**
-     * [3] Metode baru untuk menangani unggahan file dan menghitung halaman PDF.
-     * Dijalankan secara otomatis saat file diunggah.
-     */
     public function updatedUploadedFile($file)
     {
         $this->validateOnly('uploadedFile', [
-            'uploadedFile' => 'nullable|file|mimes:pdf|max:10240', // Pastikan hanya PDF yang dihitung
+            'uploadedFile' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
+        $this->page_count = null;
         if ($file && $file->getClientOriginalExtension() === 'pdf') {
             try {
-                // Gunakan pustaka untuk mendapatkan jumlah halaman dari file yang diunggah
-                $this->page_count = (new Pdf())
-                    ->setPdf($file->getRealPath())
-                    ->getNumberOfPages();
+                $this->page_count = (new Pdf())->setPdf($file->getRealPath())->getNumberOfPages();
             } catch (\Exception $e) {
-                // Tangani jika terjadi error saat membaca PDF
-                $this->page_count = null;
-                $this->addError('uploadedFile', 'Gagal menghitung halaman PDF. File mungkin rusak atau tidak valid.');
+                $this->addError('uploadedFile', 'Gagal memproses file PDF. File mungkin rusak.');
             }
-        } else {
-            // Reset jumlah halaman jika file bukan PDF atau dibatalkan
-            $this->page_count = null;
         }
     }
-
 
     #[Computed]
     public function subjects()
@@ -102,9 +79,6 @@ class MaterialForm extends Component
         return Classes::orderBy('class')->get();
     }
 
-    /**
-     * Menyimpan data (membuat baru atau update).
-     */
     public function save()
     {
         $rules = [
@@ -119,7 +93,7 @@ class MaterialForm extends Component
             'uploadedFile' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,zip|max:10240',
         ];
 
-        $this->validate($rules);
+        $validated = $this->validate($rules);
 
         try {
             $dataToSave = [
@@ -132,7 +106,7 @@ class MaterialForm extends Component
                 'is_published' => $this->is_published,
                 'youtube_url' => $this->url,
                 'user_id' => Auth::id(),
-                'page_count' => $this->page_count, // <-- [4] Sertakan jumlah halaman saat menyimpan
+                'page_count' => $this->page_count,
             ];
 
             if ($this->uploadedFile) {
@@ -141,49 +115,33 @@ class MaterialForm extends Component
                 }
 
                 $subject = Subject::find($this->subject_id);
-                $subjectName = $subject ? $subject->name : 'mapel';
-                $sanitizedChapter = Str::slug($this->chapter ?: 'bab', '_');
-                $sanitizedSubjectName = Str::slug($subjectName, '_');
+                $subjectName = Str::slug($subject?->name ?: 'mapel', '_');
+                $chapterName = Str::slug($this->chapter ?: 'bab', '_');
                 $extension = $this->uploadedFile->getClientOriginalExtension();
-                $newFileName = "{$sanitizedChapter}_{$sanitizedSubjectName}_" . Str::random(10) . ".{$extension}";
+                $fileName = "{$chapterName}_{$subjectName}_" . Str::random(10) . ".{$extension}";
 
-                $path = $this->uploadedFile->storeAs('materi', $newFileName, 'public');
-                $dataToSave['file_path'] = $path;
+                $dataToSave['file_path'] = $this->uploadedFile->storeAs('materi', $fileName, 'public');
             }
 
-            $this->material = Material::updateOrCreate(
-                ['id' => $this->material->id],
-                $dataToSave
-            );
+            $material = Material::updateOrCreate(['id' => $this->material->id], $dataToSave);
 
-            $wasRecentlyCreated = $this->material->wasRecentlyCreated;
+            $wasRecentlyCreated = $material->wasRecentlyCreated;
             $message = $wasRecentlyCreated ? 'Materi berhasil ditambahkan.' : 'Materi berhasil diperbarui.';
 
-            session()->flash('flash-message', [
-                'message' => $message,
-                'type' => 'success'
-            ]);
-
-            if ($wasRecentlyCreated && $this->is_published) {
-                $class = Classes::find($this->class_id);
-                if ($class) {
-                    $students = $class->users()->whereHas('roles', function ($query) {
-                        $query->where('name', 'siswa');
-                    })->get();
-
+            if ($wasRecentlyCreated && $material->is_published) {
+                if ($class = Classes::find($material->class_id)) {
+                    $students = $class->users()->whereHas('roles', fn($q) => $q->where('name', 'siswa'))->get();
                     if ($students->isNotEmpty()) {
-                        Notification::send($students, new NotificationStudent($this->material));
+                        Notification::send($students, new NotificationStudent($material));
                     }
                 }
             }
 
-            $this->redirectRoute('teacher.materials');
+            session()->flash('flash_message', ['message' => $message, 'type' => 'success']);
+            $this->redirect(route('teacher.materials'), navigate: true);
 
         } catch (\Exception $e) {
-            $this->dispatch('flash-message', [
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
-                'type' => 'error'
-            ]);
+            session()->flash('flash_message', ['message' => 'Terjadi kesalahan: ' . $e->getMessage(), 'type' => 'error']);
         }
     }
 

@@ -34,6 +34,7 @@
     </div>
 
     @livewireScripts
+    <x-ui.flash-message />
 
 
     @vite(['resources/js/app.js'])

@@ -7,9 +7,11 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
+use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 
 #[Layout('layouts.app')]
+#[Title('Login Pengguna - Website Pembelajaran Digital')]
 class Login extends Component
 {
     #[Validate('required|string')]
@@ -26,6 +28,10 @@ class Login extends Component
 
         // Attempt login
         if (!Auth::attempt(['username' => $this->username, 'password' => $this->password])) {
+            session()->flash('flash-message', [
+                'message' => 'Username atau password tidak sesuai.',
+                'type' => 'error'
+            ]);
             $this->addError('username', 'Username atau password tidak sesuai.');
             return;
         }
@@ -35,6 +41,10 @@ class Login extends Component
         // Check role
         if (!$user->hasRole($role)) {
             Auth::logout();
+            session()->flash('flash-message', [
+                'message' => 'Anda tidak memiliki akses sebagai ' . ucfirst($role) . '.',
+                'type' => 'error'
+            ]);
             $this->addError('username', 'Anda tidak memiliki akses sebagai ' . ucfirst($role) . '.');
             return;
         }
@@ -47,10 +57,12 @@ class Login extends Component
             default => 'dashboard'
         };
 
-        $this->dispatch('flash-message', [
-            'message' => 'Login berhasil sebagai ' . ucfirst($role) . '.',
+
+        session()->flash('flash_message', [
+            'message' => 'Berhasil masuk sebagai ' . ucfirst($role) . '.',
             'type' => 'success'
         ]);
+
         $this->redirect(route($redirectRoute), navigate: true);
     }
 
