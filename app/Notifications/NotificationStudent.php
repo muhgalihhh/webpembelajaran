@@ -2,14 +2,15 @@
 
 namespace App\Notifications;
 
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Notification;
 use App\Models\Material;
-use App\Models\Task;
 use App\Models\Quiz;
+use App\Models\Task;
 
-class NotificationStudent extends Notification
+class NotificationStudent extends Notification implements ShouldBroadcast
 {
     protected $model;
 
@@ -32,15 +33,12 @@ class NotificationStudent extends Notification
         if ($this->model instanceof Material) {
             $type = 'Materi Baru';
             $title = $this->model->title;
-            // $link = route('student.materials.show', $this->model->id);
         } elseif ($this->model instanceof Task) {
             $type = 'Tugas Baru';
             $title = $this->model->title;
-            // $link = route('student.tasks.show', $this->model->id);
         } elseif ($this->model instanceof Quiz) {
             $type = 'Kuis Baru';
             $title = $this->model->title;
-            //$link = route('student.quizzes.show', $this->model->id);
         }
 
         return [
@@ -51,33 +49,29 @@ class NotificationStudent extends Notification
         ];
     }
 
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        $data = $this->toDatabase($notifiable);
-        return new BroadcastMessage([
-            'notification' => $data,
-            'user_id' => $notifiable->id,
-        ]);
-    }
-
+    /**
+     * Menentukan channel siaran notifikasi.
+     */
     public function broadcastOn(): array
     {
-        // Broadcast ke channel class yang sesuai dengan class_id dari model
         return [
             new PrivateChannel('class.' . $this->model->class_id),
         ];
     }
 
+    /**
+     * Menentukan nama event siaran.
+     */
     public function broadcastType(): string
     {
-        if ($this->model instanceof Material) {
-            return 'material.created';
-        } elseif ($this->model instanceof Task) {
-            return 'task.created';
-        } elseif ($this->model instanceof Quiz) {
-            return 'quiz.created';
-        }
+        return 'new-content-notification';
+    }
 
-        return 'content.created';
+    /**
+     * Mengambil representasi siaran dari notifikasi.
+     */
+    public function toBroadcast($notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage($this->toDatabase($notifiable));
     }
 }

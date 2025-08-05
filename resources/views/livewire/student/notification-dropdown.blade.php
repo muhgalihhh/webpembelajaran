@@ -1,8 +1,13 @@
 <div x-data="{
     notificationOpen: false,
-    unreadCount: @entangle('notificationCount')
+    unreadCount: @entangle('notificationCount').live
 }" @click.away="notificationOpen = false"
-    @notification-updated.window="unreadCount = $event.detail.count" class="relative">
+    @notification-updated.window="
+        unreadCount = $event.detail.count;
+        // Auto refresh component setiap kali ada notifikasi baru
+        $wire.$refresh();
+    "
+    class="relative">
 
     {{-- Tombol Notifikasi --}}
     <button @click="notificationOpen = !notificationOpen"
@@ -68,4 +73,11 @@
             </div>
         @endif
     </div>
+
+    {{-- Debug Info (hapus setelah selesai debugging) --}}
+    @if (config('app.debug'))
+        <div class="fixed p-2 text-xs text-white bg-gray-800 rounded bottom-4 right-4">
+            Debug: Count = {{ $this->notificationCount }} | User Class = {{ Auth::user()->class_id ?? 'null' }}
+        </div>
+    @endif
 </div>

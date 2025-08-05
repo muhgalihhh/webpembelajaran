@@ -29,9 +29,8 @@ class NotificationDropdown extends Component
         $classId = Auth::user()->class_id;
 
         return [
-            "echo-private:class.{$classId},.material.created" => 'handleNewNotification',
-            "echo-private:class.{$classId},.task.created" => 'handleNewNotification',
-            "echo-private:class.{$classId},.quiz.created" => 'handleNewNotification',
+            // Format yang benar untuk Laravel Echo dengan Pusher
+            "echo-private:class.{$classId},.new-content-notification" => 'handleNewNotification',
             'notification-read' => 'refreshNotificationData',
         ];
     }
@@ -48,17 +47,23 @@ class NotificationDropdown extends Component
             'class_id' => Auth::user()->class_id ?? null
         ]);
 
-        // Refresh notifikasi count tanpa unset computed properties
+        // Refresh notifikasi count
         $this->notificationCount = Auth::user()->unreadNotifications()->count();
+
+        // Reset computed properties untuk force refresh
+        unset($this->computedPropertyCache['notifications']);
+        unset($this->computedPropertyCache['unreadCount']);
 
         // Dispatch browser event untuk update UI
         $this->dispatch('notification-updated', [
-            'count' => $this->notificationCount
+            'count' => $this->notificationCount,
+            'type' => $event['type'] ?? 'Notifikasi Baru',
+            'title' => $event['title'] ?? 'Ada konten baru'
         ]);
 
-        // Show toast notification
+        // Show toast notification dengan informasi spesifik
         $this->dispatch('flash-message', [
-            'message' => 'Ada notifikasi baru!',
+            'message' => ($event['type'] ?? 'Notifikasi') . ': ' . ($event['title'] ?? 'Ada konten baru'),
             'type' => 'info'
         ]);
     }
@@ -72,8 +77,14 @@ class NotificationDropdown extends Component
         // Update notification count langsung dari database
         $this->notificationCount = Auth::user()->unreadNotifications()->count();
 
-        // Force refresh view
-        $this->render();
+        // Reset computed properties
+        unset($this->computedPropertyCache['notifications']);
+        unset($this->computedPropertyCache['unreadCount']);
+
+        // Dispatch event untuk update UI
+        $this->dispatch('notification-updated', [
+            'count' => $this->notificationCount
+        ]);
     }
 
     public function markAsReadAndRedirect(string $notificationId)
@@ -96,12 +107,18 @@ class NotificationDropdown extends Component
     {
         Auth::user()->unreadNotifications->markAsRead();
         $this->refreshNotificationData();
+
+        $this->dispatch('flash-message', [
+            'message' => 'Semua notifikasi telah ditandai sebagai dibaca',
+            'type' => 'success'
+        ]);
     }
 
     /**
      * Computed property untuk notifications - refresh setiap kali dipanggil
      */
-    public function getNotificationsProperty()
+    #[Computed]
+    public function notifications()
     {
         if (!Auth::check()) {
             return collect();
@@ -124,7 +141,8 @@ class NotificationDropdown extends Component
     /**
      * Computed property untuk unread count - refresh setiap kali dipanggil
      */
-    public function getUnreadCountProperty()
+    #[Computed]
+    public function unreadCount()
     {
         if (!Auth::check()) {
             return 0;
