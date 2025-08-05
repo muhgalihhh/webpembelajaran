@@ -4,106 +4,89 @@ namespace App\Livewire\Student;
 
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
-use Livewire\Attributes\On;
+use Livewire\Attributes\Computed;
 
 class NotificationDropdown extends Component
 {
-    public $notifications = [];
-    public $unreadCount = 0;
-
-    public function mount()
-    {
-        $this->loadNotifications();
-    }
-
     /**
-     * Load notifications dari database - RETURN SEBAGAI COLLECTION, BUKAN ARRAY
+     * Mendefinisikan listener secara dinamis untuk menangani event broadcast.
      */
-    public function loadNotifications()
+    protected function getListeners()
     {
-        $user = Auth::user();
-        if ($user) {
-            // JANGAN gunakan toArray() - biarkan sebagai Collection
-            $this->notifications = $user->notifications()->latest()->take(10)->get();
-            $this->unreadCount = $user->unreadNotifications()->count();
+        if (!Auth::check() || !Auth::user()->class_id) {
+            return [];
         }
+
+        $classId = Auth::user()->class_id;
+
+        return [
+            "echo-private:class.{$classId},.material.created" => 'handleNewNotification',
+            "echo-private:class.{$classId},.task.created" => 'handleNewNotification',
+            "echo-private:class.{$classId},.quiz.created" => 'handleNewNotification',
+            'notification-read' => 'refreshNotificationData',
+        ];
     }
 
     /**
-     * Event listener untuk notifikasi baru dari Pusher
+     * Method ini dipanggil saat notifikasi baru diterima.
      */
-    #[On('notification-received')]
     public function handleNewNotification($notificationData = null)
     {
-        $this->loadNotifications();
-        $this->dispatch('show-notification-toast', $notificationData);
+        // Mengosongkan properti computed agar dihitung ulang saat render berikutnya.
+        unset($this->notifications);
+        unset($this->unreadCount);
+
+        // Memberi notifikasi toast di frontend.
+        // Dispatch ini juga akan memicu re-render pada komponen.
+        $this->dispatch('flash-message', message: 'Ada notifikasi baru!', type: 'info');
     }
 
     /**
-     * Event listener untuk notifikasi yang dibaca
+     * Me-refresh data setelah notifikasi dibaca.
      */
-    #[On('notification-read')]
-    public function handleNotificationRead()
+    public function refreshNotificationData()
     {
-        $this->loadNotifications();
+        unset($this->notifications);
+        unset($this->unreadCount);
     }
 
-    /**
-     * Menandai notifikasi sebagai sudah dibaca
-     */
     public function markAsReadAndRedirect(string $notificationId)
     {
         $user = Auth::user();
-        if (!$user)
-            return;
-
         $notification = $user->notifications()->find($notificationId);
 
         if ($notification) {
             $notification->markAsRead();
-            $this->loadNotifications();
             $this->dispatch('notification-read');
 
             $link = $notification->data['link'] ?? '#';
-            return $this->redirect($link, navigate: true);
+            if ($link !== '#') {
+                return $this->redirect($link, navigate: true);
+            }
         }
     }
 
-    /**
-     * Mark all notifications as read
-     */
     public function markAllAsRead()
     {
-        $user = Auth::user();
-        if ($user) {
-            $user->unreadNotifications->markAsRead();
-            $this->loadNotifications();
-            $this->dispatch('notification-read');
-        }
+        Auth::user()->unreadNotifications->markAsRead();
+        $this->dispatch('notification-read');
     }
 
     /**
-     * Computed property untuk notifications
+     * 👇 PERUBAHAN DI SINI: Hapus 'persist: true'
+     * Ini memastikan data selalu fresh setiap kali komponen render.
      */
-    public function getNotificationsProperty()
+    #[Computed]
+    public function notifications()
     {
-        $user = Auth::user();
-        if ($user) {
-            return $user->notifications()->latest()->take(10)->get();
-        }
-        return collect([]);
+        // Mengambil notifikasi terbaru untuk pengguna yang sedang login.
+        return Auth::check() ? Auth::user()->notifications()->latest()->take(10)->get() : collect();
     }
 
-    /**
-     * Computed property untuk unread count
-     */
-    public function getUnreadCountProperty()
+    #[Computed]
+    public function unreadCount()
     {
-        $user = Auth::user();
-        if ($user) {
-            return $user->unreadNotifications()->count();
-        }
-        return 0;
+        return Auth::check() ? Auth::user()->unreadNotifications()->count() : 0;
     }
 
     public function render()

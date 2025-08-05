@@ -3,7 +3,7 @@
 namespace App\Notifications;
 
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Messages\BroadcastMessage; // ← TAMBAHKAN INI
 use App\Models\Material;
 use App\Models\Task;
 use App\Models\Quiz;
@@ -47,27 +47,20 @@ class NotificationStudent extends Notification
             'title' => $title,
             'link' => $link,
             'subject_name' => $this->model->subject->name ?? 'Umum',
-            'class_id' => $this->model->class_id ?? null,
         ];
     }
 
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         $data = $this->toDatabase($notifiable);
-
-        // Tambahkan info tambahan untuk real-time
-        $data['notification_id'] = $this->id;
-        $data['user_id'] = $notifiable->id;
-
         return new BroadcastMessage($data);
     }
+
 
     public function broadcastOn(): array
     {
         return [
-            'notifications', // Channel global
-            // Bisa juga tambahkan channel per kelas:
-            // 'class.' . $this->model->class_id,
+            'notifications',
         ];
     }
 
