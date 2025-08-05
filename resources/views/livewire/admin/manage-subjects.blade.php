@@ -37,6 +37,10 @@
                     <th wire:click="sortBy('code')"
                         class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                         Kode</th>
+                    {{-- Kolom Kurikulum Ditambahkan --}}
+                    <th wire:click="sortBy('kurikulum')"
+                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
+                        Kurikulum</th>
                     <th wire:click="sortBy('is_active')"
                         class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                         Status</th>
@@ -48,9 +52,11 @@
                     <tr class="hover:bg-gray-100">
                         <td class="px-6 py-4 whitespace-nowrap">{{ $subject->name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $subject->code }}</td>
+                        {{-- Data Kurikulum Ditampilkan --}}
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $subject->kurikulum }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $subject->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full {{ $subject->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                 {{ $subject->is_active ? 'Aktif' : 'Nonaktif' }}
                             </span>
                         </td>
@@ -63,7 +69,8 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="py-4 text-center text-gray-500">Tidak ada data mata pelajaran
+                        {{-- Colspan disesuaikan menjadi 5 --}}
+                        <td colspan="5" class="py-4 text-center text-gray-500">Tidak ada data mata pelajaran
                             ditemukan.</td>
                     </tr>
                 @endforelse
@@ -71,16 +78,23 @@
         </table>
     </div>
 
+    {{-- Paginasi --}}
     <div class="mt-4">{{ $this->subjects->links() }}</div>
+
     {{-- Modal Konfirmasi Delete --}}
     <x-ui.confirm-modal title="Hapus Mata Pelajaran" message="Anda yakin ingin menghapus data mata pelajaran ini?"
         wireConfirmAction="delete" />
+
     {{-- Modal Form --}}
     <x-ui.modal id="subject-form-modal">
         <h2 class="text-2xl font-bold">{{ $isEditing ? 'Edit' : 'Tambah' }} Mata Pelajaran</h2>
         <form wire:submit.prevent="save" class="mt-4 space-y-4">
             <x-form.input-group label="Nama Mata Pelajaran" type="text" wireModel="name" id="name" required />
             <x-form.input-group label="Kode Mata Pelajaran" type="text" wireModel="code" id="code" required />
+
+            {{-- Select untuk Kurikulum Ditambahkan --}}
+            <x-form.select-group label="Kurikulum" name="kurikulum" wireModel="kurikulum" :options="$kurikulumOptions" />
+
             <x-form.select-group label="Status" name="is_active" wireModel="is_active" :options="['1' => 'Aktif', '0' => 'Nonaktif']" required />
 
             <div class="flex justify-end pt-4 space-x-4">
@@ -91,7 +105,4 @@
             </div>
         </form>
     </x-ui.modal>
-
-
-
 </div>

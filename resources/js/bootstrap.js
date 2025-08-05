@@ -9,3 +9,13 @@ window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
  * allow your team to quickly build robust real-time web applications.
  */
 import "./echo";
+
+
+// Cek koneksi Pusher
+window.Echo.connector.pusher.connection.state
+
+// Listen manual untuk testing
+window.Echo.private('class.1') // ganti 1 dengan class_id yang sesuai
+    .listen('.material.created', (e) => {
+        console.log('Received notification:', e);
+    });

@@ -21,8 +21,14 @@ Route::middleware('guest.custom')->group(function () {
     Route::get('/reset-sandi/{token}', \App\Livewire\Auth\ResetPassword::class)->name('password.reset');
 });
 
+
+
 // Route Auth Group Spatie
 Route::middleware(['auth'])->group(function () {
+    Route::get('api/user', function () {
+        return response()->json(['user' => Auth::user()]);
+    })->name('api.user');
+
     // Rute untuk Admin
     Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('', \App\Livewire\Admin\Index::class)->name('index');

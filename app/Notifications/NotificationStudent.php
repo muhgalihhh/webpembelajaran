@@ -3,7 +3,8 @@
 namespace App\Notifications;
 
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\BroadcastMessage; // ← TAMBAHKAN INI
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Broadcasting\PrivateChannel;
 use App\Models\Material;
 use App\Models\Task;
 use App\Models\Quiz;
@@ -53,14 +54,17 @@ class NotificationStudent extends Notification
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         $data = $this->toDatabase($notifiable);
-        return new BroadcastMessage($data);
+        return new BroadcastMessage([
+            'notification' => $data,
+            'user_id' => $notifiable->id,
+        ]);
     }
-
 
     public function broadcastOn(): array
     {
+        // Broadcast ke channel class yang sesuai dengan class_id dari model
         return [
-            'notifications',
+            new PrivateChannel('class.' . $this->model->class_id),
         ];
     }
 

@@ -33,15 +33,17 @@ class ManageSubjects extends Component
     public $perPage = 10;
 
     // Properti Form
-    public $name, $code;
+    public $name, $code, $kurikulum;
     public $is_active = true; // Default value
 
     // Properti untuk state modal & data
     public $isEditing = false;
     public ?Subject $editingSubject = null;
     public $itemToDeleteId = null;
-
-    // --- PERBAIKAN: Lifecycle Hooks untuk Reset Paginasi ---
+    public $kurikulumOptions = [
+        'K-13' => 'K-13',
+        'Kurikulum Merdeka' => 'Kurikulum Merdeka',
+    ];
     public function updatingSearch()
     {
         $this->resetPage();
@@ -51,14 +53,23 @@ class ManageSubjects extends Component
     {
         $this->resetPage();
     }
-    // --- AKHIR PERBAIKAN ---
 
     protected function rules()
     {
         $subjectId = $this->editingSubject?->id;
+
         return [
-            'name' => ['required', 'string', 'max:255', Rule::unique('subjects')->ignore($subjectId)],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                // Aturan validasi yang baru
+                Rule::unique('subjects')->where(function ($query) {
+                    return $query->where('kurikulum', $this->kurikulum);
+                })->ignore($subjectId),
+            ],
             'code' => ['required', 'string', 'max:50', Rule::unique('subjects')->ignore($subjectId)],
+            'kurikulum' => ['required', 'string', Rule::in(array_keys($this->kurikulumOptions))],
             'is_active' => 'required|boolean',
         ];
     }
@@ -91,7 +102,7 @@ class ManageSubjects extends Component
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingSubject', 'name', 'code', 'is_active']);
+        $this->reset(['isEditing', 'editingSubject', 'name', 'code', 'is_active', 'kurikulum']);
         $this->resetValidation();
     }
 
@@ -110,6 +121,7 @@ class ManageSubjects extends Component
         $this->editingSubject = $subject;
         $this->name = $subject->name;
         $this->code = $subject->code;
+        $this->kurikulum = $subject->kurikulum;
         $this->is_active = $subject->is_active;
         $this->dispatch('open-modal', id: 'subject-form-modal');
     }

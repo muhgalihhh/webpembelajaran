@@ -2,38 +2,118 @@
 
 namespace App\Livewire\Student;
 
-use App\Models\MaterialAccessLog;
-use App\Models\Subject;
 use App\Models\Material;
+use App\Models\Subject;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Title('Daftar Materi')]
 #[Layout('layouts.landing')]
 class MaterialList extends Component
 {
+    use WithPagination;
+
+    /**
+     * Mengatur tema pagination agar sesuai dengan Tailwind CSS.
+     * Ini akan memperbaiki tampilan pagination yang rusak.
+     */
+    protected $paginationTheme = 'tailwind';
+
     public Subject $subject;
     public $activeTab = 'text';
     public $selectedMaterial = null;
 
-    public function setTab($tab)
+    public function mount(Subject $subject)
     {
-        $this->activeTab = $tab;
+        $this->subject = $subject;
     }
 
     /**
-     * Menangani klik pada materi video.
-     * Fungsi ini sekarang menjadi pusat untuk interaksi video.
+     * Mendefinisikan listener untuk broadcast events
+     */
+    protected function getListeners()
+    {
+        if (!Auth::check() || !Auth::user()->class_id) {
+            return [];
+        }
+
+        $classId = Auth::user()->class_id;
+
+        return [
+            "echo-private:class.{$classId},.material.created" => 'handleNewMaterial',
+            "echo-private:class.{$classId},.task.created" => 'handleNewContent',
+            "echo-private:class.{$classId},.quiz.created" => 'handleNewContent',
+        ];
+    }
+
+    /**
+     * Handle ketika ada materi baru
+     */
+    public function handleNewMaterial($event)
+    {
+        Log::info('New material broadcast received', [
+            'event' => $event,
+            'subject_id' => $this->subject->id,
+            'user_id' => Auth::id()
+        ]);
+
+        // Reset pagination ke halaman pertama
+        $this->resetPage();
+
+        // Refresh component data
+        $this->render();
+
+        // Dispatch event untuk notifikasi
+        $this->dispatch('flash-message', [
+            'message' => 'Materi baru telah ditambahkan!',
+            'type' => 'info'
+        ]);
+    }
+
+    /**
+     * Handle ketika ada konten baru (task/quiz)
+     */
+    public function handleNewContent($event)
+    {
+        Log::info('New content broadcast received', [
+            'event' => $event,
+            'subject_id' => $this->subject->id
+        ]);
+    }
+
+    /**
+     * Event listener untuk refresh manual
+     */
+    #[On('refresh-materials')]
+    public function refreshMaterials()
+    {
+        $this->resetPage();
+        $this->render();
+    }
+
+    /**
+     * Mengganti tab aktif dan mereset paginasi ke halaman pertama.
+     */
+    public function setTab($tab)
+    {
+        $this->activeTab = $tab;
+        $this->resetPage();
+    }
+
+    /**
+     * Memilih materi dan mencatat akses pengguna.
      */
     public function selectMaterial($materialId)
     {
         $this->selectedMaterial = Material::find($materialId);
 
         if ($this->selectedMaterial) {
-            // Logika dari recordAccess() dipindahkan ke sini.
-            // Mencatat akses langsung saat video dipilih.
             $this->selectedMaterial->accessLogs()->updateOrCreate(
                 ['user_id' => Auth::id(), 'material_id' => $materialId],
                 ['accessed_at' => now()]
@@ -47,35 +127,57 @@ class MaterialList extends Component
         return $matches[2] ?? null;
     }
 
-    public function recordAccess($materialId)
-    {
-        $user = Auth::user();
-        $material = Material::find($materialId);
-
-        if ($material) {
-            MaterialAccessLog::updateOrCreate(
-                ['user_id' => $user->id, 'material_id' => $materialId],
-                ['accessed_at' => now()]
-            );
-        }
-    }
+    /**
+     * Merender komponen ke view.
+     */
     public function render()
     {
         $user = Auth::user();
 
-        $allMaterials = Material::where('subject_id', $this->subject->id)
+        // Query dasar untuk materi dengan fresh data
+        $baseQuery = Material::where('subject_id', $this->subject->id)
             ->where('class_id', $user->class_id)
-            ->where('is_published', true)
-            ->get();
+            ->where('is_published', true);
 
+        $textMaterials = collect();
+        $videoMaterials = collect();
+
+        // Memuat data hanya untuk tab yang aktif dengan paginasi
+        if ($this->activeTab === 'text') {
+            $textMaterials = (clone $baseQuery)
+                ->where(function (Builder $query) {
+                    $query->whereNotNull('content')->orWhereNotNull('file_path');
+                })
+                ->latest('updated_at') // Ubah ke updated_at untuk memastikan data terbaru muncul
+                ->paginate(6, ['*'], 'textPage');
+
+            Log::info('Text materials loaded', [
+                'count' => $textMaterials->count(),
+                'subject_id' => $this->subject->id,
+                'class_id' => $user->class_id
+            ]);
+        } elseif ($this->activeTab === 'video') {
+            $videoMaterials = (clone $baseQuery)
+                ->whereNotNull('youtube_url')
+                ->latest('updated_at') // Ubah ke updated_at untuk memastikan data terbaru muncul
+                ->paginate(6, ['*'], 'videoPage');
+
+            Log::info('Video materials loaded', [
+                'count' => $videoMaterials->count(),
+                'subject_id' => $this->subject->id,
+                'class_id' => $user->class_id
+            ]);
+        }
+
+        // Mengambil materi yang terakhir diakses
         $lastAccessed = $user->lastAccessedMaterials()
             ->where('materials.subject_id', $this->subject->id)
             ->distinct()
             ->get();
 
         return view('livewire.student.material-list', [
-            'textMaterials' => $allMaterials->filter(fn($m) => !empty($m->content) || !empty($m->file_path)),
-            'videoMaterials' => $allMaterials->filter(fn($m) => !empty($m->youtube_url)),
+            'textMaterials' => $textMaterials,
+            'videoMaterials' => $videoMaterials,
             'lastAccessed' => $lastAccessed,
         ]);
     }

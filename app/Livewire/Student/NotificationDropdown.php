@@ -3,11 +3,20 @@
 namespace App\Livewire\Student;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 
 class NotificationDropdown extends Component
 {
+    public $notificationCount = 0;
+
+    public function mount()
+    {
+        $this->notificationCount = $this->unreadCount;
+    }
+
     /**
      * Mendefinisikan listener secara dinamis untuk menangani event broadcast.
      */
@@ -28,26 +37,43 @@ class NotificationDropdown extends Component
     }
 
     /**
-     * Method ini dipanggil saat notifikasi baru diterima.
+     * Method ini dipanggil saat notifikasi baru diterima via broadcast.
      */
-    public function handleNewNotification($notificationData = null)
+    public function handleNewNotification($event)
     {
-        // Mengosongkan properti computed agar dihitung ulang saat render berikutnya.
-        unset($this->notifications);
-        unset($this->unreadCount);
+        // Log untuk debugging
+        Log::info('Broadcast notification received', [
+            'event' => $event,
+            'user_id' => Auth::id(),
+            'class_id' => Auth::user()->class_id ?? null
+        ]);
 
-        // Memberi notifikasi toast di frontend.
-        // Dispatch ini juga akan memicu re-render pada komponen.
-        $this->dispatch('flash-message', message: 'Ada notifikasi baru!', type: 'info');
+        // Refresh notifikasi count tanpa unset computed properties
+        $this->notificationCount = Auth::user()->unreadNotifications()->count();
+
+        // Dispatch browser event untuk update UI
+        $this->dispatch('notification-updated', [
+            'count' => $this->notificationCount
+        ]);
+
+        // Show toast notification
+        $this->dispatch('flash-message', [
+            'message' => 'Ada notifikasi baru!',
+            'type' => 'info'
+        ]);
     }
 
     /**
      * Me-refresh data setelah notifikasi dibaca.
      */
+    #[On('notification-read')]
     public function refreshNotificationData()
     {
-        unset($this->notifications);
-        unset($this->unreadCount);
+        // Update notification count langsung dari database
+        $this->notificationCount = Auth::user()->unreadNotifications()->count();
+
+        // Force refresh view
+        $this->render();
     }
 
     public function markAsReadAndRedirect(string $notificationId)
@@ -55,9 +81,9 @@ class NotificationDropdown extends Component
         $user = Auth::user();
         $notification = $user->notifications()->find($notificationId);
 
-        if ($notification) {
+        if ($notification && is_null($notification->read_at)) {
             $notification->markAsRead();
-            $this->dispatch('notification-read');
+            $this->refreshNotificationData();
 
             $link = $notification->data['link'] ?? '#';
             if ($link !== '#') {
@@ -69,24 +95,49 @@ class NotificationDropdown extends Component
     public function markAllAsRead()
     {
         Auth::user()->unreadNotifications->markAsRead();
-        $this->dispatch('notification-read');
+        $this->refreshNotificationData();
     }
 
     /**
-     * 👇 PERUBAHAN DI SINI: Hapus 'persist: true'
-     * Ini memastikan data selalu fresh setiap kali komponen render.
+     * Computed property untuk notifications - refresh setiap kali dipanggil
      */
-    #[Computed]
-    public function notifications()
+    public function getNotificationsProperty()
     {
-        // Mengambil notifikasi terbaru untuk pengguna yang sedang login.
-        return Auth::check() ? Auth::user()->notifications()->latest()->take(10)->get() : collect();
+        if (!Auth::check()) {
+            return collect();
+        }
+
+        $notifications = Auth::user()
+            ->notifications()
+            ->latest()
+            ->take(10)
+            ->get();
+
+        Log::info('Loading notifications', [
+            'count' => $notifications->count(),
+            'user_id' => Auth::id()
+        ]);
+
+        return $notifications;
     }
 
-    #[Computed]
-    public function unreadCount()
+    /**
+     * Computed property untuk unread count - refresh setiap kali dipanggil
+     */
+    public function getUnreadCountProperty()
     {
-        return Auth::check() ? Auth::user()->unreadNotifications()->count() : 0;
+        if (!Auth::check()) {
+            return 0;
+        }
+
+        $count = Auth::user()->unreadNotifications()->count();
+
+        Log::info('Unread count', [
+            'count' => $count,
+            'user_id' => Auth::id()
+        ]);
+
+        return $count;
     }
 
     public function render()

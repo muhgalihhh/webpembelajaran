@@ -7,6 +7,7 @@ use App\Models\Material;
 use App\Models\Subject;
 use App\Notifications\NotificationStudent;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -37,13 +38,16 @@ class MaterialForm extends Component
     public ?string $currentFileUrl = null;
     public ?int $page_count = null;
 
+    private bool $originalPublishStatus = false;
+
     public function mount(Material $material)
     {
         $this->material = $material;
 
         if ($this->material->exists) {
             $this->fill($this->material->toArray());
-            $this->url = $this->material->youtube_url; // Penyesuaian nama kolom
+            $this->url = $this->material->youtube_url;
+            $this->originalPublishStatus = $this->material->is_published;
 
             if ($this->material->file_path && Storage::disk('public')->exists($this->material->file_path)) {
                 $this->currentFileUrl = Storage::url($this->material->file_path);
@@ -67,16 +71,22 @@ class MaterialForm extends Component
         }
     }
 
+
     #[Computed]
     public function subjects()
     {
-        return Subject::orderBy('name')->get();
+
+        return Subject::orderBy('kurikulum', 'asc')->orderBy('kurikulum')->get()
+            ->mapWithKeys(function ($subject) {
+                $displayText = "{$subject->name} - ({$subject->kurikulum})";
+                return [$subject->id => $displayText];
+            });
     }
 
     #[Computed]
     public function classes()
     {
-        return Classes::orderBy('class')->get();
+        return Classes::orderBy('class')->get()->pluck('class', 'id');
     }
 
     public function save()
@@ -93,7 +103,7 @@ class MaterialForm extends Component
             'uploadedFile' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,zip|max:10240',
         ];
 
-        $validated = $this->validate($rules);
+        $this->validate($rules);
 
         try {
             $dataToSave = [
@@ -124,17 +134,12 @@ class MaterialForm extends Component
             }
 
             $material = Material::updateOrCreate(['id' => $this->material->id], $dataToSave);
-
             $wasRecentlyCreated = $material->wasRecentlyCreated;
+            $statusChangedToPublished = !$this->originalPublishStatus && $this->is_published;
             $message = $wasRecentlyCreated ? 'Materi berhasil ditambahkan.' : 'Materi berhasil diperbarui.';
 
-            if ($wasRecentlyCreated && $material->is_published) {
-                if ($class = Classes::find($material->class_id)) {
-                    $students = $class->users()->whereHas('roles', fn($q) => $q->where('name', 'siswa'))->get();
-                    if ($students->isNotEmpty()) {
-                        Notification::send($students, new NotificationStudent($material));
-                    }
-                }
+            if ($material->is_published && ($wasRecentlyCreated || $statusChangedToPublished)) {
+                $this->sendNotificationToStudents($material);
             }
 
             session()->flash('flash_message', ['message' => $message, 'type' => 'success']);
@@ -142,6 +147,24 @@ class MaterialForm extends Component
 
         } catch (\Exception $e) {
             session()->flash('flash_message', ['message' => 'Terjadi kesalahan: ' . $e->getMessage(), 'type' => 'error']);
+        }
+    }
+
+    private function sendNotificationToStudents(Material $material)
+    {
+        if ($class = Classes::find($material->class_id)) {
+            $students = $class->users()
+                ->whereHas('roles', fn($q) => $q->where('name', 'siswa'))
+                ->get();
+
+            if ($students->isNotEmpty()) {
+                Notification::send($students, new NotificationStudent($material));
+                Log::info('Notification sent to students', [
+                    'material_id' => $material->id,
+                    'class_id' => $material->class_id,
+                    'student_count' => $students->count(),
+                ]);
+            }
         }
     }
 

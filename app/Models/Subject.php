@@ -17,6 +17,7 @@ class Subject extends Model
     protected $fillable = [
         'name',
         'code',
+        'kurikulum',
         'is_active',
     ];
 
