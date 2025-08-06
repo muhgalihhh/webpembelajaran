@@ -77,6 +77,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/subjects/{subject}/materials', \App\Livewire\Student\MaterialList::class)->name('materials.index');
         Route::get('/materials/{material}', \App\Livewire\Student\MaterialDetail::class)->name('materials.show');
         Route::get('/quizzes', \App\Livewire\Student\QuizList::class)->name('quizzes');
+        Route::get('/quizzes/{quiz}/attempt', \App\Livewire\Student\QuizAttempt::class)->name('quizzes.attempt');
     });
 
 

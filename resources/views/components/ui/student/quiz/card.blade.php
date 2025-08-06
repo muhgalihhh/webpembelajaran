@@ -107,7 +107,7 @@
         {{-- Tombol Aksi --}}
         <div>
             @if ($isPublished)
-                <a href="" wire:navigate
+                <a href="{{ route('student.quizzes.attempt', $quiz) }}" wire:navigate
                     class="block w-full py-3 px-6 text-center font-bold text-white {{ $buttonColor }} rounded-b-xl shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl">
                     <div class="flex items-center justify-center space-x-2">
                         <span>Mulai Kuis</span>

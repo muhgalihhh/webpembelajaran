@@ -8,12 +8,14 @@
         <div class="grid items-end grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <x-form.input-group label="Pencarian Kuis" type="search" wireModel="search" id="search"
                 placeholder="Cari judul kuis..." />
-            <x-form.select-group label="Filter Mata Pelajaran" name="subjectFilter" wireModel="subjectFilter.live"
+            <x-form.select-group label="Filter Mata Pelajaran" name="subjectFilter" wireModel="subjectFilter"
                 :options="$this->subjects" placeholder="Semua Mata Pelajaran" />
-            <x-form.select-group label="Filter Kelas" name="classFilter" wireModel="classFilter.live" :options="$this->classes"
+
+            <x-form.select-group label="Filter Kelas" name="classFilter" wireModel="classFilter" :options="$this->classes"
                 optionLabel="class" placeholder="Semua Kelas" />
-            <x-form.select-group label="Filter Status" name="statusFilter" wireModel="statusFilter.live"
-                :options="['' => 'Semua Status', 'publish' => 'Published', 'draft' => 'Draft']" placeholder="Semua Status" />
+
+            <x-form.select-group label="Filter Status" name="statusFilter" wireModel="statusFilter" :options="['' => 'Semua Status', 'publish' => 'Published', 'draft' => 'Draft']"
+                placeholder="Semua Status" />
 
             <div class="lg:col-start-4">
                 <x-form.button wireClick="create" icon="fa-solid fa-plus" class="w-full">

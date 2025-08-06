@@ -46,8 +46,6 @@ class ManageQuizzes extends Component
     public $title, $description, $subject_id, $class_id, $category, $duration_minutes, $passing_score, $status, $start_time, $end_time;
     public bool $shuffle_questions = false, $shuffle_options = false;
 
-    // [4] Hapus semua hook 'updating...' karena kita akan menggunakan .live di view
-
     protected function rules()
     {
         return [
@@ -82,7 +80,6 @@ class ManageQuizzes extends Component
     #[Computed]
     public function subjects()
     {
-        // [6] Perbarui format subject untuk menyertakan kurikulum
         return Subject::orderBy('kurikulum', 'asc')->orderBy('name')->get()
             ->mapWithKeys(function ($subject) {
                 $displayText = "{$subject->name} - ({$subject->kurikulum})";
@@ -140,7 +137,7 @@ class ManageQuizzes extends Component
 
     public function save()
     {
-        // [7] Logika notifikasi yang disempurnakan
+
         $wasPreviouslyPublished = $this->isEditing ? $this->editingQuiz->status === 'publish' : false;
 
         $validatedData = $this->validate();

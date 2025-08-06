@@ -11,72 +11,76 @@
 <div x-data="{
     open: false,
     search: '',
-    value: @entangle($wireModel).live, // Tambahkan .live untuk real-time sync
+    value: @entangle($wireModel).live,
     selectedLabel: '',
 
-    // Mengambil daftar opsi dari prop
-    options: {{ json_encode($options) }},
+    // Gabungkan placeholder sebagai opsi pertama
+    get optionsWithPlaceholder() {
+        const placeholderOption = { '': '{{ $placeholder }}' };
+        // Cek apakah options adalah array of objects atau key-value
+        if (Array.isArray({{ json_encode($options) }})) {
+            // Konversi array of objects ke format yang benar
+            const formattedOptions = {{ json_encode($options) }}.reduce((acc, item) => {
+                acc[item.id] = item;
+                return acc;
+            }, {});
+            return { ...placeholderOption, ...formattedOptions };
+        }
+        return { ...placeholderOption, ...{{ json_encode($options) }} };
+    },
 
-    // Logika untuk memfilter opsi berdasarkan pencarian
     get filteredOptions() {
         if (this.search === '') {
-            return this.options;
+            return this.optionsWithPlaceholder;
         }
         const searchLower = this.search.toLowerCase();
 
-        // Handle jika options berupa array of objects (untuk optionLabel)
-        if (typeof Object.values(this.options)[0] === 'object') {
+        if (typeof Object.values(this.optionsWithPlaceholder)[1] === 'object') { // Cek dari indeks ke-1
             return Object.fromEntries(
-                Object.entries(this.options).filter(([key, item]) => {
+                Object.entries(this.optionsWithPlaceholder).filter(([key, item]) => {
+                    if (key === '') return true; // Selalu tampilkan placeholder
                     const label = '{{ $optionLabel }}' ? item['{{ $optionLabel }}'] : item.name || item.label;
                     return label.toLowerCase().includes(searchLower);
                 })
             );
         } else {
-            // Handle jika options berupa key-value pairs biasa
             return Object.fromEntries(
-                Object.entries(this.options).filter(([key, label]) =>
+                Object.entries(this.optionsWithPlaceholder).filter(([key, label]) =>
                     label.toLowerCase().includes(searchLower)
                 )
             );
         }
     },
 
-    // Fungsi untuk memilih sebuah opsi
     selectOption(key, label) {
         this.value = key;
-        this.selectedLabel = label;
+        // Jika placeholder dipilih, set label sesuai placeholder
+        this.selectedLabel = (key === '') ? '{{ $placeholder }}' : label;
         this.open = false;
-        this.search = ''; // Reset search setelah memilih
+        this.search = '';
     },
 
-    // Fungsi untuk mendapatkan label dari value
     getLabelFromValue(val) {
-        if (!val || !this.options[val]) {
+        // Handle jika value kosong atau tidak ada di options
+        if (!val || !this.optionsWithPlaceholder[val]) {
             return '{{ $placeholder }}';
         }
+        const option = this.optionsWithPlaceholder[val];
 
-        const option = this.options[val];
         if (typeof option === 'object') {
             return '{{ $optionLabel }}' ? option['{{ $optionLabel }}'] : (option.name || option.label || val);
         }
         return option;
     },
 
-    // Inisialisasi untuk menampilkan label yang sudah ada saat edit
     init() {
-        // Tetapkan label awal jika ada nilai
         this.selectedLabel = this.getLabelFromValue(this.value);
 
-        // Pantau perubahan dari Livewire untuk memperbarui label
         this.$watch('value', (newValue) => {
             this.selectedLabel = this.getLabelFromValue(newValue);
         });
 
-        // Update options jika ada perubahan dari parent component
-        this.$watch('options', () => {
-            this.selectedLabel = this.getLabelFromValue(this.value);
-        });
+        // Tidak perlu watch 'options', karena sudah digabung di `optionsWithPlaceholder`
     }
 }" x-init="init()" class="relative" @click.outside="open = false">
     {{-- Label --}}
@@ -127,7 +131,7 @@
             </template>
 
             {{-- Pesan Jika Tidak Ada Hasil --}}
-            <template x-if="Object.keys(filteredOptions).length === 0">
+            <template x-if="Object.keys(filteredOptions).length === 1 && Object.keys(filteredOptions)[0] === ''">
                 <li class="px-3 py-2 text-gray-500 select-none">Tidak ada hasil ditemukan.</li>
             </template>
         </ul>
