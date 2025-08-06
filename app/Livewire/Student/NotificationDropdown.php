@@ -50,9 +50,6 @@ class NotificationDropdown extends Component
         // Refresh notifikasi count
         $this->notificationCount = Auth::user()->unreadNotifications()->count();
 
-        // Reset computed properties untuk force refresh
-        unset($this->computedPropertyCache['notifications']);
-        unset($this->computedPropertyCache['unreadCount']);
 
         // Dispatch browser event untuk update UI
         $this->dispatch('notification-updated', [
@@ -77,9 +74,6 @@ class NotificationDropdown extends Component
         // Update notification count langsung dari database
         $this->notificationCount = Auth::user()->unreadNotifications()->count();
 
-        // Reset computed properties
-        unset($this->computedPropertyCache['notifications']);
-        unset($this->computedPropertyCache['unreadCount']);
 
         // Dispatch event untuk update UI
         $this->dispatch('notification-updated', [
@@ -108,10 +102,6 @@ class NotificationDropdown extends Component
         Auth::user()->unreadNotifications->markAsRead();
         $this->refreshNotificationData();
 
-        $this->dispatch('flash-message', [
-            'message' => 'Semua notifikasi telah ditandai sebagai dibaca',
-            'type' => 'success'
-        ]);
     }
 
     /**

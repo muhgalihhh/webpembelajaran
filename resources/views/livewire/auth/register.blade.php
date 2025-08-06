@@ -66,7 +66,8 @@
             @if ($activeTab === 'siswa')
                 <div wire:key="student-fields">
                     <x-form.select-group label="Pilih Kelas Anda" name="class_id" wireModel="class_id" :options="$this->classes"
-                        optionLabel="class" {{-- Sesuaikan dengan nama kolom di tabel 'classes' --}} required />
+                        wire:model.live='class_id' {{-- Sesuaikan dengan nama kolom di tabel 'classes' --}} optionLabel="class" {{-- Sesuaikan dengan nama kolom di tabel 'classes' --}}
+                        required />
                 </div>
             @endif
         </div>

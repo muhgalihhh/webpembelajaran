@@ -2,12 +2,13 @@
 
 namespace App\Livewire\Teacher;
 
-use App\Events\QuizCreated;
 use App\Models\Classes;
 use App\Models\Quiz;
 use App\Models\Subject;
+use App\Notifications\NotificationStudent; // <-- [1] Tambahkan Notifikasi
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification; // <-- [2] Tambahkan Notifikasi
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -22,21 +23,21 @@ class ManageQuizzes extends Component
     use WithPagination;
 
     // Properti Filter
-    #[Url(as: 'q')]
+    #[Url(as: 'q', keep: true)] // <-- [3] Tambahkan 'keep: true' agar filter tidak hilang saat pindah halaman
     public string $search = '';
-    #[Url(as: 'mapel')]
+    #[Url(as: 'mapel', keep: true)]
     public string $subjectFilter = '';
-    #[Url(as: 'kelas')]
+    #[Url(as: 'kelas', keep: true)]
     public string $classFilter = '';
-    #[Url(as: 'status')]
+    #[Url(as: 'status', keep: true)]
     public string $statusFilter = '';
     public $itemToDeleteId = null;
 
     // Properti Sorting
     #[Url]
-    public string $sortBy = 'title';
+    public string $sortBy = 'created_at'; // Default sort by terbaru
     #[Url]
-    public string $sortDirection = 'asc';
+    public string $sortDirection = 'desc';
 
     // Properti Form Modal
     public bool $isEditing = false;
@@ -45,23 +46,7 @@ class ManageQuizzes extends Component
     public $title, $description, $subject_id, $class_id, $category, $duration_minutes, $passing_score, $status, $start_time, $end_time;
     public bool $shuffle_questions = false, $shuffle_options = false;
 
-    // Lifecycle Hooks
-    public function updatingSearch()
-    {
-        $this->resetPage();
-    }
-    public function updatingSubjectFilter()
-    {
-        $this->resetPage();
-    }
-    public function updatingClassFilter()
-    {
-        $this->resetPage();
-    }
-    public function updatingStatusFilter()
-    {
-        $this->resetPage();
-    }
+    // [4] Hapus semua hook 'updating...' karena kita akan menggunakan .live di view
 
     protected function rules()
     {
@@ -84,7 +69,7 @@ class ManageQuizzes extends Component
     #[Computed]
     public function quizzes()
     {
-        return Quiz::with(['subject', 'targetClass'])
+        return Quiz::with(['subject', 'targetClass'])->withCount('questions')
             ->where('user_id', Auth::id())
             ->when($this->search, fn($q) => $q->where('title', 'like', '%' . $this->search . '%'))
             ->when($this->subjectFilter, fn($q) => $q->where('subject_id', $this->subjectFilter))
@@ -97,13 +82,18 @@ class ManageQuizzes extends Component
     #[Computed]
     public function subjects()
     {
-        return Subject::orderBy('name')->get();
+        // [6] Perbarui format subject untuk menyertakan kurikulum
+        return Subject::orderBy('kurikulum', 'asc')->orderBy('name')->get()
+            ->mapWithKeys(function ($subject) {
+                $displayText = "{$subject->name} - ({$subject->kurikulum})";
+                return [$subject->id => $displayText];
+            });
     }
 
     #[Computed]
     public function classes()
     {
-        return Classes::orderBy('class')->get();
+        return Classes::orderBy('class')->get()->pluck('class', 'id');
     }
 
     public function sortBy(string $field): void
@@ -150,45 +140,55 @@ class ManageQuizzes extends Component
 
     public function save()
     {
+        // [7] Logika notifikasi yang disempurnakan
+        $wasPreviouslyPublished = $this->isEditing ? $this->editingQuiz->status === 'publish' : false;
+
         $validatedData = $this->validate();
 
-        // Validasi kustom: Kuis tidak boleh di-publish jika tidak ada soal
-        Validator::make($validatedData, [])->after(function ($validator) {
+        if ($this->status === 'publish') {
             $questionCount = $this->isEditing ? $this->editingQuiz->questions()->count() : 0;
-            if ($this->status === 'publish' && $questionCount === 0) {
-                $validator->errors()->add(
-                    'status',
-                    'Kuis tidak dapat dipublikasikan karena belum ada soal yang ditambahkan.'
-                );
+            if ($questionCount === 0) {
+                $this->addError('status', 'Kuis tidak dapat dipublikasikan karena belum ada soal.');
+                return;
             }
-        })->validate();
+        }
 
         $validatedData['user_id'] = Auth::id();
-
-        $validatedData['start_date'] = $this->start_time ? date('Y-m-d', strtotime($this->start_time)) : null;
-        $validatedData['end_date'] = $this->end_time ? date('Y-m-d', strtotime($this->end_time)) : null;
+        $message = 'Kuis berhasil diperbarui.';
 
         if ($this->isEditing) {
             $this->editingQuiz->update($validatedData);
-            $message = 'Kuis berhasil diperbarui.';
+            $quiz = $this->editingQuiz->fresh();
         } else {
-            // Nilai default untuk kuis baru
-            $validatedData['total_questions'] = 0;
-            $validatedData['score_weight'] = 100;
-
-            // FIX: 1. Buat instance kuis dan simpan ke variabel
-            $newQuiz = Quiz::create($validatedData);
-
-            // FIX: 2. Kirim event broadcast HANYA jika statusnya 'publish'
-            if ($newQuiz->status === 'publish') {
-                // FIX: 3. Kirim instance model Quiz, bukan array
-                broadcast(new QuizCreated($newQuiz))->toOthers();
-            }
-
+            $quiz = Quiz::create($validatedData);
             $message = 'Kuis berhasil ditambahkan.';
         }
+
+        $isNowPublished = $quiz->status === 'publish';
+        if ($isNowPublished && !$wasPreviouslyPublished) {
+            $this->sendNotificationToStudents($quiz);
+            $message .= ' Notifikasi telah dikirim ke siswa.';
+        }
+
         $this->dispatch('flash-message', ['message' => $message, 'type' => 'success']);
         $this->dispatch('close-modal');
+    }
+
+    // [8] Method baru untuk mengirim notifikasi
+    private function sendNotificationToStudents(Quiz $quiz)
+    {
+        try {
+            if ($class = Classes::find($quiz->class_id)) {
+                $students = $class->users()->whereHas('roles', fn($q) => $q->where('name', 'siswa'))->get();
+                if ($students->isNotEmpty()) {
+                    Notification::send($students, new NotificationStudent($quiz));
+                }
+            }
+        } catch (\Exception $e) {
+            // Log error jika notifikasi gagal
+            Log::error('Gagal mengirim notifikasi siswa: ' . $e->getMessage());
+            $this->dispatch('flash-message', ['message' => 'Gagal mengirim notifikasi siswa.', 'type' => 'error']);
+        }
     }
 
     public function confirmDelete($id)

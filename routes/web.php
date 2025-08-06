@@ -5,9 +5,11 @@ use App\Livewire\Admin\ManageStudents;
 use App\Livewire\Admin\ManageSubjects;
 use App\Livewire\Admin\ManageTeachers;
 use App\Livewire\Admin\ProfileAdmin;
+use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('/', function () {
     return view('welcome');
@@ -22,12 +24,22 @@ Route::middleware('guest.custom')->group(function () {
 });
 
 
-
 // Route Auth Group Spatie
 Route::middleware(['auth'])->group(function () {
     Route::get('api/user', function () {
         return response()->json(['user' => Auth::user()]);
     })->name('api.user');
+
+    Route::get('/materials/{material}/download', [\App\Http\Controllers\FileController::class, 'downloadMaterial'])
+        ->name('materials.download');
+
+    Route::get('/view/materi/{material}', function (Material $material) {
+
+        if (!Storage::disk('local')->exists($material->file_path)) {
+            abort(404, 'File tidak ditemukan.');
+        }
+        return response()->file(Storage::disk('local')->path($material->file_path));
+    })->name('materials.view');
 
     // Rute untuk Admin
     Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -47,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/materials', \App\Livewire\Teacher\ManageMaterials::class)->name('materials');
         Route::get('/materials/create', \App\Livewire\Teacher\MaterialForm::class)->name('materials.create');
         Route::get('/materials/{material}/edit', \App\Livewire\Teacher\MaterialForm::class)->name('materials.edit');
+
         Route::get('/quizzes', \App\Livewire\Teacher\ManageQuizzes::class)->name('quizzes');
         Route::get('/quizzes/{quiz}/questions', \App\Livewire\Teacher\QuizQuestions::class)->name('quizzes.questions');
         Route::get('/task', \App\Livewire\Teacher\ManageTasks::class)->name('tasks');
@@ -62,6 +75,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', \App\Livewire\Student\Dashboard::class)->name('dashboard');
         Route::get('/subjects', action: \App\Livewire\Student\SubjectList::class)->name('subjects');
         Route::get('/subjects/{subject}/materials', \App\Livewire\Student\MaterialList::class)->name('materials.index');
+        Route::get('/materials/{material}', \App\Livewire\Student\MaterialDetail::class)->name('materials.show');
+        Route::get('/quizzes', \App\Livewire\Student\QuizList::class)->name('quizzes');
     });
 
 

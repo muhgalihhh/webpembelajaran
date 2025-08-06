@@ -1,6 +1,5 @@
 <div class="relative w-full h-10"> {{-- Beri tinggi agar ada ruang untuk header --}}
     <div class="absolute inset-x-0 -top-6 sm:-top-8">
-        {{-- Posisi header diatur dari sini --}}
         <div class="flex justify-center">
             <div
                 class="inline-flex items-center p-3 space-x-2 bg-yellow-400 border-black rounded-lg shadow-xl border-1 sm:p-4 sm:space-x-3">

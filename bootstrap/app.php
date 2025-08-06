@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'guest.custom' => \App\Http\Middleware\RedirectIfAuthenticatedCustom::class,
+            'secure.storage' => App\Http\Middleware\SecureStorageAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

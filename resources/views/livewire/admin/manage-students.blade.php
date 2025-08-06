@@ -15,7 +15,7 @@
             </div>
             <div class="flex-1">
                 <x-form.select-group label="Filter Kelas" name="class_filter" wireModel="class_filter" :options="$this->availableClasses"
-                    optionLabel="class" />
+                    wire:model.live='class_filter' optionLabel="class" />
             </div>
             <div>
                 <x-form.button wireClick="create" icon="fa-solid fa-plus" class="w-full md:w-auto">

@@ -16,7 +16,7 @@
             </div>
             <div class="flex-1">
                 <x-form.select-group label="Filter Status" name="status_filter" wireModel="status_filter"
-                    :options="['1' => 'Aktif', '0' => 'Nonaktif']" />
+                    wire:model.live='status_filter' :options="['1' => 'Aktif', '0' => 'Nonaktif']" />
             </div>
             <div>
                 <x-form.button wireClick="create" icon="fa-solid fa-plus" class="w-full md:w-auto">

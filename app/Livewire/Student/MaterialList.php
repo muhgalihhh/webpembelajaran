@@ -63,13 +63,10 @@ class MaterialList extends Component
             'user_id' => Auth::id()
         ]);
 
-        // Reset pagination ke halaman pertama
-        $this->resetPage();
 
-        // Refresh component data
+        $this->resetPage();
         $this->render();
 
-        // Dispatch event untuk notifikasi
         $this->dispatch('flash-message', [
             'message' => 'Materi baru telah ditambahkan!',
             'type' => 'info'
@@ -105,10 +102,6 @@ class MaterialList extends Component
         $this->activeTab = $tab;
         $this->resetPage();
     }
-
-    /**
-     * Memilih materi dan mencatat akses pengguna.
-     */
     public function selectMaterial($materialId)
     {
         $this->selectedMaterial = Material::find($materialId);
@@ -127,9 +120,6 @@ class MaterialList extends Component
         return $matches[2] ?? null;
     }
 
-    /**
-     * Merender komponen ke view.
-     */
     public function render()
     {
         $user = Auth::user();

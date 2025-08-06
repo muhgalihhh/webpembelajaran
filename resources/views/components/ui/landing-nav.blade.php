@@ -1,10 +1,6 @@
 <header x-data="{ mobileMenuOpen: false, profileDropdownOpen: false }"
     class="bg-[#4A90E2] text-white py-3 px-4 sm:px-6 flex justify-between items-center shadow-md w-full sticky top-0 z-50">
-
-    {{-- Logo (diasumsikan dari komponen lain) --}}
     <x-ui.logo-nav />
-
-    {{-- Kontainer untuk menu dan ikon --}}
     <div class="flex items-center space-x-3">
         @auth
             <nav class="hidden space-x-4 md:flex">
@@ -15,7 +11,7 @@
                         class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.dashboard') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Pembelajaran</a>
                     <a href="{{ route('student.subjects') }}" wire:navigate
                         class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.subjects') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Materi</a>
-                    <a href="#" wire:navigate
+                    <a href="{{ route('student.quizzes') }}" wire:navigate
                         class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.quiz') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Kuis</a>
                     <a href="#" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Game Edukatif</a>

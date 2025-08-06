@@ -11,9 +11,9 @@
             <x-form.select-group label="Filter Mata Pelajaran" name="filterSubject" wireModel="filterSubject"
                 :options="$this->subjects" />
             <x-form.select-group label="Filter Kelas" name="filterClass" wireModel="filterClass" :options="$this->classes"
-                optionLabel="class" />
+                wire:model.live='filterClass' optionLabel="class" />
             <x-form.select-group label="Filter Status" name="filterPublished" wireModel="filterPublished"
-                :options="['' => 'Semua Status', '1' => 'Published', '0' => 'Draft']" />
+                wire:model.live='filterPublished' :options="['' => 'Semua Status', '1' => 'Published', '0' => 'Draft']" />
             <div class="lg:col-start-4">
                 <a href="{{ route('teacher.materials.create') }}" wire:navigate
                     class="inline-flex items-center justify-center w-full px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
@@ -84,8 +84,10 @@
                             <button wire:click="confirmDelete({{ $material->id }})"
                                 class="ml-4 text-red-600 hover:text-red-900">Hapus</button>
                             @if ($material->file_path)
-                                <button wire:click="download({{ $material->id }})"
-                                    class="ml-4 text-blue-600 hover:text-blue-900">Download</button>
+                                <a href="{{ route('materials.download', $material) }}" ...
+                                    class="ml-4 text-indigo-600 hover:text-indigo-900">
+                                    <i class="mr-2 fas fa-download"></i> Unduh Materi
+                                </a>
                             @endif
                         </td>
                     </tr>

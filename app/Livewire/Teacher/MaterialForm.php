@@ -72,8 +72,8 @@ class MaterialForm extends Component
             $this->url = $this->material->youtube_url;
             $this->originalPublishStatus = $this->material->is_published;
 
-            if ($this->material->file_path && Storage::disk('public')->exists($this->material->file_path)) {
-                $this->currentFileUrl = Storage::url($this->material->file_path);
+            if ($this->material->file_path && Storage::disk('private')->exists($this->material->file_path)) {
+                $this->currentFileUrl = $this->material->file_path;
             }
         }
     }
@@ -82,15 +82,71 @@ class MaterialForm extends Component
     {
         $this->validateOnly('uploadedFile');
 
+        // Reset page count
         $this->page_count = null;
-        if ($file && $file->getClientOriginalExtension() === 'pdf') {
-            try {
-                $this->page_count = (new Pdf())->setPdf($file->getRealPath())->getNumberOfPages();
-            } catch (\Exception $e) {
-                $this->addError('uploadedFile', 'Gagal memproses file PDF. Pastikan file tidak rusak atau terproteksi.');
-                $this->reset('uploadedFile');
-            }
+
+        if ($file && strtolower($file->getClientOriginalExtension()) === 'pdf') {
+            $this->countPdfPages($file);
         }
+    }
+
+    private function countPdfPages($file)
+    {
+        try {
+            // Method 1: Pure PHP - Manual PDF parsing (TANPA dependencies)
+            $content = file_get_contents($file->getRealPath());
+            if ($content !== false) {
+                // Cari pattern /Type /Page untuk menghitung halaman
+                $pageCount = preg_match_all('/\/Type\s*\/Page[^s]/i', $content);
+                if ($pageCount > 0) {
+                    $this->page_count = $pageCount;
+                    return;
+                }
+
+                // Alternative: cari pattern /Count
+                if (preg_match('/\/Count\s+(\d+)/', $content, $matches)) {
+                    $this->page_count = (int) $matches[1];
+                    return;
+                }
+
+                // Alternative: cari /N (number of pages)
+                if (preg_match('/\/N\s+(\d+)/', $content, $matches)) {
+                    $this->page_count = (int) $matches[1];
+                    return;
+                }
+            }
+        } catch (\Exception $e) {
+            Log::warning('Manual PDF parsing failed: ' . $e->getMessage());
+        }
+
+        try {
+            // Method 2: Menggunakan Spatie PdfToText (jika tersedia)
+            if (class_exists('\Spatie\PdfToText\Pdf')) {
+                $pdf = new Pdf();
+                $this->page_count = $pdf->setPdf($file->getRealPath())->getNumberOfPages();
+                return;
+            }
+        } catch (\Exception $e) {
+            Log::warning('Spatie PDF method failed: ' . $e->getMessage());
+        }
+
+        try {
+            // Method 3: Menggunakan imagick jika tersedia
+            if (extension_loaded('imagick')) {
+                $imagick = new \Imagick();
+                $imagick->readImage($file->getRealPath());
+                $this->page_count = $imagick->getNumberImages();
+                $imagick->clear();
+                $imagick->destroy();
+                return;
+            }
+        } catch (\Exception $e) {
+            Log::warning('Imagick method failed: ' . $e->getMessage());
+        }
+
+        // Jika semua method gagal, biarkan null (tidak error)
+        Log::warning('All PDF page counting methods failed for file: ' . $file->getClientOriginalName());
+        $this->page_count = null; // Tidak menampilkan error ke user
     }
 
     #[Computed]
@@ -131,7 +187,7 @@ class MaterialForm extends Component
             if ($this->uploadedFile) {
                 // Hapus file lama jika ada
                 if ($this->material->exists && $this->material->file_path) {
-                    Storage::disk('public')->delete($this->material->file_path);
+                    Storage::disk('private')->delete($this->material->file_path);
                 }
 
                 $subject = Subject::find($this->subject_id);
@@ -140,23 +196,42 @@ class MaterialForm extends Component
                 $extension = $this->uploadedFile->getClientOriginalExtension();
                 $fileName = "{$chapterName}_{$subjectName}_" . Str::random(10) . ".{$extension}";
 
-                $dataToSave['file_path'] = $this->uploadedFile->storeAs('materi', $fileName, 'public');
+                $dataToSave['file_path'] = $this->uploadedFile->storeAs('materi', $fileName, 'private');
+
+                // Jika masih belum ada page_count dan ini PDF, coba hitung lagi setelah file tersimpan
+                if (!$this->page_count && strtolower($extension) === 'pdf') {
+                    $this->countPdfPagesFromStorage($dataToSave['file_path']);
+                    $dataToSave['page_count'] = $this->page_count;
+                }
             }
 
-            // Save material
+            // Simpan material
+            $isNewRecord = !$this->material->exists;
             $material = Material::updateOrCreate(['id' => $this->material->id], $dataToSave);
+            $material->refresh();
 
-            // Tentukan status untuk notifikasi
-            $wasRecentlyCreated = $material->wasRecentlyCreated;
-            $statusChangedToPublished = !$this->originalPublishStatus && $this->is_published;
+            // === LOGIKA NOTIFIKASI BARU ===
+            $isNowPublished = $this->is_published;
+            $wasPreviouslyPublished = $this->originalPublishStatus;
+            $notificationType = null;
+            $message = $isNewRecord ? 'Materi berhasil ditambahkan.' : 'Materi berhasil diperbarui.';
 
-            // Tentukan pesan sukses
-            $message = $wasRecentlyCreated ? 'Materi berhasil ditambahkan.' : 'Materi berhasil diperbarui.';
+            if ($isNowPublished) {
+                // Kasus 1: Materi dipublikasikan untuk PERTAMA KALI (sebelumnya draft atau baru dibuat).
+                if (!$wasPreviouslyPublished) {
+                    $notificationType = 'new';
+                    $message = 'Materi berhasil dipublikasikan. Notifikasi materi baru telah dikirim ke siswa.';
+                }
+                // Kasus 2: Materi yang SUDAH PUBLISH diperbarui.
+                elseif (!$isNewRecord && $wasPreviouslyPublished) {
+                    $notificationType = 'updated';
+                    $message = 'Materi berhasil diperbarui. Notifikasi pembaruan telah dikirim ke siswa.';
+                }
+            }
 
-            // Kirim notifikasi jika materi dipublish (baru dibuat atau status berubah ke published)
-            if ($material->is_published && ($wasRecentlyCreated || $statusChangedToPublished)) {
-                $this->sendNotificationToStudents($material);
-                $message .= ' Notifikasi telah dikirim ke siswa.';
+            // Kirim notifikasi jika tipe notifikasi sudah ditentukan
+            if ($notificationType) {
+                $this->sendNotificationToStudents($material, $notificationType);
             }
 
             // Set flash message
@@ -181,7 +256,30 @@ class MaterialForm extends Component
         }
     }
 
-    private function sendNotificationToStudents(Material $material)
+    private function countPdfPagesFromStorage($filePath)
+    {
+        try {
+            $fullPath = Storage::disk('private')->path($filePath);
+            if (file_exists($fullPath)) {
+                // Gunakan method yang sama seperti sebelumnya
+                $tempFile = new \stdClass();
+                $tempFile->path = $fullPath;
+
+                // Method dengan Spatie
+                if (class_exists('\Spatie\PdfToText\Pdf')) {
+                    $pdf = new Pdf();
+                    $this->page_count = $pdf->setPdf($fullPath)->getNumberOfPages();
+                    return;
+                }
+
+                // Method lainnya bisa ditambahkan di sini jika diperlukan
+            }
+        } catch (\Exception $e) {
+            Log::warning('Failed to count pages from storage: ' . $e->getMessage());
+        }
+    }
+
+    private function sendNotificationToStudents(Material $material, string $notificationType)
     {
         try {
             if ($class = Classes::find($material->class_id)) {
@@ -190,11 +288,11 @@ class MaterialForm extends Component
                     ->get();
 
                 if ($students->isNotEmpty()) {
-                    Notification::send($students, new NotificationStudent($material));
-
+                    // Kirim tipe notifikasi ke constructor
+                    Notification::send($students, new NotificationStudent($material, $notificationType));
                     Log::info('Notification sent to students', [
                         'material_id' => $material->id,
-                        'material_title' => $material->title,
+                        'notification_type' => $notificationType,
                         'class_id' => $material->class_id,
                         'student_count' => $students->count(),
                     ]);

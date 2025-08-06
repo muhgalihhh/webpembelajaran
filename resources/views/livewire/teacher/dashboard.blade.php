@@ -27,11 +27,11 @@
         <div class="flex flex-col gap-4 md:flex-row md:items-end">
             <div class="flex-1">
                 <x-form.select-group label="Filter Kelas" name="classFilter" wireModel="classFilter" :options="$this->filterOptions['classes']"
-                    optionLabel="class" />
+                    wire:model.live='classFilter' optionLabel="class" />
             </div>
             <div class="flex-1">
                 <x-form.select-group label="Filter Mapel" name="subjectFilter" wireModel="subjectFilter"
-                    :options="$this->filterOptions['subjects']" />
+                    wire:model.live='subjectFilter' :options="$this->filterOptions['subjects']" />
             </div>
             <div class="flex-1">
                 <x-form.input-group label="Pencarian Kuis" type="search" wireModel="quizSearch" id="quizSearch"

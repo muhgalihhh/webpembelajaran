@@ -95,10 +95,21 @@
                             </div>
                         @endif
 
-                        @if ($currentFileUrl && !$uploadedFile)
+                        @if ($material->exists && $currentFileUrl && !$uploadedFile)
                             <div class="mt-2 text-sm">
-                                File saat ini: <a href="{{ $currentFileUrl }}" target="_blank"
-                                    class="text-blue-600 hover:underline">Lihat File</a>
+                                File saat ini:
+
+                                <a href="{{ route('materials.view', $material) }}" target="_blank"
+                                    class="text-blue-600 hover:underline">
+                                    <i class="mr-1 fas fa-eye"></i> Lihat File
+                                </a>
+
+                                <span class="mx-1 text-gray-300">|</span>
+                                <a href="{{ route('materials.download', $material) }}"
+                                    class="text-blue-600 hover:underline">
+                                    <i class="mr-1 fas fa-download"></i> Unduh
+                                </a>
+
                                 @if ($material->page_count)
                                     <span class="ml-2 text-gray-500">({{ $material->page_count }} Halaman)</span>
                                 @endif
