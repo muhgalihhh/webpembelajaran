@@ -5,7 +5,8 @@
                 <h2 class="text-2xl font-bold text-gray-800">Detail Pengumpulan Tugas</h2>
                 <p class="text-sm text-gray-500">Tugas: {{ $task->title }}</p>
             </div>
-            <a href="{{ route('teacher.scores.tasks') }}" wire:navigate class="btn btn-sm">
+            <a href="{{ route('teacher.scores.tasks') }}" wire:navigate
+                class="px-3 py-2 text-white bg-blue-500 rounded-lg btn btn-sm hover:bg-blue-600">
                 <i class="fa-solid fa-arrow-left"></i>
                 Kembali ke Daftar Tugas
             </a>

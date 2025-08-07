@@ -1,12 +1,20 @@
 @props(['quiz'])
 
 @php
-    $isPublished = $quiz->status === 'publish' && $quiz->questions->count() > 0;
+    // Cek apakah kuis siap untuk dikerjakan (published dan punya soal)
+    $isReady = $quiz->status === 'publish' && $quiz->questions->count() > 0;
+
+    // Ambil data percobaan (attempt) siswa untuk kuis ini
+    $attempt = $quiz->attempts->first();
+
+    // Tentukan status kelulusan jika kuis sudah selesai
+    $hasPassed = false;
+    if ($attempt && $attempt->is_completed) {
+        $hasPassed = $attempt->score >= $quiz->passing_score;
+    }
 
     // --- PALET WARNA BERDASARKAN MATA PELAJARAN ---
     $subjectName = strtolower($quiz->subject->name ?? 'default');
-
-    // Anda bisa menambahkan atau mengubah mapel dan warnanya di sini
     $palettes = [
         'matematika' => [
             'container' => 'bg-blue-400',
@@ -49,78 +57,87 @@
             'button' => 'bg-gray-600 hover:bg-gray-700',
         ],
     ];
-
-    // Pilih palet warna, jika tidak ada, gunakan 'default'
     $colorPalette = $palettes[$subjectName] ?? $palettes['default'];
-
-    // Logika untuk kuis yang belum publish
-    if (!$isPublished) {
-        $colorContainer = 'bg-gray-300';
-        $colorContent = 'bg-gray-400';
-        $buttonColor = 'bg-gray-500 cursor-not-allowed';
-    } else {
-        $colorContainer = $colorPalette['container'];
-        $colorContent = $colorPalette['content'];
-        $buttonColor = $colorPalette['button'];
-    }
 @endphp
 
-{{-- === KARTU KUIS DENGAN WARNA DINAMIS === --}}
+{{-- === KARTU KUIS DENGAN WARNA DAN TOMBOL DINAMIS === --}}
 <div
-    class="quiz-card p-4 overflow-hidden transition-all duration-300 border shadow-xl rounded-2xl hover:-translate-y-2 hover:shadow-2xl {{ $colorContainer }}">
-    {{-- Container Konten --}}
-    <div class="{{ $colorContent }} rounded-xl overflow-hidden border text-black">
-        <div class="relative">
+    class="quiz-card p-4 overflow-hidden transition-all duration-300 border shadow-xl rounded-2xl hover:-translate-y-2 hover:shadow-2xl {{ $isReady ? $colorPalette['container'] : 'bg-gray-300' }}">
+    <div class="{{ $isReady ? $colorPalette['content'] : 'bg-gray-400' }} rounded-xl overflow-hidden border text-black">
+        <div class="relative p-4">
+            {{-- PERUBAHAN: Tampilkan status Lulus/Tidak Lulus jika sudah selesai --}}
+            @if ($attempt && $attempt->is_completed)
+                <div class="absolute top-0 right-0 p-3">
+                    <span
+                        class="px-3 py-1 text-xs font-bold text-white {{ $hasPassed ? 'bg-green-500' : 'bg-red-500' }} rounded-full shadow-lg">
+                        {{ $hasPassed ? 'LULUS' : 'TIDAK LULUS' }}
+                    </span>
+                </div>
+            @endif
+
+            {{-- Konten Kartu --}}
             <div class="flex items-center justify-between mb-2">
                 <div class="px-3 py-1 bg-white border rounded-lg bg-opacity-20">
                     <h3 class="text-lg font-bold tracking-wide uppercase">{{ $quiz->subject->name }}</h3>
                 </div>
             </div>
 
-            {{-- Info Kuis --}}
-            <div class="mx-2 mb-2 space-y-1 text-sm opacity-90">
-                <p>Terdapat <strong>{{ $quiz->questions->count() }} Soal</strong> Dari Guru</p>
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-clock"></i>
-                    <span><strong>DURASI : {{ $quiz->duration_minutes }} MENIT</strong></span>
+            {{-- PERUBAHAN: Tampilkan nilai jika sudah selesai --}}
+            @if ($attempt && $attempt->is_completed)
+                <div class="my-2">
+                    <p class="text-sm opacity-90">Nilai Kamu:</p>
+                    <p class="text-3xl font-bold">{{ round($attempt->score) }}</p>
                 </div>
-            </div>
+            @else
+                <div class="mx-2 mb-2 space-y-1 text-sm opacity-90">
+                    <p>Terdapat <strong>{{ $quiz->questions->count() }} Soal</strong> Dari Guru</p>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-clock"></i>
+                        <span><strong>DURASI : {{ $quiz->duration_minutes }} MENIT</strong></span>
+                    </div>
+                </div>
+            @endif
 
-            {{-- Visual Bar (hanya hiasan) --}}
             <div class="p-3 mx-2 mb-2 bg-white rounded-lg bg-opacity-20">
                 <div class="flex items-center justify-between">
                     <span class="text-sm font-semibold">QUIZ</span>
                     <div class="flex space-x-1">
                         @for ($i = 1; $i <= 5; $i++)
-                            <div class="w-8 h-2 bg-white bg-opacity-50 rounded-full"></div>
+                            <div class="w-8 h-2 bg-black bg-opacity-50 rounded-full"></div>
                         @endfor
                     </div>
                 </div>
             </div>
-
-            {{-- Deskripsi --}}
             <p class="text-md leading-relaxed opacity-80 min-h-[50px] mx-2">
                 {{ $quiz->description ?: 'Pastikan kamu sudah siap, duduk dengan tenang, dan fokus. Baca soal dengan teliti dan jawab dengan tepat.' }}
             </p>
         </div>
 
-        {{-- Tombol Aksi --}}
+        {{-- Tombol Aksi Dinamis --}}
         <div>
-            @if ($isPublished)
-                <a href="{{ route('student.quizzes.attempt', $quiz) }}" wire:navigate
-                    class="block w-full py-3 px-6 text-center font-bold text-white {{ $buttonColor }} rounded-b-xl shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl">
-                    <div class="flex items-center justify-center space-x-2">
-                        <span>Mulai Kuis</span>
-                        <i class="text-sm fas fa-play"></i>
-                    </div>
+            @if (!$isReady)
+                <button disabled
+                    class="block w-full px-6 py-3 font-bold text-center text-white bg-gray-500 shadow-lg cursor-not-allowed rounded-b-xl">
+                    <div class="flex items-center justify-center space-x-2"><span>Kuis Belum Tersedia</span><i
+                            class="text-sm fas fa-lock"></i></div>
+                </button>
+            @elseif ($attempt && $attempt->is_completed)
+                <a href="{{ route('student.quizzes.result', $attempt->id) }}" wire:navigate
+                    class="block w-full px-6 py-3 font-bold text-center text-white bg-green-600 shadow-lg hover:bg-green-700 rounded-b-xl">
+                    <div class="flex items-center justify-center space-x-2"><span>Lihat Hasil</span><i
+                            class="text-sm fas fa-eye"></i></div>
+                </a>
+            @elseif ($attempt && !$attempt->is_completed)
+                <a href="{{ route('student.quizzes.attempt', $quiz->id) }}" wire:navigate
+                    class="block w-full px-6 py-3 font-bold text-center text-white bg-yellow-500 shadow-lg hover:bg-yellow-600 rounded-b-xl">
+                    <div class="flex items-center justify-center space-x-2"><span>Lanjutkan Mengerjakan</span><i
+                            class="text-sm fas fa-arrow-right"></i></div>
                 </a>
             @else
-                <button disabled
-                    class="block w-full py-3 px-6 text-center font-bold text-white {{ $buttonColor }} rounded-b-xl shadow-lg">
-                    <div class="flex items-center justify-center space-x-2">
-                        <span>Kuis Belum Tersedia</span>
-                        <i class="text-sm fas fa-lock"></i>
-                    </div>
+                <button wire:click="$dispatch('confirm-start-quiz', { quizId: {{ $quiz->id }} })"
+                    class="block w-full py-3 px-6 text-center font-bold text-white {{ $colorPalette['button'] }} rounded-b-xl shadow-lg">
+                    <div class="flex items-center justify-center space-x-2"><span>Mulai Kuis</span><i
+                            class="text-sm fas fa-play"></i></div>
                 </button>
             @endif
         </div>
@@ -133,7 +150,6 @@
     }
 
     .quiz-card {
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-            box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 </style>

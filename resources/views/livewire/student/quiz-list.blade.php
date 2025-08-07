@@ -1,7 +1,7 @@
 <div class="min-h-screen px-4 py-10 bg-blue-100"
     style="background-image: url('/images/transparent bg.png'); background-size: 30rem; background-position: center;"
     x-data="{ isLoaded: false }" x-init="setTimeout(() => { isLoaded = true }, 50)">
-    <x-ui.student.container title="Halaman Quis" header_color="bg-gradient-to-r from-green-200 to-green-300"
+    <x-ui.student.container title="Halaman Kuis" header_color="bg-gradient-to-r from-green-200 to-green-300"
         icon="fa-solid fa-question-circle">
         <div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
             @forelse ($this->quizzes as $quiz)
@@ -19,14 +19,16 @@
             @endforelse
         </div>
 
-        {{-- Paginasi --}}
         @if ($this->quizzes->hasPages())
             <div class="px-4 py-6 mt-8 bg-white rounded-lg shadow-md">
                 {{ $this->quizzes->links() }}
             </div>
         @endif
-</div>
-</div>
-</x-ui.student.container>
 
+        @if ($selectedQuiz)
+            <x-ui.student.quiz.confirm-modal wire:model="showStartConfirmation" icon="fa-solid fa-play-circle"
+                iconColor="text-blue-500" title="Mulai Kuis?" :message="'Anda akan memulai kuis ' . $selectedQuiz->title . '. Pastikan Anda sudah siap!'" confirmText="Ya, Mulai!"
+                cancelText="Batal" wireConfirmAction="startQuiz" wireCancelAction="cancelStart" />
+        @endif
+    </x-ui.student.container>
 </div>

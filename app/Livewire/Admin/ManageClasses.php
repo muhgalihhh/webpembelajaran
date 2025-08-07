@@ -20,14 +20,15 @@ class ManageClasses extends Component
     #[Url(as: 'q', history: true)]
     public $search = '';
     #[Url(history: true)]
-    public $sortBy = 'class'; // Default sort by 'class'
+    public $sortBy = 'class';
     #[Url(history: true)]
     public $sortDirection = 'asc';
     public $perPage = 10;
 
-    // Properti Form disederhanakan
+    // Properti Form
     public $class;
     public $description;
+    public $whatsapp_group_id;
 
     public $isEditing = false;
     public ?Classes $editingClass = null;
@@ -44,6 +45,7 @@ class ManageClasses extends Component
         return [
             'class' => ['required', 'string', 'max:10', Rule::unique('classes')->ignore($classId)],
             'description' => 'nullable|string',
+            'whatsapp_group_id' => 'nullable|string|max:255',
         ];
     }
 
@@ -72,7 +74,8 @@ class ManageClasses extends Component
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingClass', 'class', 'description']);
+        // 3. Reset properti baru
+        $this->reset(['isEditing', 'editingClass', 'class', 'description', 'whatsapp_group_id']);
         $this->resetValidation();
     }
 
@@ -89,12 +92,15 @@ class ManageClasses extends Component
         $this->editingClass = $class;
         $this->class = $class->class;
         $this->description = $class->description;
+        $this->whatsapp_group_id = $class->whatsapp_group_id;
         $this->dispatch('open-modal', id: 'class-form-modal');
     }
 
     public function save()
     {
         $validatedData = $this->validate();
+
+        // 5. Simpan data baru
         if ($this->isEditing) {
             $this->editingClass->update($validatedData);
             $message = 'Data kelas berhasil diperbarui.';
@@ -102,6 +108,7 @@ class ManageClasses extends Component
             Classes::create($validatedData);
             $message = 'Data kelas berhasil ditambahkan.';
         }
+
         $this->dispatch('flash-message', message: $message, type: 'success');
         $this->dispatch('close-modal');
     }

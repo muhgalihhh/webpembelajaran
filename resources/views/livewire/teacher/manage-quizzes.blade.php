@@ -8,14 +8,12 @@
         <div class="grid items-end grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <x-form.input-group label="Pencarian Kuis" type="search" wireModel="search" id="search"
                 placeholder="Cari judul kuis..." />
-            <x-form.select-group label="Filter Mata Pelajaran" name="subjectFilter" wireModel="subjectFilter"
+            <x-form.select-group label="Filter Mata Pelajaran" name="subjectFilter" wireModel="subjectFilter.live"
                 :options="$this->subjects" placeholder="Semua Mata Pelajaran" />
-
-            <x-form.select-group label="Filter Kelas" name="classFilter" wireModel="classFilter" :options="$this->classes"
+            <x-form.select-group label="Filter Kelas" name="classFilter" wireModel="classFilter.live" :options="$this->classes"
                 optionLabel="class" placeholder="Semua Kelas" />
-
-            <x-form.select-group label="Filter Status" name="statusFilter" wireModel="statusFilter" :options="['' => 'Semua Status', 'publish' => 'Published', 'draft' => 'Draft']"
-                placeholder="Semua Status" />
+            <x-form.select-group label="Filter Status" name="statusFilter" wireModel="statusFilter.live"
+                :options="['' => 'Semua Status', 'publish' => 'Published', 'draft' => 'Draft']" placeholder="Semua Status" />
 
             <div class="lg:col-start-4">
                 <x-form.button wireClick="create" icon="fa-solid fa-plus" class="w-full">
@@ -121,12 +119,18 @@
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                             <div class="text-gray-500">
                                 @if ($quiz->start_time)
-                                    <div class="text-xs">Mulai: {{ $quiz->start_time->format('d M Y H:i') }}</div>
+                                    <div class="text-xs">
+                                        Mulai: {{ $quiz->start_date->format('d/m/Y') }}
+                                    </div>
                                 @endif
                                 @if ($quiz->end_time)
-                                    <div class="text-xs">Selesai: {{ $quiz->end_time->format('d M Y H:i') }}</div>
+                                    <div class="text-xs">
+                                        Selesai: {{ $quiz->end_date->format('d/m/Y') }}
+                                    </div>
                                 @endif
-                                <div class="font-semibold text-blue-600">{{ $quiz->total_questions ?? '0' }} soal</div>
+                                <div class="font-semibold text-blue-600">
+                                    {{ $quiz->total_questions ?? '0' }} soal
+                                </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">

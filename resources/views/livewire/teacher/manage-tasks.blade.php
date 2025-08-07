@@ -9,12 +9,12 @@
             <x-form.input-group label="Pencarian Tugas" type="search" wireModel="search" id="search"
                 placeholder="Cari judul tugas..." />
             <x-form.select-group label="Filter Mata Pelajaran" name="subjectFilter" wireModel="subjectFilter"
-                :options="$this->subjects" />
+                :options="$this->subjects" placeholder="Semua Mapel" />
             <x-form.select-group label="Filter Kelas" name="classFilter" wireModel="classFilter" :options="$this->classes"
-                optionLabel="class" />
+                placeholder="Semua Kelas" />
             <x-form.select-group label="Filter Status" name="statusFilter" wireModel="statusFilter" :options="['' => 'Semua Status', 'open' => 'Open', 'closed' => 'Closed']" />
             <div class="lg:col-start-4">
-                <x-form.button wireClick="create" icon="fa-solid fa-plus" class="w-full">
+                <x-form.button wire:click="create" icon="fa-solid fa-plus" class="w-full">
                     Tambah Tugas
                 </x-form.button>
             </div>
@@ -35,7 +35,7 @@
                     <th wire:click="sortBy('user_id')"
                         class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                         Pembuat Tugas</th>
-                    <th wire:click="sortBy('due_time')"
+                    <th wire:click="sortBy('due_date')"
                         class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                         Tenggat</th>
                     <th wire:click="sortBy('status')"
@@ -55,21 +55,26 @@
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                             <div>{{ $task->subject?->name ?? 'N/A' }}</div>
+                            <div>{{ $task->subject?->kurikulum ?? 'N/A' }}</div>
                             <div class="text-xs">Kelas {{ $task->class?->class ?? 'N/A' }}</div>
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                             {{ $task->creator?->name ?? 'N/A' }}
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                            {{ $task->due_time ? $task->due_time->format('d M Y, H:i') : '-' }} <br>
-                            @if ($task->published_at)
-                                <span class="text-xs text-gray-400">Diterbitkan:
-                                    {{ $task->published_at->format('d M Y, H:i') }}</span> <br>
-                            @endif
-                            @if (date('Y-m-d H:i') > $task->due_time)
-                                <span class="text-xs text-red-500">Tenggat terlewat</span>
+                            @if ($task->due_date && $task->due_time)
+                                {{-- PERBAIKAN: Gunakan accessor untuk format yang konsisten --}}
+                                <div class="text-sm">{{ $task->due_date->format('d M Y') }}</div>
+                                <div class="text-xs">{{ $task->due_time_formatted }}</div>
+
+                                {{-- PERBAIKAN: Gunakan accessor due_date_time --}}
+                                @if (now()->gt($task->due_date_time))
+                                    <span class="text-xs text-red-500">Tenggat terlewat</span>
+                                @else
+                                    <span class="text-xs text-green-500">Tenggat masih berlaku</span>
+                                @endif
                             @else
-                                <span class="text-xs text-green-500">Tenggat masih berlaku</span>
+                                <span class="text-xs text-gray-400">Tanpa Batas Waktu</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -83,9 +88,7 @@
                         </td>
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                             <a href="{{ route('teacher.scores.submissions', $task) }}" wire:navigate
-                                class="text-blue-600 hover:text-blue-900">
-                                Lihat Pengumpulan
-                            </a>
+                                class="text-blue-600 hover:text-blue-900">Lihat Pengumpulan</a>
                             <button wire:click="edit({{ $task->id }})"
                                 class="ml-4 text-indigo-600 hover:text-indigo-900">Edit</button>
                             <button wire:click="confirmDelete({{ $task->id }})"
@@ -94,7 +97,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="py-4 text-center text-gray-500">Tidak ada tugas ditemukan.</td>
+                        <td colspan="6" class="py-4 text-center text-gray-500">Tidak ada tugas ditemukan.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -119,8 +122,8 @@
                     <x-form.textarea-group label="Deskripsi / Instruksi Tugas" name="description"
                         wireModel="description" required />
                 </div>
-                <x-form.input-group label="Tenggat Waktu" type="datetime-local" wireModel="due_time" id="due_time"
-                    required />
+                <x-form.input-group label="Tenggat Waktu (Opsional)" type="datetime-local" wireModel="due_time"
+                    id="due_time" />
                 <x-form.select-group label="Status Tugas" name="status" wireModel="status" :options="['draft' => 'Draft', 'publish' => 'Publish']"
                     required />
                 <div class="md:col-span-2">

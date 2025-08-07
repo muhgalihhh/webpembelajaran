@@ -56,13 +56,17 @@ class ScoreTaskList extends Component
     #[Computed]
     public function subjects()
     {
-        return Subject::orderBy('name')->get();
+        return Subject::orderBy('kurikulum', 'asc')->orderBy('name')->get()
+            ->mapWithKeys(function ($subject) {
+                $displayText = "{$subject->name} - ({$subject->kurikulum})";
+                return [$subject->id => $displayText];
+            });
     }
 
     #[Computed]
     public function classes()
     {
-        return Classes::orderBy('class')->get();
+        return Classes::orderBy('class')->get()->pluck('class', 'id');
     }
 
     public function render()

@@ -5,7 +5,9 @@ use App\Livewire\Admin\ManageStudents;
 use App\Livewire\Admin\ManageSubjects;
 use App\Livewire\Admin\ManageTeachers;
 use App\Livewire\Admin\ProfileAdmin;
+use App\Models\Classes;
 use App\Models\Material;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +28,7 @@ Route::middleware('guest.custom')->group(function () {
 
 // Route Auth Group Spatie
 Route::middleware(['auth'])->group(function () {
+
     Route::get('api/user', function () {
         return response()->json(['user' => Auth::user()]);
     })->name('api.user');
@@ -78,6 +81,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/materials/{material}', \App\Livewire\Student\MaterialDetail::class)->name('materials.show');
         Route::get('/quizzes', \App\Livewire\Student\QuizList::class)->name('quizzes');
         Route::get('/quizzes/{quiz}/attempt', \App\Livewire\Student\QuizAttempt::class)->name('quizzes.attempt');
+        Route::get('/quizzes/{attempt}/result', \App\Livewire\Student\QuizResult::class)->name('quizzes.result');
+        Route::get('/ranking', \App\Livewire\Student\StudentRanking::class)->name('ranking');
+        Route::get('/tasks', \App\Livewire\Student\TaskList::class)->name('tasks');
     });
 
 
@@ -89,3 +95,31 @@ Route::middleware(['auth'])->group(function () {
     })->name('logout');
 
 });
+
+
+Route::get('/cek_idgrup', function () {
+
+    $token = config('services.fonnte.token');
+
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://api.fonnte.com/get-whatsapp-group',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_HTTPHEADER => array(
+            "Authorization: $token",
+        ),
+    ));
+
+    $response = curl_exec($curl);
+
+    curl_close($curl);
+    echo $response;
+})->middleware(['auth', 'role:siswa']);

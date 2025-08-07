@@ -24,6 +24,7 @@ class QuizAttempt extends Model
         'end_time',
         'duration_taken',
         'is_completed',
+        'question_order',
     ];
 
     /**

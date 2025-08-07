@@ -35,7 +35,7 @@ class Task extends Model
      */
     protected $casts = [
         'due_date' => 'date',
-        'due_time' => 'datetime',
+        // PERBAIKAN: Hapus cast time karena Laravel tidak support, biarkan sebagai string
         'is_published' => 'boolean',
         'published_at' => 'datetime',
     ];
@@ -45,6 +45,7 @@ class Task extends Model
     {
         return $this->belongsTo(Subject::class, 'subject_id');
     }
+
     public function class()
     {
         return $this->belongsTo(Classes::class, 'class_id');
@@ -58,5 +59,25 @@ class Task extends Model
     public function submissions()
     {
         return $this->hasMany(TaskSubmission::class, 'task_id');
+    }
+
+    public function getDueDateTimeAttribute()
+    {
+        if ($this->due_date && $this->due_time) {
+            return \Carbon\Carbon::createFromFormat(
+                'Y-m-d H:i:s',
+                $this->due_date->format('Y-m-d') . ' ' . $this->due_time
+            );
+        }
+        return null;
+    }
+
+
+    public function getDueTimeFormattedAttribute()
+    {
+        if ($this->due_time) {
+            return \Carbon\Carbon::createFromFormat('H:i:s', $this->due_time)->format('H:i');
+        }
+        return null;
     }
 }

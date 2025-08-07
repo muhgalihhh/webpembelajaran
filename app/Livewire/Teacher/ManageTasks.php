@@ -5,6 +5,7 @@ namespace App\Livewire\Teacher;
 use App\Models\Classes;
 use App\Models\Subject;
 use App\Models\Task;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
@@ -22,7 +23,7 @@ class ManageTasks extends Component
 {
     use WithPagination, WithFileUploads;
 
-    // Properti Filter
+
     #[Url(as: 'q')]
     public string $search = '';
     #[Url(as: 'mapel')]
@@ -35,7 +36,7 @@ class ManageTasks extends Component
 
     // Properti Sorting
     #[Url]
-    public string $sortBy = 'due_time';
+    public string $sortBy = 'due_date';
     #[Url]
     public string $sortDirection = 'desc';
 
@@ -43,7 +44,7 @@ class ManageTasks extends Component
     public bool $isEditing = false;
     public ?Task $editingTask = null;
 
-    // Properti Form (disesuaikan dengan model dan database)
+    // Properti Form
     #[Rule('required|string|max:255')]
     public string $title = '';
     #[Rule('required|string')]
@@ -52,13 +53,12 @@ class ManageTasks extends Component
     public $subject_id = '';
     #[Rule('required|exists:classes,id')]
     public $class_id = '';
-    #[Rule('required|date')]
+
+    #[Rule('nullable|date')]
     public $due_time;
 
-    // --- PERBAIKAN: Menyesuaikan aturan validasi status dengan database ---
     #[Rule('required|in:draft,publish')]
     public string $status = 'draft';
-
     #[Rule('required|boolean')]
     public bool $is_published = false;
     #[Rule('nullable|date|required_if:is_published,true')]
@@ -88,7 +88,7 @@ class ManageTasks extends Component
     #[Computed]
     public function tasks()
     {
-        return Task::with(['subject', 'class'])
+        return Task::with(['subject', 'class', 'creator'])
             ->where('user_id', Auth::id())
             ->when($this->search, fn($q) => $q->where('title', 'like', '%' . $this->search . '%'))
             ->when($this->subjectFilter, fn($q) => $q->where('subject_id', $this->subjectFilter))
@@ -143,7 +143,14 @@ class ManageTasks extends Component
         $this->description = $task->description;
         $this->subject_id = $task->subject_id;
         $this->class_id = $task->class_id;
-        $this->due_time = $task->due_time ? $task->due_time->format('Y-m-d\TH:i') : null;
+
+        if ($task->due_date && $task->due_time) {
+            $this->due_time = $task->due_date->format('Y-m-d') . 'T' .
+                \Carbon\Carbon::createFromFormat('H:i:s', $task->due_time)->format('H:i');
+        } else {
+            $this->due_time = null;
+        }
+
         $this->status = $task->status;
         $this->is_published = $task->is_published;
         $this->published_at = $task->published_at ? $task->published_at->format('Y-m-d\TH:i') : null;
@@ -155,7 +162,16 @@ class ManageTasks extends Component
     {
         $validatedData = $this->validate();
         $validatedData['user_id'] = Auth::id();
-        $validatedData['due_date'] = $this->due_time ? date('Y-m-d', strtotime($this->due_time)) : null;
+
+        // PERBAIKAN: Penanganan due_date dan due_time
+        if (!empty($this->due_time)) {
+            $dueTimeCarbon = \Carbon\Carbon::parse($this->due_time);
+            $validatedData['due_date'] = $dueTimeCarbon->toDateString();
+            $validatedData['due_time'] = $dueTimeCarbon->format('H:i:s');
+        } else {
+            $validatedData['due_date'] = null;
+            $validatedData['due_time'] = null;
+        }
 
         if ($this->uploadedFile) {
             if ($this->isEditing && $this->editingTask->attachment_path) {
@@ -168,11 +184,41 @@ class ManageTasks extends Component
             $this->editingTask->update($validatedData);
             $message = 'Tugas berhasil diperbarui.';
         } else {
-            Task::create($validatedData);
+            $task = Task::create($validatedData);
             $message = 'Tugas berhasil ditambahkan.';
+            if ($task->status === 'publish') {
+                $this->sendNewTaskNotification($task);
+            }
         }
         $this->dispatch('flash-message', message: $message, type: 'success');
         $this->dispatch('close-modal');
+    }
+
+    private function sendNewTaskNotification(Task $task)
+    {
+        $task->load('subject', 'class');
+        $class = $task->class;
+
+        if ($class && $class->whatsapp_group_id) {
+            $subjectName = $task->subject->name;
+            $className = $class->class;
+
+            // PERBAIKAN: Gunakan accessor untuk format tanggal
+            $dueDate = 'Tanpa Batas Waktu';
+            if ($task->due_date && $task->due_time) {
+                $dueDate = $task->due_date_time->format('d F Y, H:i');
+            }
+
+            $waMessage = "🔔 *Notifikasi Tugas Baru* 🔔\n\n" .
+                "Halo siswa kelas *{$className}*!\n\n" .
+                "Ada tugas baru untuk mata pelajaran *{$subjectName}* dengan judul:\n" .
+                "*\"{$task->title}\"*\n\n" .
+                "Batas pengumpulan: *{$dueDate}*.\n\n" .
+                "Yuk, segera cek dan kerjakan di web pembelajaran ya! Semangat! 💪";
+
+            $notificationService = new WhatsAppNotificationService();
+            $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
+        }
     }
 
     public function confirmDelete($id)

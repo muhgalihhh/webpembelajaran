@@ -6,15 +6,21 @@
             <nav class="hidden space-x-4 md:flex">
                 @role('siswa')
                     <a href="{{ route('student.index') }}" wire:navigate
-                        class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.index') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Beranda</a>
+                        class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.index*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Beranda</a>
                     <a href="{{ route('student.dashboard') }}" wire:navigate
-                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.dashboard') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Pembelajaran</a>
+                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.dashboard*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Pembelajaran</a>
                     <a href="{{ route('student.subjects') }}" wire:navigate
-                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.subjects') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Materi</a>
+                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.subjects*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Materi</a>
                     <a href="{{ route('student.quizzes') }}" wire:navigate
-                        class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.quiz') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Kuis</a>
+                        class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.quiz*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Kuis</a>
+                    <a href="{{ route('student.tasks') }} " wire:navigate
+                        class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.tasks*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Tugas</a>
                     <a href="#" wire:navigate
-                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Game Edukatif</a>
+                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('student.games*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Game
+                        Edukatif</a>
+
+                    <a href="{{ route('student.ranking') }}" wire:navigate
+                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('student.ranking*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Peringkat</a>
                     @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
                 @endrole
 
@@ -76,17 +82,22 @@
 
             <nav class="flex flex-col space-y-2">
                 @role('siswa')
-                    <a href="#" wire:navigate @click="mobileMenuOpen = false"
-                        class="block px-4 py-3 font-semibold text-white rounded-md hover:bg-blue-600">Materi</a>
-                    <a href="#" wire:navigate @click="mobileMenuOpen = false"
-                        class="block px-4 py-3 font-semibold text-white rounded-md hover:bg-blue-600">Kuis</a>
-                    <a href="#" wire:navigate @click="mobileMenuOpen = false"
-                        class="block px-4 py-3 font-semibold text-white rounded-md hover:bg-blue-600">Game Edukatif</a>
-                    <a href="#" wire:navigate @click="mobileMenuOpen = false"
-                        class="flex items-center px-4 py-3 font-semibold text-white rounded-md hover:bg-blue-600">
-                        <i class="mr-2 fas fa-bell"></i> Notifikasi
-                        <span class="px-2 py-1 ml-auto text-xs text-white bg-red-500 rounded-full">!</span>
-                    </a>
+                    <a href="{{ route('student.index') }}" wire:navigate
+                        class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.index*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Beranda</a>
+                    <a href="{{ route('student.dashboard') }}" wire:navigate
+                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.dashboard*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Pembelajaran</a>
+                    <a href="{{ route('student.subjects') }}" wire:navigate
+                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.subjects*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Materi</a>
+                    <a href="{{ route('student.quizzes') }}" wire:navigate
+                        class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.quiz*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Kuis</a>
+                    <a href="{{ route('student.tasks') }} " wire:navigate
+                        class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.tasks*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Tugas</a>
+                    <a href="#" wire:navigate
+                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('student.games*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Game
+                        Edukatif</a>
+                    <a href="{{ route('student.ranking') }}" wire:navigate
+                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('student.ranking*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Peringkat</a>
+                    @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
                 @endrole
                 @role('guru')
                     <a href="#" wire:navigate @click="mobileMenuOpen = false"

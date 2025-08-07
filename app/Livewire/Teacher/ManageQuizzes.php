@@ -5,10 +5,11 @@ namespace App\Livewire\Teacher;
 use App\Models\Classes;
 use App\Models\Quiz;
 use App\Models\Subject;
-use App\Notifications\NotificationStudent; // <-- [1] Tambahkan Notifikasi
+use App\Notifications\NotificationStudent;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification; // <-- [2] Tambahkan Notifikasi
+use Illuminate\Support\Facades\Notification;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -23,7 +24,7 @@ class ManageQuizzes extends Component
     use WithPagination;
 
     // Properti Filter
-    #[Url(as: 'q', keep: true)] // <-- [3] Tambahkan 'keep: true' agar filter tidak hilang saat pindah halaman
+    #[Url(as: 'q', keep: true)]
     public string $search = '';
     #[Url(as: 'mapel', keep: true)]
     public string $subjectFilter = '';
@@ -35,7 +36,7 @@ class ManageQuizzes extends Component
 
     // Properti Sorting
     #[Url]
-    public string $sortBy = 'created_at'; // Default sort by terbaru
+    public string $sortBy = 'created_at';
     #[Url]
     public string $sortDirection = 'desc';
 
@@ -43,7 +44,7 @@ class ManageQuizzes extends Component
     public bool $isEditing = false;
     public ?Quiz $editingQuiz = null;
 
-    public $title, $description, $subject_id, $class_id, $category, $duration_minutes, $passing_score, $status, $start_time, $end_time;
+    public $title, $description, $subject_id, $class_id, $category, $duration_minutes, $passing_score, $status, $start_time, $end_time, $start_date, $end_date;
     public bool $shuffle_questions = false, $shuffle_options = false;
 
     protected function rules()
@@ -101,7 +102,7 @@ class ManageQuizzes extends Component
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingQuiz', 'title', 'description', 'subject_id', 'class_id', 'category', 'duration_minutes', 'passing_score', 'status', 'start_time', 'end_time', 'shuffle_questions', 'shuffle_options']);
+        $this->reset(['isEditing', 'editingQuiz', 'title', 'description', 'subject_id', 'class_id', 'category', 'duration_minutes', 'passing_score', 'status', 'start_time', 'end_time', 'shuffle_questions', 'shuffle_options', 'start_date', 'end_date']);
         $this->resetValidation();
     }
 
@@ -137,7 +138,6 @@ class ManageQuizzes extends Component
 
     public function save()
     {
-
         $wasPreviouslyPublished = $this->isEditing ? $this->editingQuiz->status === 'publish' : false;
 
         $validatedData = $this->validate();
@@ -151,12 +151,22 @@ class ManageQuizzes extends Component
         }
 
         $validatedData['user_id'] = Auth::id();
+
+
+        if (!empty($this->start_time)) {
+            $validatedData['start_date'] = \Carbon\Carbon::parse($this->start_time)->toDateString();
+        }
+        if (!empty($this->end_time)) {
+            $validatedData['end_date'] = \Carbon\Carbon::parse($this->end_time)->toDateString();
+        }
+
         $message = 'Kuis berhasil diperbarui.';
 
         if ($this->isEditing) {
             $this->editingQuiz->update($validatedData);
             $quiz = $this->editingQuiz->fresh();
         } else {
+            $validatedData['total_questions'] = 0;
             $quiz = Quiz::create($validatedData);
             $message = 'Kuis berhasil ditambahkan.';
         }
@@ -164,27 +174,42 @@ class ManageQuizzes extends Component
         $isNowPublished = $quiz->status === 'publish';
         if ($isNowPublished && !$wasPreviouslyPublished) {
             $this->sendNotificationToStudents($quiz);
-            $message .= ' Notifikasi telah dikirim ke siswa.';
+            $message .= ' Notifikasi WhatsApp telah dikirim ke siswa.';
         }
 
         $this->dispatch('flash-message', ['message' => $message, 'type' => 'success']);
         $this->dispatch('close-modal');
     }
 
-    // [8] Method baru untuk mengirim notifikasi
     private function sendNotificationToStudents(Quiz $quiz)
     {
         try {
-            if ($class = Classes::find($quiz->class_id)) {
-                $students = $class->users()->whereHas('roles', fn($q) => $q->where('name', 'siswa'))->get();
+            $quiz->load('subject', 'targetClass');
+            $class = $quiz->targetClass;
+
+            if ($class && $class->whatsapp_group_id) {
+                $subjectName = $quiz->subject->name;
+                $className = $class->class;
+
+                $students = $class->users;
+
                 if ($students->isNotEmpty()) {
                     Notification::send($students, new NotificationStudent($quiz));
                 }
+
+                $waMessage = "🔔 *Notifikasi Kuis Baru* 🔔\n\n" .
+                    "Sudah siap untuk kuis baru, kelas *{$className}*?\n\n" .
+                    "Ada kuis mata pelajaran *{$subjectName}* dengan judul:\n" .
+                    "*\"{$quiz->title}\"*\n\n" .
+                    "Durasi pengerjaan: *{$quiz->duration_minutes} menit*.\n\n" .
+                    "Ayo, persiapkan dirimu dan kerjakan di web pembelajaran! Good luck! ✨";
+
+                $notificationService = new WhatsAppNotificationService();
+                $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
             }
         } catch (\Exception $e) {
-            // Log error jika notifikasi gagal
-            Log::error('Gagal mengirim notifikasi siswa: ' . $e->getMessage());
-            $this->dispatch('flash-message', ['message' => 'Gagal mengirim notifikasi siswa.', 'type' => 'error']);
+            Log::error('Gagal mengirim notifikasi WhatsApp: ' . $e->getMessage());
+            $this->dispatch('flash-message', ['message' => 'Gagal mengirim notifikasi WhatsApp.', 'type' => 'error']);
         }
     }
 
