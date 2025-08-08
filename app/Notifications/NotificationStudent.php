@@ -32,12 +32,15 @@ class NotificationStudent extends Notification implements ShouldBroadcast
 
         if ($this->model instanceof Material) {
             $type = 'Materi Baru';
+            $link = route('student.materials.show', $this->model->id);
             $title = $this->model->title;
         } elseif ($this->model instanceof Task) {
             $type = 'Tugas Baru';
+            $link = route('student.tasks');
             $title = $this->model->title;
         } elseif ($this->model instanceof Quiz) {
             $type = 'Kuis Baru';
+            $link = route('student.quizzes');
             $title = $this->model->title;
         }
 
@@ -49,9 +52,6 @@ class NotificationStudent extends Notification implements ShouldBroadcast
         ];
     }
 
-    /**
-     * Menentukan channel siaran notifikasi.
-     */
     public function broadcastOn(): array
     {
         return [

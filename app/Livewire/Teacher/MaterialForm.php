@@ -6,6 +6,7 @@ use App\Models\Classes;
 use App\Models\Material;
 use App\Models\Subject;
 use App\Notifications\NotificationStudent;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
@@ -103,7 +104,6 @@ class MaterialForm extends Component
                     return;
                 }
 
-                // Alternative: cari pattern /Count
                 if (preg_match('/\/Count\s+(\d+)/', $content, $matches)) {
                     $this->page_count = (int) $matches[1];
                     return;
@@ -234,7 +234,6 @@ class MaterialForm extends Component
                 $this->sendNotificationToStudents($material, $notificationType);
             }
 
-            // Set flash message
             session()->flash('flash_message', [
                 'message' => $message,
                 'type' => 'success'
@@ -296,6 +295,17 @@ class MaterialForm extends Component
                         'class_id' => $material->class_id,
                         'student_count' => $students->count(),
                     ]);
+
+                    $waMessage = "🔔 *Notifikasi Materi Baru* 🔔\n\n" .
+                        "Kelas *{$class->class}* telah menerima materi baru:\n" .
+                        "*\"{$material->title}\"*\n" .
+                        "Mata Pelajaran: *{$material->subject->name}*\n" .
+                        "Kurikulum: *{$material->subject->kurikulum}*\n" .
+                        "Deskripsi: {$material->description}\n\n" .
+                        "Silakan cek di web pembelajaran untuk detail lebih lanjut.";
+
+                    $notificationService = new WhatsAppNotificationService();
+                    $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
                 }
             }
         } catch (\Exception $e) {

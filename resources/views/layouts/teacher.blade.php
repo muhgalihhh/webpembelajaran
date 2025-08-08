@@ -19,6 +19,7 @@
     <div wire:loading class="fixed inset-0 z-50 flex items-center justify-center bg-gray-100 bg-opacity-75">
         <div class="w-16 h-16 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
     </div>
+
     <div x-data="{ sidebarCollapsed: false, mobileSidebarOpen: false }" @keydown.escape.window="mobileSidebarOpen = false" class="flex flex-col h-screen">
         <x-ui.teacher.navbar />
         <div class="flex flex-1 overflow-hidden">

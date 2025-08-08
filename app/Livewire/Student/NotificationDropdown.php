@@ -16,10 +16,6 @@ class NotificationDropdown extends Component
     {
         $this->notificationCount = $this->unreadCount;
     }
-
-    /**
-     * Mendefinisikan listener secara dinamis untuk menangani event broadcast.
-     */
     protected function getListeners()
     {
         if (!Auth::check() || !Auth::user()->class_id) {
@@ -29,7 +25,6 @@ class NotificationDropdown extends Component
         $classId = Auth::user()->class_id;
 
         return [
-            // Format yang benar untuk Laravel Echo dengan Pusher
             "echo-private:class.{$classId},.new-content-notification" => 'handleNewNotification',
             'notification-read' => 'refreshNotificationData',
         ];

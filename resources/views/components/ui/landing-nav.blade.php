@@ -21,7 +21,6 @@
 
                     <a href="{{ route('student.ranking') }}" wire:navigate
                         class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.ranking*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Peringkat</a>
-                    @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
                 @endrole
 
                 @role('guru')
