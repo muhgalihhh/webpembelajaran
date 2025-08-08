@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Curriculum; // Import model Curriculum
 use App\Models\Subject;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
@@ -17,33 +18,21 @@ class ManageSubjects extends Component
 {
     use WithPagination;
 
-    // Properti untuk state & filter
-    #[Url(as: 'q', history: true)]
+    // ... (properti lain tidak berubah) ...
     public $search = '';
-
-    #[Url(history: true)]
-    public $status_filter = ''; // Filter untuk status aktif/nonaktif
-
-    #[Url(history: true)]
+    public $status_filter = '';
     public $sortBy = 'name';
-
-    #[Url(history: true)]
     public $sortDirection = 'asc';
-
     public $perPage = 10;
-
-    // Properti Form
     public $name, $code, $kurikulum;
-    public $is_active = true; // Default value
-
-    // Properti untuk state modal & data
+    public $is_active = true;
     public $isEditing = false;
     public ?Subject $editingSubject = null;
     public $itemToDeleteId = null;
-    public $kurikulumOptions = [
-        'K-13' => 'K-13',
-        'Kurikulum Merdeka' => 'Kurikulum Merdeka',
-    ];
+
+    // Hapus properti kurikulumOptions yang hardcoded
+    // public $kurikulumOptions = [ ... ];
+
     public function updatingSearch()
     {
         $this->resetPage();
@@ -52,6 +41,13 @@ class ManageSubjects extends Component
     public function updatingStatusFilter()
     {
         $this->resetPage();
+    }
+
+    // Ambil data kurikulum dari database
+    #[Computed]
+    public function kurikulumOptions()
+    {
+        return Curriculum::where('is_active', true)->orderBy('name')->pluck('name', 'name')->toArray();
     }
 
     protected function rules()
@@ -63,17 +59,17 @@ class ManageSubjects extends Component
                 'required',
                 'string',
                 'max:255',
-                // Aturan validasi yang baru
                 Rule::unique('subjects')->where(function ($query) {
                     return $query->where('kurikulum', $this->kurikulum);
                 })->ignore($subjectId),
             ],
             'code' => ['required', 'string', 'max:50', Rule::unique('subjects')->ignore($subjectId)],
-            'kurikulum' => ['required', 'string', Rule::in(array_keys($this->kurikulumOptions))],
+            'kurikulum' => ['required', 'string', Rule::in(array_keys($this->kurikulumOptions()))], // Validasi berdasarkan data dari database
             'is_active' => 'required|boolean',
         ];
     }
 
+    // ... (Fungsi-fungsi lain seperti subjects(), render(), sortBy() tidak perlu diubah) ...
     #[Computed]
     public function subjects()
     {
@@ -110,13 +106,12 @@ class ManageSubjects extends Component
     {
         $this->isEditing = false;
         $this->resetForm();
-        $this->is_active = true; // Set default value
+        $this->is_active = true;
         $this->dispatch('open-modal', id: 'subject-form-modal');
     }
 
     public function edit(Subject $subject)
     {
-        usleep(500000); // Simulasi loading
         $this->isEditing = true;
         $this->editingSubject = $subject;
         $this->name = $subject->name;

@@ -1,8 +1,6 @@
 <div>
     <main class="relative flex items-center justify-center flex-grow px-6 py-8 md:py-12">
-        {{-- Div untuk logo latar belakang. Penting: posisinya di sini agar bisa diatur z-index di belakang konten. --}}
         <div class="bg-school-logo"></div>
-
         <div
             class="relative z-10 flex flex-col items-center justify-center w-full max-w-6xl lg:flex-row lg:items-center">
             <div class="flex flex-col items-center text-center lg:items-start lg:text-left lg:w-1/2 lg:pr-8">
@@ -16,8 +14,7 @@
                     "Belajar hari ini adalah investasi untuk masa depan yang lebih cerah. Jadilah yang terbaik versi
                     dirimu!"
                 </p>
-                {{-- Tombol Masuk Sekarang --}}
-                <a href="{{ route('login') }}"
+                <a href="{{ route('admin.dashboard') }}"
                     class="bg-[#4A90E2] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-blue-600 transition-colors duration-200"
                     wire:navigate>
                     Masuk Sekarang

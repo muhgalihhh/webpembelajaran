@@ -104,6 +104,15 @@
                     <span class="ml-3" x-show="!sidebarCollapsed">Manajemen Mapel</span>
                 </a>
             </li>
+            <li>
+                <a href="{{ route('admin.manage-curriculums') }}" wire:navigate title="Manajemen Kurikulum"
+                    @click="$dispatch('close-mobile-sidebar')"
+                    class="flex items-center p-3 text-gray-700 transition-all duration-200 border {{ request()->routeIs('admin.manage-curriculums') ? 'bg-gray-500 text-white font-bold shadow-md' : 'hover:bg-gray-300 hover:shadow-sm' }}"
+                    :class="{ 'justify-center': sidebarCollapsed }">
+                    <i class="w-6 text-center fa-solid fa-scroll"></i>
+                    <span class="ml-3" x-show="!sidebarCollapsed">Manajemen Kurikulum</span>
+                </a>
+            </li>
         </ul>
     </nav>
 

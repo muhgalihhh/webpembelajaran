@@ -43,7 +43,7 @@
             </div>
         </div>
     </div>
-    <x-ui.alert-popup />
+    {{-- <x-ui.alert-popup /> --}}
     <x-ui.flash-message />
     <x-ui.logout-confirmation />
 

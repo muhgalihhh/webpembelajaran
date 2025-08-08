@@ -92,8 +92,7 @@
             <x-form.input-group label="Nama Mata Pelajaran" type="text" wireModel="name" id="name" required />
             <x-form.input-group label="Kode Mata Pelajaran" type="text" wireModel="code" id="code" required />
 
-            {{-- Select untuk Kurikulum Ditambahkan --}}
-            <x-form.select-group label="Kurikulum" name="kurikulum" wireModel="kurikulum" :options="$kurikulumOptions" />
+            <x-form.select-group label="Kurikulum" name="kurikulum" wireModel="kurikulum" :options="$this->kurikulumOptions()" />
 
             <x-form.select-group label="Status" name="is_active" wireModel="is_active" :options="['1' => 'Aktif', '0' => 'Nonaktif']" required />
 

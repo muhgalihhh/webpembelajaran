@@ -53,6 +53,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/manage-classes', ManageClasses::class)->name('manage-classes');
         Route::get('/manage-subjects', ManageSubjects::class)->name('manage-subjects');
         Route::get('/profile', ProfileAdmin::class)->name('profile');
+        Route::get('/manage-curriculums', \App\Livewire\Admin\ManageCurriculums::class)->name('manage-curriculums');
     });
 
     // Rute untuk Guru

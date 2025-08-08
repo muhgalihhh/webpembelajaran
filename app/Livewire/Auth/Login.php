@@ -26,9 +26,12 @@ class Login extends Component
     {
         $this->validate();
 
-        // Attempt login
         if (!Auth::attempt(['username' => $this->username, 'password' => $this->password])) {
             session()->flash('flash-message', [
+                'message' => 'Username atau password tidak sesuai.',
+                'type' => 'error'
+            ]);
+            $this->dispatch('flash-message', [
                 'message' => 'Username atau password tidak sesuai.',
                 'type' => 'error'
             ]);
@@ -45,18 +48,21 @@ class Login extends Component
                 'message' => 'Anda tidak memiliki akses sebagai ' . ucfirst($role) . '.',
                 'type' => 'error'
             ]);
+            $this->dispatch('flash-message', [
+                'message' => 'Anda tidak memiliki akses sebagai ' . ucfirst($role) . '.',
+                'type' => 'error'
+            ]);
             $this->addError('username', 'Anda tidak memiliki akses sebagai ' . ucfirst($role) . '.');
             return;
         }
 
-        session()->regenerate();
         $redirectRoute = match ($role) {
             'siswa' => 'student.index',
             'guru' => 'teacher.index',
-            'admin' => 'admin.index',
             default => 'dashboard'
         };
 
+        session()->regenerate();
 
         session()->flash('flash_message', [
             'message' => 'Berhasil masuk sebagai ' . ucfirst($role) . '.',
