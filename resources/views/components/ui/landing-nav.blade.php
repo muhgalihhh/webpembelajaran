@@ -37,7 +37,7 @@
 
                 @role('admin')
                     <a href="{{ route('admin.dashboard') }}" wire:navigate
-                        class="flex items-center px-4 py-2 text-sm font-semibold text-blue-600 bg-white rounded-lg hover:bg-gray-200">
+                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('admin.dashboard*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">
                         <i class="mr-2 fas fa-tachometer-alt"></i>
                         Dashboard Admin
                     </a>
@@ -61,7 +61,6 @@
                 </button>
             </div>
         @else
-            {{-- Tombol untuk pengguna yang belum login --}}
             <a href="{{ route('admin.login') }}" wire:navigate
                 class="hidden sm:inline-block bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">
                 Admin
@@ -109,7 +108,8 @@
                 @endrole
                 @role('admin')
                     <a href="{{ route('admin.dashboard') }}" wire:navigate @click="mobileMenuOpen = false"
-                        class="block px-4 py-3 font-semibold text-white rounded-md hover:bg-blue-600">Dashboard Admin</a>
+                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('admin.dashboard*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Dashboard
+                        Admin</a>
                 @endrole
             </nav>
         </div>

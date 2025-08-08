@@ -1,5 +1,8 @@
 <div>
     <x-slot:pageHeader>
+        <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
+            <i class="text-xl fa-solid fa-bars"></i>
+        </button>
         <h2 class="text-2xl font-bold text-gray-800">Profil Saya</h2>
     </x-slot:pageHeader>
 
@@ -15,7 +18,6 @@
                             @if ($photo)
                                 <img src="{{ $photo->temporaryUrl() }}" alt="Preview"
                                     class="object-cover w-20 h-20 rounded-full">
-                                {{-- Menggunakan 'profile_picture' sesuai nama kolom di database Anda --}}
                             @elseif (Auth::user()->profile_picture)
                                 <img src="{{ Storage::url(Auth::user()->profile_picture) }}" alt="Foto Profil"
                                     class="object-cover w-20 h-20 rounded-full">
@@ -52,8 +54,6 @@
                 </form>
             </div>
         </div>
-
-        {{-- Kolom Ganti Password --}}
         <div class="lg:col-span-1">
             <div class="p-6 bg-white rounded-lg shadow-md">
                 <h3 class="pb-3 text-lg font-medium text-gray-900 border-b">Ubah Kata Sandi</h3>

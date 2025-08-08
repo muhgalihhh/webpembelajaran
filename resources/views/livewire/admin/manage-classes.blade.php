@@ -1,13 +1,28 @@
 <div>
-    <div class="p-6 bg-white rounded-lg shadow-md">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-2xl font-bold">Manajemen Kelas</h2>
-            <button wire:click="create" class="px-4 py-2 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600">
-                <i class="mr-2 fa-solid fa-plus"></i> Tambah Kelas
-            </button>
+    <x-slot:pageHeader>
+        <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
+            <i class="text-xl fa-solid fa-bars"></i>
+        </button>
+
+        <h2 class="text-2xl font-bold text-gray-800">
+            Manajemen Kelas
+        </h2>
+
+    </x-slot:pageHeader>
+    <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
+        <div class="flex flex-col gap-4 md:flex-row md:items-end">
+            <x-form.input-group label="Cari Kelas" name="search" wireModel="search"
+                placeholder="Cari berdasarkan nama kelas atau ID grup WhatsApp" icon="fa-solid fa-search" />
+            <div>
+                <x-form.button wireClick="create" icon="fa-solid fa-plus" class="w-full md:w-auto">
+                    Tambah Kelas
+                </x-form.button>
+
+            </div>
         </div>
-        <x-form.input-group label="Cari Kelas" name="search" wireModel="search"
-            placeholder="Cari berdasarkan nama kelas atau ID grup WhatsApp" icon="fa-solid fa-search" />
+    </div>
+    <div class="p-6 bg-white rounded-lg shadow-md">
+
 
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">

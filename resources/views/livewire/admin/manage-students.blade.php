@@ -6,7 +6,7 @@
         <h2 class="text-2xl font-bold text-gray-800">Manajemen Siswa</h2>
     </x-slot:pageHeader>
 
-    {{-- Filter Section --}}
+
     <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
         <div class="flex flex-col gap-4 md:flex-row md:items-end">
             <div class="flex-1">

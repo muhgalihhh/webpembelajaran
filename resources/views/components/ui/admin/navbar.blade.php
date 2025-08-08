@@ -5,7 +5,6 @@
     </div>
 
     <div class="flex items-center justify-center gap-3">
-        {{-- tombol ke halaman awal --}}
         <a href="{{ route('admin.index') }}" class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">
             <i class="fa-solid fa-house fa-lg"></i>
             <span class="hidden sm:inline">Halaman Awal</span>

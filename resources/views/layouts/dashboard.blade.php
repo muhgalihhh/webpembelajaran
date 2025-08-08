@@ -28,7 +28,7 @@
                 <main class="flex-1 overflow-y-auto">
 
                     @if (isset($pageHeader))
-                        <div class="p-4 bg-white border-b border-gray-200 shadow-sm sm:p-6">
+                        <div class="flex items-center p-4 bg-white border-b border-gray-200 shadow-sm sm:p-6">
                             {{ $pageHeader }}
                         </div>
                     @endif

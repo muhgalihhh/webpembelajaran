@@ -41,16 +41,10 @@
     }" x-cloak>
 
         <x-ui.landing-nav />
-
-        <!-- Content area yang akan mengambil sisa ruang -->
         <main class="flex-1">
             {{ $slot }}
         </main>
-
-
     </div>
-
-    <!-- Footer yang akan selalu di bawah -->
     <footer class="w-full py-4 mx-auto text-xs font-bold text-center text-white bg-[#4A90E2] rounded-t-lg mt-auto">
         &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
     </footer>

@@ -73,7 +73,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/about-us', \App\Livewire\Teacher\AboutUs::class)->name('about-us');
     });
 
-    // Rute untuk Siswa (contoh)
+    // Rute untuk Siswa
     Route::middleware(['auth', 'role:siswa'])->prefix('student')->name('student.')->group(function () {
         Route::get('/', \App\Livewire\Student\Index::class)->name('index');
         Route::get('/dashboard', \App\Livewire\Student\Dashboard::class)->name('dashboard');
