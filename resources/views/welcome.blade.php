@@ -85,7 +85,7 @@
             x-transition:enter-start="opacity-0 transform translate-y-8"
             x-transition:enter-end="opacity-100 transform translate-y-0">
 
-            {{-- Div untuk logo latar belakang. Penting: posisinya di sini agar bisa diatur z-index di belakang konten. --}}
+
             <div class="bg-school-logo"></div>
 
             <div
@@ -97,7 +97,7 @@
                     x-transition:enter-end="opacity-100 transform translate-x-0">
 
                     <h1 class="mb-4 text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
-                        MASUK ATAU DAFTAR AKUN MEDIA PEMBELAJARAN DIGITAL SEKOLAH DASAR | KELAS VI
+                        MASUK ATAU DAFTAR AKUN MEDIA PEMBELAJARAN DIGITAL SEKOLAH DASAR
                     </h1>
                     <p class="max-w-xl mb-8 text-base italic text-gray-600 sm:text-lg">
                         "Belajar hari ini adalah investasi untuk masa depan yang lebih cerah. Jadilah yang terbaik

@@ -62,7 +62,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/materials', \App\Livewire\Teacher\ManageMaterials::class)->name('materials');
         Route::get('/materials/create', \App\Livewire\Teacher\MaterialForm::class)->name('materials.create');
         Route::get('/materials/{material}/edit', \App\Livewire\Teacher\MaterialForm::class)->name('materials.edit');
-
         Route::get('/quizzes', \App\Livewire\Teacher\ManageQuizzes::class)->name('quizzes');
         Route::get('/quizzes/{quiz}/questions', \App\Livewire\Teacher\QuizQuestions::class)->name('quizzes.questions');
         Route::get('/task', \App\Livewire\Teacher\ManageTasks::class)->name('tasks');
@@ -70,6 +69,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/scores/tasks/{task}/submissions', \App\Livewire\Teacher\ScoreTaskSubmissions::class)->name('scores.submissions');
         Route::get('/games', \App\Livewire\Teacher\ManageEducationalGames::class)->name('games');
         Route::get('/profile', \App\Livewire\Teacher\ProfileGuru::class)->name('profile');
+        Route::get('/rankings', \App\Livewire\Teacher\StudentRanking::class)->name('rankings');
+        Route::get('/about-us', \App\Livewire\Teacher\AboutUs::class)->name('about-us');
     });
 
     // Rute untuk Siswa (contoh)
@@ -84,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/quizzes/{attempt}/result', \App\Livewire\Student\QuizResult::class)->name('quizzes.result');
         Route::get('/ranking', \App\Livewire\Student\StudentRanking::class)->name('ranking');
         Route::get('/tasks', \App\Livewire\Student\TaskList::class)->name('tasks');
+        Route::get('/games', \App\Livewire\Student\GameList::class)->name('games');
     });
 
 
@@ -97,10 +99,37 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+
+Route::get('/update_gruplist', function () {
+    $token = config('services.fonnte.token');
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://api.fonnte.com/fetch-group',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_HTTPHEADER => array(
+            "Authorization: $token"
+        ),
+    ));
+
+    $response = curl_exec($curl);
+
+    curl_close($curl);
+    echo $response;
+})->middleware(['auth', 'role:admin']);
+
+
+
+
 Route::get('/cek_idgrup', function () {
 
     $token = config('services.fonnte.token');
-
 
     $curl = curl_init();
 
@@ -122,4 +151,4 @@ Route::get('/cek_idgrup', function () {
 
     curl_close($curl);
     echo $response;
-})->middleware(['auth', 'role:siswa']);
+})->middleware(['auth', 'role:admin']);

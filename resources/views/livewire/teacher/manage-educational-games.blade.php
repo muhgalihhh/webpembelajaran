@@ -1,5 +1,8 @@
 <div>
     <x-slot:pageHeader>
+        <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
+            <i class="text-xl fa-solid fa-bars"></i>
+        </button>
         <h2 class="text-2xl font-bold text-gray-800">Manajemen Game Edukasi</h2>
     </x-slot:pageHeader>
 
@@ -12,7 +15,12 @@
             </div>
             <div class="flex-1">
                 <x-form.select-group label="Filter Mata Pelajaran" name="subjectFilter" wireModel="subjectFilter"
-                    :options="$this->subjects" wire:model.live='subjectFilter' optionLabel="name" />
+                    :options="$this->subjects" placeholder="Semua Mapel" />
+            </div>
+            {{-- Filter Kelas Baru --}}
+            <div class="flex-1">
+                <x-form.select-group label="Filter Kelas" name="classFilter" wireModel="classFilter" :options="$this->classes"
+                    optionValue="id" optionLabel="class" placeholder="Semua Kelas" />
             </div>
             <div>
                 <x-form.button wireClick="create" icon="fa-solid fa-plus" class="w-full md:w-auto">
@@ -29,8 +37,10 @@
                 <img src="{{ $game->image_path ? Storage::url($game->image_path) : 'https://placehold.co/600x400/e2e8f0/e2e8f0' }}"
                     alt="{{ $game->title }}" class="object-cover w-full h-48">
                 <div class="flex flex-col flex-grow p-4">
-                    <span
-                        class="text-xs font-semibold text-blue-600 uppercase">{{ $game->subject->name ?? 'N/A' }}</span>
+                    <div class="flex justify-between text-xs font-semibold uppercase">
+                        <span class="text-blue-600">{{ $game->subject->name ?? 'N/A' }}</span>
+                        <span class="text-gray-500">Kelas {{ $game->class->class ?? 'N/A' }}</span>
+                    </div>
                     <h3 class="mt-1 text-lg font-bold text-gray-800">{{ $game->title }}</h3>
                     <p class="flex-grow mt-2 text-sm text-gray-600">{{ Str::limit($game->description, 100) }}</p>
                     <div class="flex items-center justify-between pt-4 mt-4 border-t">
@@ -64,8 +74,15 @@
                 </div>
                 <x-form.select-group label="Mata Pelajaran" name="subject_id" wireModel="subject_id" :options="$this->subjects"
                     required />
-                <x-form.input-group label="URL Game" type="url" wireModel="game_url" id="game_url"
-                    placeholder="https://..." required />
+
+                {{-- Input Kelas Baru --}}
+                <x-form.select-group label="Kelas" name="class_id" wireModel="class_id" :options="$this->classes"
+                    optionValue="id" optionLabel="class" required />
+
+                <div class="md:col-span-2">
+                    <x-form.input-group label="URL Game" type="url" wireModel="game_url" id="game_url"
+                        placeholder="https://..." required />
+                </div>
                 <div class="md:col-span-2">
                     <x-form.textarea-group label="Deskripsi" name="description" wireModel="description" required />
                 </div>
@@ -85,8 +102,12 @@
                 </div>
             </div>
             <div class="flex justify-end pt-4 mt-4 space-x-4 border-t">
-                <button type="button" @click="$dispatch('close-modal')" class="btn btn-secondary">Batal</button>
-                <button type="submit" class="btn btn-primary">Simpan</button>
+                <button type="button" @click="$dispatch('close-modal')"
+                    class="px-3 py-2 font-bold text-black bg-gray-400 border rounded-lg btn btn-secondary hover:bg-gray-500">Batal</button>
+                <button type="submit"
+                    class="px-3 py-2 font-bold text-white bg-blue-400 border rounded-lg btn btn-primary hover:bg-blue-600">
+                    Simpan
+                </button>
             </div>
         </form>
     </x-ui.modal>

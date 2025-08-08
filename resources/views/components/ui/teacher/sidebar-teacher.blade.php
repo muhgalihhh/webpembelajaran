@@ -80,6 +80,15 @@
                     <span class="ml-3" x-show="!sidebarCollapsed">Game Edukatif</span>
                 </a>
             </li>
+            <li>
+                {{-- About US --}}
+                <a href="{{ route('teacher.about-us') }}" wire:navigate title="Tentang Aplikasi"
+                    class="flex bg-gray-500 items-center border border-black p-3 text-gray-700{{ request()->routeIs('teacher.about-us') ? 'bg-gray-700 text-white font-bold' : 'hover:bg-gray-300' }}"
+                    :class="{ 'justify-center': sidebarCollapsed }">
+                    <i class="w-6 text-center fa-solid fa-info-circle"></i>
+                    <span class="ml-3" x-show="!sidebarCollapsed">About Us</span>
+                </a>
+            </li>
         </ul>
     </nav>
 </aside>

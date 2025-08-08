@@ -1,6 +1,19 @@
 <div>
-    {{-- Header dan Statistik (Tidak berubah) --}}
-    <h1 class="text-2xl font-semibold text-gray-900">Dashboard Guru</h1>
+    <x-slot:pageHeader>
+        <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
+            <i class="text-xl fa-solid fa-bars"></i>
+        </button>
+        <h2 class="text-2xl font-bold text-gray-800">Dasbor Guru</h2>
+    </x-slot:pageHeader>
+
+    <div class="flex justify-end mb-4">
+
+        <a href="{{ route('teacher.rankings') }}" wire:navigate
+            class="px-4 py-2 font-bold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600">
+            <i class="mr-2 fa-solid fa-trophy"></i>
+            Lihat Peringkat Siswa
+        </a>
+    </div>
     <div class="grid grid-cols-1 gap-5 mt-6 sm:grid-cols-2 lg:grid-cols-3">
         <div class="p-4 overflow-hidden bg-white rounded-lg shadow">
             <p class="font-medium text-gray-500 truncate">Siswa Aktif</p>
@@ -18,7 +31,7 @@
 
     {{-- Bagian Aktivitas Siswa --}}
     <div class="p-6 mt-8 bg-white rounded-lg shadow">
-        {{-- Filter Utama dan Dropdown (Tidak berubah) --}}
+
         <div>
             <h2 class="text-xl font-bold text-gray-800">Aktivitas Siswa</h2>
             <p class="text-gray-500">Pilih untuk melihat hasil kuis atau tugas yang telah dikerjakan siswa.</p>

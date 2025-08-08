@@ -28,6 +28,7 @@ class EducationalGame extends Model
         'image_path',
         'game_url',
         'subject_id',
+        'class_id',
     ];
 
     /**
@@ -39,5 +40,10 @@ class EducationalGame extends Model
     public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    public function class(): BelongsTo
+    {
+        return $this->belongsTo(Classes::class, 'class_id');
     }
 }

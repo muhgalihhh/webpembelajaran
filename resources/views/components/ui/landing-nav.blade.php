@@ -15,7 +15,7 @@
                         class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.quiz*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Kuis</a>
                     <a href="{{ route('student.tasks') }} " wire:navigate
                         class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.tasks*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Tugas</a>
-                    <a href="#" wire:navigate
+                    <a href="{{ route('student.games') }}" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('student.games*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Game
                         Edukatif</a>
 
@@ -92,7 +92,7 @@
                         class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.quiz*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Kuis</a>
                     <a href="{{ route('student.tasks') }} " wire:navigate
                         class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.tasks*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Tugas</a>
-                    <a href="#" wire:navigate
+                    <a href="{{ route('student.games') }}" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('student.games*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Game
                         Edukatif</a>
                     <a href="{{ route('student.ranking') }}" wire:navigate
