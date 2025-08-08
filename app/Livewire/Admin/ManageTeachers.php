@@ -3,7 +3,9 @@
 namespace App\Livewire\Admin;
 
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -53,10 +55,11 @@ class ManageTeachers extends Component
         $userId = $this->editingUser?->id;
         return [
             'name' => 'required|string|max:255',
-            'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($userId)],
+            'username' => ['required', 'string', 'min:3', 'max:255', Rule::unique('users')->ignore($userId)],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($userId)],
             'phone_number' => ['nullable', 'string', 'max:20', Rule::unique('users')->ignore($userId)],
             'password' => $this->isEditing ? 'nullable|min:8|same:password_confirmation' : 'required|min:8|same:password_confirmation',
+            'password_confirmation' => $this->isEditing ? 'nullable|required_with:password|min:8' : 'required|min:8',
             'status' => 'required|in:active,inactive',
         ];
     }
@@ -113,6 +116,9 @@ class ManageTeachers extends Component
         $this->email = $user->email;
         $this->phone_number = $user->phone_number;
         $this->status = $user->status;
+        $this->password = null;
+        $this->password_confirmation = null;
+        $this->resetValidation();
         $this->dispatch('open-modal', id: 'teacher-form-modal');
     }
 
@@ -120,24 +126,55 @@ class ManageTeachers extends Component
     {
         $validatedData = $this->validate();
 
-        if ($this->isEditing) {
-            if (!empty($validatedData['password'])) {
-                $validatedData['password'] = Hash::make($validatedData['password']);
+        try {
+            if ($this->isEditing) {
+                if (!empty($validatedData['password'])) {
+                    $validatedData['password'] = Hash::make($validatedData['password']);
+                } else {
+                    unset($validatedData['password']);
+                }
+                $this->editingUser->update($validatedData);
+                $message = 'Data guru berhasil diperbarui.';
             } else {
-                unset($validatedData['password']);
+                $validatedData['password'] = Hash::make($validatedData['password']);
+                $user = User::create($validatedData);
+                $user->assignRole('guru');
+                $message = 'Data guru berhasil ditambahkan.';
             }
-            $this->editingUser->update($validatedData);
-            $message = 'Data guru berhasil diperbarui.';
-        } else {
-            $validatedData['password'] = Hash::make($validatedData['password']);
-            $user = User::create($validatedData);
-            $user->assignRole('guru');
-            $message = 'Data guru berhasil ditambahkan.';
-        }
 
-        $this->dispatch('flash-message', message: $message, type: 'success');
-        $this->dispatch('close-modal');
+            // Jika berhasil, kirim notifikasi dan tutup modal
+            $this->dispatch('flash-message', message: $message, type: 'success');
+            $this->dispatch('close-modal');
+
+        } catch (QueryException $e) {
+            // Tangkap error spesifik dari database
+            Log::error('Error saving teacher (QueryException): ' . $e->getMessage());
+            $this->dispatch('flash-message', message: 'Terjadi kesalahan pada database saat menyimpan data.', type: 'error');
+            $this->handleDatabaseError($e);
+
+        } catch (\Exception $e) {
+            Log::error('Error saving teacher: ' . $e->getMessage());
+            $this->dispatch('flash-message', message: 'Terjadi kesalahan saat menyimpan data.', type: 'error');
+            $this->addError('name', 'Terjadi kesalahan tak terduga saat menyimpan data.');
+        }
     }
+
+    // Fungsi baru untuk menangani error database dan menambahkan pesan ke form
+    private function handleDatabaseError(QueryException $e)
+    {
+        $errorMessage = $e->getMessage();
+
+        if (str_contains($errorMessage, 'users_email_unique')) {
+            $this->addError('email', 'Email ini sudah terdaftar. Silakan gunakan email lain.');
+        } elseif (str_contains($errorMessage, 'users_username_unique')) {
+            $this->addError('username', 'Username ini sudah digunakan. Silakan pilih username lain.');
+        } elseif (str_contains($errorMessage, 'users_phone_number_unique')) {
+            $this->addError('phone_number', 'Nomor telepon ini sudah terdaftar.');
+        } else {
+            $this->addError('name', 'Terjadi kesalahan pada database saat menyimpan.');
+        }
+    }
+
 
     public function confirmDelete($id)
     {
@@ -147,13 +184,28 @@ class ManageTeachers extends Component
 
     public function delete()
     {
-        if ($this->itemToDeleteId) {
+        if (!$this->itemToDeleteId)
+            return;
+
+        try {
             User::findOrFail($this->itemToDeleteId)->delete();
             $this->dispatch('flash-message', message: 'Data guru berhasil dihapus.', type: 'success');
+        } catch (QueryException $e) {
+            Log::error('Error deleting teacher (QueryException): ' . $e->getMessage());
+            $errorCode = $e->errorInfo[1];
+            if ($errorCode == 1451) {
+                $this->dispatch('flash-message', message: 'Gagal menghapus. Guru ini mungkin masih terkait dengan data lain (misal: kelas).', type: 'error');
+            } else {
+                $this->dispatch('flash-message', message: 'Terjadi kesalahan pada database saat menghapus data.', type: 'error');
+            }
+        } catch (\Exception $e) {
+            Log::error('Error deleting teacher: ' . $e->getMessage());
+            $this->dispatch('flash-message', message: 'Terjadi kesalahan saat menghapus data.', type: 'error');
+        } finally {
+            $this->dispatch('close-confirm-modal');
+            $this->itemToDeleteId = null;
+            $this->resetPage();
         }
-        $this->dispatch('close-confirm-modal');
-        $this->itemToDeleteId = null;
-        $this->resetPage();
     }
 
     public function view(User $user)

@@ -6,7 +6,6 @@
         <h2 class="text-2xl font-bold text-gray-800">Manajemen Guru</h2>
     </x-slot:pageHeader>
 
-    {{-- Filter Section --}}
     <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
         <div class="flex flex-col gap-4 md:flex-row md:items-end">
             <div class="flex-1">
@@ -94,7 +93,7 @@
                 <x-form.input-group label="No. Telepon (Opsional)" type="tel" wireModel="phone_number"
                     id="phone_number" />
                 <x-form.select-group label="Status" name="status" wireModel="status" :options="['active' => 'Aktif', 'inactive' => 'Nonaktif']" />
-                {{-- Spacer div to align password fields correctly --}}
+
                 <div></div>
                 <x-form.input-group label="Password" type="password" wireModel="password" id="password"
                     :required="!$isEditing" passwordToggle />
