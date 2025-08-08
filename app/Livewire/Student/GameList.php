@@ -20,7 +20,7 @@ class GameList extends Component
 
         return EducationalGame::with(['subject', 'class'])
             ->where('class_id', $studentClassId)
-            ->get();
+            ->paginate(10);
     }
 
     public function render()

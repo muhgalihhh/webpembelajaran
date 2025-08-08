@@ -60,9 +60,8 @@
     $colorPalette = $palettes[$subjectName] ?? $palettes['default'];
 @endphp
 
-{{-- === KARTU KUIS DENGAN WARNA DAN TOMBOL DINAMIS === --}}
 <div
-    class="quiz-card p-4 overflow-hidden transition-all duration-300 border shadow-xl rounded-2xl hover:-translate-y-2 hover:shadow-2xl {{ $isReady ? $colorPalette['container'] : 'bg-gray-300' }}">
+    class="quiz-card p-4 overflow-hidden transition-all duration-300 border rounded-2xl hover:-translate-y-2 {{ $isReady ? $colorPalette['container'] : 'bg-gray-300' }} shadow-[6px_6px_0px_rgba(0,0,0,0.2)]">
     <div class="{{ $isReady ? $colorPalette['content'] : 'bg-gray-400' }} rounded-xl overflow-hidden border text-black">
         <div class="relative p-4">
             {{-- PERUBAHAN: Tampilkan status Lulus/Tidak Lulus jika sudah selesai --}}
@@ -79,10 +78,12 @@
             <div class="flex items-center justify-between mb-2">
                 <div class="px-3 py-1 bg-white border rounded-lg bg-opacity-20">
                     <h3 class="text-lg font-bold tracking-wide uppercase">{{ $quiz->subject->name }}</h3>
+                    <p class="text-sm text-gray-700">{{ $quiz->title }}</p>
+                    {{-- kurikulum --}}
+                    <p class="text-xs text-gray-600">Kurikulum: {{ $quiz->subject->kurikulum }}</p>
                 </div>
             </div>
 
-            {{-- PERUBAHAN: Tampilkan nilai jika sudah selesai --}}
             @if ($attempt && $attempt->is_completed)
                 <div class="my-2">
                     <p class="text-sm opacity-90">Nilai Kamu:</p>

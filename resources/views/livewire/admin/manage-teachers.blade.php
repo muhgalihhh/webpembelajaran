@@ -1,4 +1,5 @@
 <div>
+    {{-- Header Halaman --}}
     <x-slot:pageHeader>
         <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
             <i class="text-xl fa-solid fa-bars"></i>
@@ -6,6 +7,7 @@
         <h2 class="text-2xl font-bold text-gray-800">Manajemen Guru</h2>
     </x-slot:pageHeader>
 
+    {{-- Bagian Filter dan Pencarian --}}
     <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
         <div class="flex flex-col gap-4 md:flex-row md:items-end">
             <div class="flex-1">
@@ -24,8 +26,8 @@
         </div>
     </div>
 
-    {{-- Tabel Data Guru --}}
-    <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+    {{-- Tampilan Tabel untuk Desktop (Terlihat di layar lg ke atas) --}}
+    <div class="hidden overflow-x-auto bg-white rounded-lg shadow-md lg:block">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -51,24 +53,23 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $teacher->status == 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full {{ $teacher->status == 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                 {{ ucfirst($teacher->status) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                             <button wire:click="view({{ $teacher->id }})"
                                 class="text-blue-600 hover:text-blue-900 btn">
-                                <i class="fa-solid fa-eye"></i>
-                                Detail</button>
+                                <i class="fa-solid fa-eye"></i> Detail
+                            </button>
                             <button wire:click="edit({{ $teacher->id }})"
                                 class="ml-4 text-indigo-600 hover:text-indigo-900">
-                                <i class="fa-solid fa-pencil-alt"></i>
-                                Edit</button>
+                                <i class="fa-solid fa-pencil-alt"></i> Edit
+                            </button>
                             <button wire:click="confirmDelete({{ $teacher->id }})"
                                 class="ml-4 text-red-600 hover:text-red-900">
-                                <i class="fa-solid fa-trash"></i>
-                                Hapus</button>
-
+                                <i class="fa-solid fa-trash"></i> Hapus
+                            </button>
                         </td>
                     </tr>
                 @empty
@@ -80,6 +81,36 @@
         </table>
     </div>
 
+    {{-- Tampilan Kartu untuk Mobile (Tersembunyi di layar lg ke atas) --}}
+    <div class="grid grid-cols-1 gap-4 lg:hidden">
+        @forelse ($this->teachers as $teacher)
+            <div class="p-4 bg-white rounded-lg shadow-md">
+                <div class="flex items-center justify-between">
+                    <div class="text-lg font-bold text-gray-800">{{ $teacher->name }}</div>
+                    <span
+                        class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full {{ $teacher->status == 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                        {{ ucfirst($teacher->status) }}
+                    </span>
+                </div>
+                <div class="mt-2 text-sm text-gray-600">
+                    <p>{{ $teacher->email }}</p>
+                    <p>{{ $teacher->phone_number }}</p>
+                </div>
+                <div class="flex justify-end mt-4 space-x-4">
+                    <button wire:click="view({{ $teacher->id }})"
+                        class="text-blue-600 hover:text-blue-900">Detail</button>
+                    <button wire:click="edit({{ $teacher->id }})"
+                        class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                    <button wire:click="confirmDelete({{ $teacher->id }})"
+                        class="text-red-600 hover:text-red-900">Hapus</button>
+                </div>
+            </div>
+        @empty
+            <div class="py-4 text-center text-gray-500">Tidak ada data guru ditemukan.</div>
+        @endforelse
+    </div>
+
+    {{-- Paginasi --}}
     <div class="mt-4">{{ $this->teachers->links() }}</div>
 
     {{-- Modal Form --}}
@@ -93,7 +124,6 @@
                 <x-form.input-group label="No. Telepon (Opsional)" type="tel" wireModel="phone_number"
                     id="phone_number" />
                 <x-form.select-group label="Status" name="status" wireModel="status" :options="['active' => 'Aktif', 'inactive' => 'Nonaktif']" />
-
                 <div></div>
                 <x-form.input-group label="Password" type="password" wireModel="password" id="password"
                     :required="!$isEditing" passwordToggle />
@@ -110,12 +140,10 @@
         </form>
     </x-ui.modal>
 
-    {{-- Modal Konfirmasi Delete --}}
+    {{-- Modal Konfirmasi Hapus --}}
     <x-ui.confirm-modal title="Hapus Guru" message="Anda yakin ingin menghapus data guru ini?"
         wireConfirmAction="delete" />
 
     {{-- Modal Detail Pengguna --}}
     <x-ui.user-detail-modals :user="$viewingUser" />
-
-
 </div>

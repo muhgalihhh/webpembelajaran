@@ -7,7 +7,6 @@
             <p class="text-lg font-semibold text-blue-800">Belajar sambil bermain lebih menyenangkan!</p>
         </div>
 
-        {{-- Deskripsi --}}
         <div class="mb-8">
             <h2 class="text-2xl font-bold text-gray-800">Selamat Datang di Portal Game Edukatif!</h2>
             <p class="mt-1 text-gray-600">
@@ -16,7 +15,6 @@
             </p>
         </div>
 
-        {{-- Grid Kartu Game --}}
         <div class="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             @forelse ($this->games as $game)
                 <x-ui.student.game.card :game="$game" />
@@ -27,5 +25,18 @@
                 </div>
             @endforelse
         </div>
+
+        @if ($this->games->count() > 0)
+            <div class="mt-8 text-center">
+                <p class="text-sm text-gray-500">Total Game Tersedia: {{ $this->games->count() }}</p>
+            </div>
+        @endif
+        @if ($this->games->hasPages())
+            <div class="mt-8">
+                {{ $this->games->links() }}
+            </div>
+        @endif
+
+
     </x-ui.student.container>
 </div>

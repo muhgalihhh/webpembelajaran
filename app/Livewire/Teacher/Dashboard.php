@@ -88,7 +88,6 @@ class Dashboard extends Component
     {
         if ($this->activityType === 'quiz') {
             $query = QuizAttempt::query();
-            // Terapkan filter yang relevan untuk kuis
             $query->when($this->classFilter, fn($q) => $q->whereHas('user', fn($sq) => $sq->where('class_id', $this->classFilter)));
             $query->when($this->subjectFilter, fn($q) => $q->whereHas('quiz', fn($sq) => $sq->where('subject_id', $this->subjectFilter)));
         } else {
@@ -132,11 +131,15 @@ class Dashboard extends Component
             } else {
                 TaskSubmission::findOrFail($id)->delete();
             }
-            // Kirim notifikasi sukses (jika Anda menggunakan sistem notifikasi)
-            // session()->flash('message', 'Data pengerjaan berhasil dihapus.');
+            session()->flash('flash-message', [
+                'type' => 'success',
+                'message' => 'Data pengerjaan berhasil dihapus.',
+            ]);
         } catch (\Exception $e) {
-            // Kirim notifikasi error
-            // session()->flash('error', 'Gagal menghapus data.');
+            session()->flash('flash-message', [
+                'type' => 'error',
+                'message' => 'Gagal menghapus data pengerjaan: ' . $e->getMessage(),
+            ]);
         }
     }
 }

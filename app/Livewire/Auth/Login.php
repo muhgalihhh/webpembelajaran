@@ -41,7 +41,7 @@ class Login extends Component
 
         $user = Auth::user();
 
-        // Check role
+
         if (!$user->hasRole($role)) {
             Auth::logout();
             session()->flash('flash-message', [

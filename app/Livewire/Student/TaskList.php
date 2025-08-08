@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Student;
 
+use App\Models\Curriculum;
+use App\Models\Subject;
 use App\Models\Task;
 use App\Models\TaskSubmission;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -22,19 +25,39 @@ class TaskList extends Component
     #[Url(as: 'tab', history: true)]
     public string $activeTab = 'semua';
 
+    // Properti BARU untuk filter
+    #[Url(as: 'mapel')]
+    public string $subjectFilter = '';
+    #[Url(as: 'kurikulum')]
+    public string $kurikulumFilter = '';
+
     // Properti untuk modal
     public ?Task $selectedTask = null;
     public $submissionFile;
     public $submissionNotes;
 
-    // Properti baru untuk melihat detail pengumpulan
+    // Properti untuk modal lihat nilai dan file
     public ?TaskSubmission $viewingSubmission = null;
+    public ?string $fileViewerUrl = null;
+    public ?string $fileViewerType = null;
+    public ?string $fileViewerTitle = null;
+
+    // Lifecycle hooks BARU
+    public function updatingSubjectFilter()
+    {
+        $this->resetPage();
+    }
+    public function updatingKurikulumFilter()
+    {
+        $this->resetPage();
+        $this->reset('subjectFilter'); // Reset filter mapel jika kurikulum berubah
+    }
 
     protected function rules()
     {
         return [
-            'submissionFile' => 'required|file|mimes:pdf,doc,docx,jpg,png,zip|max:5120',
-            'submissionNotes' => 'nullable|string',
+            'submissionFile' => 'required|file|mimes:pdf,doc,docx,jpg,png,zip,rar|max:5120',
+            'submissionNotes' => 'nullable|string|max:1000',
         ];
     }
 
@@ -42,11 +65,22 @@ class TaskList extends Component
     public function tasks()
     {
         $student = Auth::user();
+        if (!$student->class_id) {
+            return collect();
+        }
+
         $submittedTaskIds = $student->taskSubmissions->pluck('task_id');
 
         return Task::where('class_id', $student->class_id)
             ->where('status', 'publish')
             ->with(['subject', 'submissions' => fn($q) => $q->where('user_id', $student->id)])
+            ->when($this->subjectFilter, fn($q) => $q->where('subject_id', $this->subjectFilter))
+            ->whereHas('subject', function ($query) {
+                $query->when($this->kurikulumFilter, function ($q) {
+                    $q->where('kurikulum', $this->kurikulumFilter);
+                });
+            })
+            // ---
             ->when($this->activeTab === 'belum', fn($q) => $q->whereNotIn('id', $submittedTaskIds))
             ->when($this->activeTab === 'sudah', fn($q) => $q->whereIn('id', $submittedTaskIds))
             ->latest('due_date')
@@ -57,6 +91,10 @@ class TaskList extends Component
     public function stats()
     {
         $student = Auth::user();
+        if (!$student->class_id) {
+            return ['not_submitted' => 0, 'submitted' => 0];
+        }
+
         $allTasksCount = Task::where('class_id', $student->class_id)->where('status', 'publish')->count();
         $submittedCount = $student->taskSubmissions()->count();
 
@@ -64,6 +102,22 @@ class TaskList extends Component
             'not_submitted' => $allTasksCount - $submittedCount,
             'submitted' => $submittedCount,
         ];
+    }
+
+    // Computed property BARU untuk opsi kurikulum
+    #[Computed]
+    public function kurikulumOptions()
+    {
+        return Curriculum::where('is_active', true)->pluck('name', 'name')->all();
+    }
+
+    #[Computed]
+    public function subjects()
+    {
+        return Subject::query()
+            ->when($this->kurikulumFilter, fn($q) => $q->where('kurikulum', $this->kurikulumFilter))
+            ->orderBy('name')
+            ->get();
     }
 
     public function openSubmissionModal(Task $task)
@@ -91,22 +145,50 @@ class TaskList extends Component
 
         $this->reset(['selectedTask', 'submissionFile', 'submissionNotes']);
         $this->dispatch('close-modal');
-        $this->dispatch('flash-message', ['message' => 'Tugas berhasil dikumpulkan!', 'type' => 'success']);
+        $this->dispatch('flash-message', message: 'Tugas berhasil dikumpulkan!', type: 'success');
     }
 
-    /**
-     * Metode baru untuk membuka modal detail pengumpulan.
-     */
     public function viewSubmission(int $taskId)
     {
         $this->viewingSubmission = TaskSubmission::where('user_id', Auth::id())
             ->where('task_id', $taskId)
-            ->with('task.subject') // Eager load relasi
+            ->with('task.subject')
             ->first();
 
         if ($this->viewingSubmission) {
             $this->dispatch('open-modal', id: 'view-submission-modal');
         }
+    }
+
+    public function viewFile(int $submissionId)
+    {
+        $submission = TaskSubmission::find($submissionId);
+
+        if (!$submission || !$submission->file_path || !Storage::disk('public')->exists($submission->file_path)) {
+            $this->dispatch('flash-message', message: 'File tidak ditemukan.', type: 'error');
+            return;
+        }
+
+        $this->fileViewerTitle = 'Jawaban: ' . basename($submission->file_path);
+        $mimeType = Storage::disk('public')->mimeType($submission->file_path);
+
+        if ($mimeType === 'application/pdf') {
+            $this->fileViewerType = 'pdf';
+            $this->fileViewerUrl = Storage::url($submission->file_path);
+            $this->dispatch('open-modal', id: 'file-viewer-modal');
+        } elseif (str_starts_with($mimeType, 'image/')) {
+            $this->fileViewerType = 'image';
+            $this->fileViewerUrl = Storage::url($submission->file_path);
+            $this->dispatch('open-modal', id: 'file-viewer-modal');
+        } else {
+            return Storage::disk('public')->download($submission->file_path);
+        }
+    }
+
+    public function closeFileViewer()
+    {
+        $this->reset(['fileViewerUrl', 'fileViewerType', 'fileViewerTitle']);
+        $this->dispatch('close-modal');
     }
 
     public function render()

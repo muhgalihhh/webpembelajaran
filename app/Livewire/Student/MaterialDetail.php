@@ -5,6 +5,7 @@ namespace App\Livewire\Student;
 use App\Models\Material;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -14,7 +15,16 @@ use Livewire\Component;
 class MaterialDetail extends Component
 {
     public Material $material;
-    public Collection $subjectMaterials; // <-- Tambahkan properti ini
+    public Collection $subjectMaterials;
+
+    // Properti untuk modal penampil file
+    public ?string $fileViewerUrl = null;
+    public ?string $fileViewerType = null; // 'pdf' or 'image'
+    public ?string $fileViewerTitle = null;
+
+    // Properti untuk modal video YouTube
+    public ?string $youtubeViewerUrl = null;
+    public ?string $youtubeViewerTitle = null;
 
     public function mount(Material $material)
     {
@@ -24,14 +34,12 @@ class MaterialDetail extends Component
         $this->material = $material;
         $this->recordAccess($material->id);
 
-        // <-- Tambahkan logika ini untuk mengambil semua materi dari mapel yang sama
         $this->subjectMaterials = Material::where('subject_id', $this->material->subject_id)
             ->where('is_published', true)
             ->orderBy('chapter')
             ->orderBy('title')
             ->get();
     }
-
 
     public function recordAccess($materialId)
     {
@@ -45,11 +53,55 @@ class MaterialDetail extends Component
         }
     }
 
-
     public function extractYoutubeId($url)
     {
         preg_match('/(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $url, $matches);
         return $matches[2] ?? null;
+    }
+
+    public function viewFile(int $materialId)
+    {
+        $material = Material::find($materialId);
+
+        if (!$material || !$material->file_path || !Storage::disk('local')->exists($material->file_path)) {
+            $this->dispatch('flash-message', message: 'File materi tidak ditemukan.', type: 'error');
+            return;
+        }
+
+        $this->fileViewerTitle = 'Materi: ' . $material->title;
+        $mimeType = Storage::disk('local')->mimeType($material->file_path);
+
+        if ($mimeType === 'application/pdf' || str_starts_with($mimeType, 'image/')) {
+            $this->fileViewerType = $mimeType === 'application/pdf' ? 'pdf' : 'image';
+            $this->fileViewerUrl = route('materials.view', $material);
+            $this->dispatch('open-modal', id: 'file-viewer-modal');
+        } else {
+            return redirect()->route('materials.view', $material);
+        }
+    }
+
+    public function closeFileViewer()
+    {
+        $this->reset(['fileViewerUrl', 'fileViewerType', 'fileViewerTitle']);
+        $this->dispatch('close-modal');
+    }
+
+    public function viewYouTubeVideo(string $youtubeUrl, string $title)
+    {
+        $embedId = $this->extractYoutubeId($youtubeUrl);
+        if ($embedId) {
+            $this->youtubeViewerUrl = 'https://www.youtube.com/embed/' . $embedId;
+            $this->youtubeViewerTitle = 'Video: ' . $title;
+            $this->dispatch('open-modal', id: 'youtube-viewer-modal');
+        } else {
+            $this->dispatch('flash-message', message: 'URL video tidak valid.', type: 'error');
+        }
+    }
+
+    public function closeYouTubeViewer()
+    {
+        $this->reset(['youtubeViewerUrl', 'youtubeViewerTitle']);
+        $this->dispatch('close-modal');
     }
 
     public function render()

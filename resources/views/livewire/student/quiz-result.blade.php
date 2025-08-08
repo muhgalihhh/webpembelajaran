@@ -11,7 +11,8 @@
                 <div
                     class="w-fit mt-6 mx-auto p-4 @if ($attempt->score >= $attempt->quiz->passing_score) bg-green-50 border-green-200 @else bg-red-300 border-red-400 @endif rounded-lg">
                     <p class="text-white">Skor Akhir</p>
-                    <p class="text-5xl font-bold text-white">{{ round($attempt->score) }}/100</p>
+                    <p class="text-5xl font-bold @{{ $attempt - > score >= $attempt - > quiz - > passing_score ? 'text-green-700' : 'text-red-700' }}">
+                        {{ $attempt->score }}/</p><span class="font-normal text-md">100</span>
                     <p class="text-sm text-white">Dari {{ $attempt->quiz->total_questions }} Soal</p>
                 </div>
 

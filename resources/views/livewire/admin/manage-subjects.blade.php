@@ -16,7 +16,7 @@
             </div>
             <div class="flex-1">
                 <x-form.select-group label="Filter Status" name="status_filter" wireModel="status_filter"
-                    wire:model.live='status_filter' :options="['1' => 'Aktif', '0' => 'Nonaktif']" />
+                    wire:model.live='status_filter' :options="['all' => 'Semua Status', '1' => 'Aktif', '0' => 'Nonaktif']" />
             </div>
             <div>
                 <x-form.button wireClick="create" icon="fa-solid fa-plus" class="w-full md:w-auto">
@@ -26,8 +26,8 @@
         </div>
     </div>
 
-    {{-- Tabel Data Mapel --}}
-    <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+    {{-- Tampilan Tabel untuk Desktop (Terlihat di layar lg ke atas) --}}
+    <div class="hidden overflow-x-auto bg-white rounded-lg shadow-md lg:block">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -37,7 +37,6 @@
                     <th wire:click="sortBy('code')"
                         class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                         Kode</th>
-                    {{-- Kolom Kurikulum Ditambahkan --}}
                     <th wire:click="sortBy('kurikulum')"
                         class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                         Kurikulum</th>
@@ -52,7 +51,6 @@
                     <tr class="hover:bg-gray-100">
                         <td class="px-6 py-4 whitespace-nowrap">{{ $subject->name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $subject->code }}</td>
-                        {{-- Data Kurikulum Ditampilkan --}}
                         <td class="px-6 py-4 whitespace-nowrap">{{ $subject->kurikulum }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span
@@ -69,17 +67,46 @@
                     </tr>
                 @empty
                     <tr>
-                        {{-- Colspan disesuaikan menjadi 5 --}}
                         <td colspan="5" class="py-4 text-center text-gray-500">Tidak ada data mata pelajaran
                             ditemukan.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
+        <div class="p-4">
+            {{ $this->subjects->links() }}
+        </div>
     </div>
 
-    {{-- Paginasi --}}
-    <div class="mt-4">{{ $this->subjects->links() }}</div>
+    {{-- Tampilan Kartu untuk Mobile (Tersembunyi di layar lg ke atas) --}}
+    <div class="grid grid-cols-1 gap-4 lg:hidden">
+        @forelse ($this->subjects as $subject)
+            <div class="p-4 bg-white rounded-lg shadow-md">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="text-lg font-bold text-gray-800">{{ $subject->name }}</div>
+                        <div class="text-sm text-gray-600">Kode: {{ $subject->code }}</div>
+                        <div class="mt-1 text-sm text-gray-600">Kurikulum: {{ $subject->kurikulum }}</div>
+                    </div>
+                    <span
+                        class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full {{ $subject->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                        {{ $subject->is_active ? 'Aktif' : 'Nonaktif' }}
+                    </span>
+                </div>
+                <div class="flex justify-end mt-4 space-x-4">
+                    <button wire:click="edit({{ $subject->id }})"
+                        class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                    <button wire:click="confirmDelete({{ $subject->id }})"
+                        class="text-red-600 hover:text-red-900">Hapus</button>
+                </div>
+            </div>
+        @empty
+            <div class="py-4 text-center text-gray-500">Tidak ada data mata pelajaran ditemukan.</div>
+        @endforelse
+        <div class="mt-4">
+            {{ $this->subjects->links() }}
+        </div>
+    </div>
 
     {{-- Modal Konfirmasi Delete --}}
     <x-ui.confirm-modal title="Hapus Mata Pelajaran" message="Anda yakin ingin menghapus data mata pelajaran ini?"
@@ -88,15 +115,16 @@
     {{-- Modal Form --}}
     <x-ui.modal id="subject-form-modal">
         <h2 class="text-2xl font-bold">{{ $isEditing ? 'Edit' : 'Tambah' }} Mata Pelajaran</h2>
-        <form wire:submit.prevent="save" class="mt-4 space-y-4">
-            <x-form.input-group label="Nama Mata Pelajaran" type="text" wireModel="name" id="name" required />
-            <x-form.input-group label="Kode Mata Pelajaran" type="text" wireModel="code" id="code" required />
-
-            <x-form.select-group label="Kurikulum" name="kurikulum" wireModel="kurikulum" :options="$this->kurikulumOptions()" />
-
-            <x-form.select-group label="Status" name="is_active" wireModel="is_active" :options="['1' => 'Aktif', '0' => 'Nonaktif']" required />
-
-            <div class="flex justify-end pt-4 space-x-4">
+        <form wire:submit.prevent="save" class="mt-4">
+            <div class="space-y-4">
+                <x-form.input-group label="Nama Mata Pelajaran" type="text" wireModel="name" id="name"
+                    required />
+                <x-form.input-group label="Kode Mata Pelajaran" type="text" wireModel="code" id="code"
+                    required />
+                <x-form.select-group label="Kurikulum" name="kurikulum" wireModel="kurikulum" :options="$this->kurikulumOptions()" />
+                <x-form.select-group label="Status" name="is_active" wireModel="is_active" :options="['1' => 'Aktif', '0' => 'Nonaktif']" required />
+            </div>
+            <div class="flex justify-end pt-4 mt-4 space-x-4 border-t">
                 <button type="button" @click="$dispatch('close-modal')"
                     class="px-4 py-2 font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
                 <button type="submit"

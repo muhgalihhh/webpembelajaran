@@ -17,8 +17,7 @@
                     "Belajar hari ini adalah investasi untuk masa depan yang lebih cerah. Jadilah yang terbaik versi
                     dirimu!"
                 </p>
-                {{-- Tombol Masuk Sekarang --}}
-                <a href="{{ route('login') }}"
+                <a href="{{ route('student.dashboard') }}"
                     class="bg-[#4A90E2] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-blue-600 transition-colors duration-200"
                     wire:navigate>
                     Masuk Sekarang

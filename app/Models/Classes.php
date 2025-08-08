@@ -20,6 +20,7 @@ class Classes extends Model
         'class',
         'description',
         'whatsapp_group_id',
+        'whatsapp_group_link',
     ];
 
     // Relasi

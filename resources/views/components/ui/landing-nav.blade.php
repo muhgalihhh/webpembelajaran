@@ -16,22 +16,22 @@
                     <a href="{{ route('student.tasks') }} " wire:navigate
                         class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.tasks*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Tugas</a>
                     <a href="{{ route('student.games') }}" wire:navigate
-                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('student.games*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Game
+                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.games*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Game
                         Edukatif</a>
 
                     <a href="{{ route('student.ranking') }}" wire:navigate
-                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('student.ranking*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Peringkat</a>
+                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.ranking*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Peringkat</a>
                     @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
                 @endrole
 
                 @role('guru')
                     <a href="{{ route('teacher.dashboard') }}" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Dashboard</a>
-                    <a href="#" wire:navigate
+                    <a href="{{ route('teacher.materials') }}" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Upload Materi</a>
-                    <a href="#" wire:navigate
+                    <a href="{{ route('teacher.quizzes') }}" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Buat Kuis</a>
-                    <a href="#" wire:navigate
+                    <a href="{{ route('teacher.about-us') }}" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">About Us</a>
                 @endrole
 
@@ -43,7 +43,9 @@
                     </a>
                 @endrole
             </nav>
-
+            @role('siswa')
+                @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
+            @endrole
             <x-ui.profile-dropdown />
             <div class="md:hidden">
                 <button @click="mobileMenuOpen = !mobileMenuOpen"
@@ -92,19 +94,21 @@
                     <a href="{{ route('student.tasks') }} " wire:navigate
                         class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.tasks*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Tugas</a>
                     <a href="{{ route('student.games') }}" wire:navigate
-                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('student.games*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Game
+                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.games*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Game
                         Edukatif</a>
                     <a href="{{ route('student.ranking') }}" wire:navigate
-                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200 {{ request()->routeIs('student.ranking*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Peringkat</a>
+                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.ranking*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Peringkat</a>
                     @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
                 @endrole
                 @role('guru')
-                    <a href="#" wire:navigate @click="mobileMenuOpen = false"
-                        class="block px-4 py-3 font-semibold text-white rounded-md hover:bg-blue-600">Dashboard</a>
-                    <a href="#" wire:navigate @click="mobileMenuOpen = false"
-                        class="block px-4 py-3 font-semibold text-white rounded-md hover:bg-blue-600">Upload Materi</a>
-                    <a href="#" wire:navigate @click="mobileMenuOpen = false"
-                        class="block px-4 py-3 font-semibold text-white rounded-md hover:bg-blue-600">Buat Kuis</a>
+                    <a href="{{ route('teacher.dashboard') }}" wire:navigate
+                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Dashboard</a>
+                    <a href="{{ route('teacher.materials') }}" wire:navigate
+                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Upload Materi</a>
+                    <a href="{{ route('teacher.quizzes') }}" wire:navigate
+                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Buat Kuis</a>
+                    <a href="{{ route('teacher.about-us') }}" wire:navigate
+                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">About Us</a>
                 @endrole
                 @role('admin')
                     <a href="{{ route('admin.dashboard') }}" wire:navigate @click="mobileMenuOpen = false"

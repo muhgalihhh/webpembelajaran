@@ -4,6 +4,7 @@ namespace App\Livewire\Teacher;
 
 use App\Models\Task;
 use App\Models\TaskSubmission;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Rule;
@@ -19,20 +20,22 @@ class ScoreTaskSubmissions extends Component
 
     public Task $task;
 
-    // Properti State
+    // Properti untuk Modal Penilaian
     public bool $isScoring = false;
     public ?TaskSubmission $scoringSubmission = null;
-
-    // Properti Form
-    // --- PERBAIKAN: Mengganti 'integer' menjadi 'numeric' ---
     #[Rule('required|numeric|min:0|max:100', as: 'Nilai')]
     public $score = 0;
-
     #[Rule('nullable|string', as: 'Umpan Balik')]
     public $feedback = '';
 
-    // Aturan validasi untuk status tidak lagi diperlukan di sini karena tidak diubah oleh user di form ini
-    public $status = 'submitted';
+    // Properti untuk Modal File Viewer
+    public ?string $fileViewerUrl = null;
+    public ?string $fileViewerType = null; // 'pdf', 'image'
+    public ?TaskSubmission $viewingFileFor = null;
+
+    // Properti untuk konfirmasi hapus
+    public ?int $itemToDeleteId = null;
+
 
     public function mount(Task $task)
     {
@@ -44,13 +47,13 @@ class ScoreTaskSubmissions extends Component
     {
         return TaskSubmission::with('student')
             ->where('task_id', $this->task->id)
-            ->orderBy('submission_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
     }
 
-    private function resetForm()
+    private function resetScoreForm()
     {
-        $this->reset(['isScoring', 'scoringSubmission', 'score', 'feedback', 'status']);
+        $this->reset(['isScoring', 'scoringSubmission', 'score', 'feedback']);
         $this->resetValidation();
     }
 
@@ -60,20 +63,19 @@ class ScoreTaskSubmissions extends Component
         $this->scoringSubmission = $submission;
         $this->score = $submission->score ?? 0;
         $this->feedback = $submission->feedback ?? '';
-        $this->status = $submission->status;
         $this->dispatch('open-modal', id: 'score-form-modal');
     }
 
     public function saveScore()
     {
-        // Sekarang validate() hanya akan memeriksa 'score' dan 'feedback'
-        $this->validate();
+        $this->validateOnly('score');
+        $this->validateOnly('feedback');
 
         if ($this->scoringSubmission) {
             $this->scoringSubmission->update([
                 'score' => $this->score,
                 'feedback' => $this->feedback,
-                'status' => 'graded', // Otomatis set status menjadi 'graded' setelah dinilai
+                'status' => 'graded',
             ]);
 
             $this->dispatch('flash-message', message: 'Nilai berhasil disimpan.', type: 'success');
@@ -83,7 +85,63 @@ class ScoreTaskSubmissions extends Component
 
     public function closeModal()
     {
-        $this->resetForm();
+        $this->resetScoreForm();
+        $this->dispatch('close-modal');
+    }
+
+    public function viewFile(int $submissionId)
+    {
+        $submission = TaskSubmission::with('student')->find($submissionId);
+
+        if (!$submission || !$submission->file_path || !Storage::disk('public')->exists($submission->file_path)) {
+            $this->dispatch('flash-message', message: 'File tidak ditemukan.', type: 'error');
+            return;
+        }
+
+        $this->viewingFileFor = $submission;
+        $mimeType = Storage::disk('public')->mimeType($submission->file_path);
+
+        if ($mimeType === 'application/pdf') {
+            $this->fileViewerType = 'pdf';
+            $this->fileViewerUrl = Storage::url($submission->file_path);
+            $this->dispatch('open-modal', id: 'file-viewer-modal');
+        } elseif (str_starts_with($mimeType, 'image/')) {
+            $this->fileViewerType = 'image';
+            $this->fileViewerUrl = Storage::url($submission->file_path);
+            $this->dispatch('open-modal', id: 'file-viewer-modal');
+        } else {
+            return Storage::disk('public')->download($submission->file_path);
+        }
+    }
+
+    public function closeFileViewer()
+    {
+        $this->reset(['fileViewerUrl', 'fileViewerType', 'viewingFileFor']);
+        $this->dispatch('close-modal');
+    }
+
+    public function confirmDelete($id)
+    {
+        $this->itemToDeleteId = $id;
+        $this->dispatch('open-confirm-modal');
+    }
+
+    // Fungsi untuk menghapus data
+    public function deleteSubmission()
+    {
+        if ($this->itemToDeleteId) {
+            $submission = TaskSubmission::find($this->itemToDeleteId);
+            if ($submission) {
+                if ($submission->file_path && Storage::disk('public')->exists($submission->file_path)) {
+                    Storage::disk('public')->delete($submission->file_path);
+                }
+                $submission->delete();
+                $this->dispatch('flash-message', message: 'Pengumpulan tugas berhasil dihapus.', type: 'success');
+            } else {
+                $this->dispatch('flash-message', message: 'Pengumpulan tugas tidak ditemukan.', type: 'error');
+            }
+        }
+
         $this->dispatch('close-modal');
     }
 

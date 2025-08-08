@@ -25,24 +25,24 @@
             x-transition:enter="transition ease-out duration-700 delay-300"
             x-transition:enter-start="opacity-0 transform translate-y-4"
             x-transition:enter-end="opacity-100 transform translate-y-0">
-            <x-ui.student.feature-card title="Materi Pembelajaran" icon="fa-solid fa-book-open" link="#"
-                {{-- Ganti dengan route('student.materials') --}} linkText="Lihat Materi Pembelajaran" headerColor="bg-blue-500"
-                bodyColor="bg-yellow-300" linkColor="bg-purple-600" />
+            <x-ui.student.feature-card title="Materi Pembelajaran" icon="fa-solid fa-book-open"
+                link="{{ route('student.subjects') }}" {{-- Ganti dengan route('student.materials') --}} linkText="Lihat Materi Pembelajaran"
+                headerColor="bg-blue-500" bodyColor="bg-yellow-300" linkColor="bg-purple-600" />
 
             {{-- Card 2: Mengerjakan Kuis --}}
-            <x-ui.student.feature-card title="Mengerjakan Kuis" icon="fa-solid fa-file-pen" link="#"
-                {{-- Ganti dengan route('student.quizzes') --}} linkText="Kerjakan Kuis / Latihan Soal" headerColor="bg-yellow-500"
-                bodyColor="bg-green-300" linkColor="bg-green-600" />
+            <x-ui.student.feature-card title="Mengerjakan Kuis" icon="fa-solid fa-file-pen"
+                link="{{ route('student.quizzes') }}" {{-- Ganti dengan route('student.quizzes') --}} linkText="Kerjakan Kuis / Latihan Soal"
+                headerColor="bg-yellow-500" bodyColor="bg-green-300" linkColor="bg-green-600" />
 
             {{-- Card 3: Bermain Game Edukatif --}}
-            <x-ui.student.feature-card title="Bermain Game Edukatif" icon="fa-solid fa-gamepad" link="#"
-                {{-- Ganti dengan route('student.games') --}} linkText="Main Game Edukatif" headerColor="bg-teal-500" bodyColor="bg-cyan-200"
-                linkColor="bg-cyan-600" />
+            <x-ui.student.feature-card title="Bermain Game Edukatif" icon="fa-solid fa-gamepad"
+                link="{{ route('student.games') }}" {{-- Ganti dengan route('student.games') --}} linkText="Main Game Edukatif"
+                headerColor="bg-teal-500" bodyColor="bg-cyan-200" linkColor="bg-cyan-600" />
 
             {{-- Card 4: Mengerjakan Tugas --}}
-            <x-ui.student.feature-card title="Mengerjakan Tugas" icon="fa-solid fa-clipboard-list" link=""
-                linkText="Mengerjakan Tugas" headerColor="bg-orange-500" bodyColor="bg-red-300"
-                linkColor="bg-red-600" />
+            <x-ui.student.feature-card title="Mengerjakan Tugas" icon="fa-solid fa-clipboard-list"
+                link="{{ route('student.tasks') }}" {{-- Ganti dengan route('student.assignments') --}} linkText="Mengerjakan Tugas"
+                headerColor="bg-orange-500" bodyColor="bg-red-300" linkColor="bg-red-600" />
 
         </div>
 

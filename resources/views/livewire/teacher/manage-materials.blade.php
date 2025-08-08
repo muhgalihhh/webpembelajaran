@@ -1,4 +1,5 @@
 <div>
+    {{-- Header Halaman --}}
     <x-slot:pageHeader>
         <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
             <i class="text-xl fa-solid fa-bars"></i>
@@ -8,16 +9,24 @@
 
     {{-- Area Filter dan Tombol Aksi --}}
     <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
-        <div class="grid items-end grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <x-form.input-group label="Pencarian Materi" type="search" wireModel="search" id="search"
-                placeholder="Cari judul materi..." />
-            <x-form.select-group label="Filter Mata Pelajaran" name="filterSubject" wireModel="filterSubject"
-                :options="$this->subjects" />
-            <x-form.select-group label="Filter Kelas" name="filterClass" wireModel="filterClass" :options="$this->classes"
-                wire:model.live='filterClass' optionLabel="class" />
-            <x-form.select-group label="Filter Status" name="filterPublished" wireModel="filterPublished"
-                wire:model.live='filterPublished' :options="['' => 'Semua Status', '1' => 'Published', '0' => 'Draft']" />
-            <div class="lg:col-start-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">
+            <div class="lg:col-span-1">
+                <x-form.input-group label="Pencarian Materi" type="search" wireModel="search" id="search"
+                    placeholder="Cari judul materi..." />
+            </div>
+            <div class="lg:col-span-1">
+                <x-form.select-group label="Filter Mata Pelajaran" name="filterSubject" wireModel="filterSubject"
+                    :options="$this->subjects" optionLabel="name" placeholder="Semua Mapel" />
+            </div>
+            <div class="lg:col-span-1">
+                <x-form.select-group label="Filter Kelas" name="filterClass" wireModel="filterClass" :options="$this->classes"
+                    optionLabel="class" placeholder="Semua Kelas" />
+            </div>
+            <div class="lg:col-span-1">
+                <x-form.select-group label="Filter Status" name="filterPublished" wireModel="filterPublished"
+                    :options="['' => 'Semua Status', '1' => 'Published', '0' => 'Draft']" />
+            </div>
+            <div class="lg:col-span-1">
                 <a href="{{ route('teacher.materials.create') }}" wire:navigate
                     class="inline-flex items-center justify-center w-full px-4 py-2 font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700">
                     <i class="mr-2 fa-solid fa-plus"></i> Tambah Materi
@@ -26,8 +35,8 @@
         </div>
     </div>
 
-    {{-- Tabel Data Materi --}}
-    <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+    {{-- Tampilan Tabel untuk Desktop --}}
+    <div class="hidden overflow-x-auto bg-white rounded-lg shadow-md lg:block">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -75,7 +84,7 @@
                             {{ $material->class?->class ?? 'N/A' }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span
-                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $material->is_published ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full {{ $material->is_published ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                 {{ $material->is_published ? 'Published' : 'Draft' }}
                             </span>
                         </td>
@@ -86,12 +95,6 @@
                                 class="ml-4 text-indigo-600 hover:text-indigo-900">Edit</a>
                             <button wire:click="confirmDelete({{ $material->id }})"
                                 class="ml-4 text-red-600 hover:text-red-900">Hapus</button>
-                            @if ($material->file_path)
-                                <a href="{{ route('materials.download', $material) }}" ...
-                                    class="ml-4 text-indigo-600 hover:text-indigo-900">
-                                    <i class="mr-2 fas fa-download"></i> Unduh Materi
-                                </a>
-                            @endif
                         </td>
                     </tr>
                 @empty
@@ -103,14 +106,45 @@
         </table>
     </div>
 
+    <div class="grid grid-cols-1 gap-4 mt-6 lg:hidden">
+        @forelse ($this->materials as $material)
+            <div class="p-4 bg-white rounded-lg shadow-md">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <h3 class="font-bold text-gray-800">{{ $material->title }}</h3>
+                        <p class="text-sm text-gray-500">{{ Str::limit($material->description, 70) }}</p>
+                    </div>
+                    <span
+                        class="flex-shrink-0 ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $material->is_published ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                        {{ $material->is_published ? 'Published' : 'Draft' }}
+                    </span>
+                </div>
+                <div class="mt-3 text-xs text-gray-600">
+                    <span class="font-semibold">Mapel:</span> {{ $material->subject?->name ?? 'N/A' }} |
+                    <span class="font-semibold">Kelas:</span> {{ $material->class?->class ?? 'N/A' }}
+                </div>
+                <div class="flex items-center justify-end mt-4 space-x-4">
+                    <button wire:click="view({{ $material->id }})"
+                        class="text-sm font-medium text-green-600 hover:text-green-900">Lihat</button>
+                    <a href="{{ route('teacher.materials.edit', $material) }}" wire:navigate
+                        class="text-sm font-medium text-indigo-600 hover:text-indigo-900">Edit</a>
+                    <button wire:click="confirmDelete({{ $material->id }})"
+                        class="text-sm font-medium text-red-600 hover:text-red-900">Hapus</button>
+                </div>
+            </div>
+        @empty
+            <div class="py-4 text-center text-gray-500">Tidak ada materi ditemukan.</div>
+        @endforelse
+    </div>
+
     <div class="mt-4">{{ $this->materials->links() }}</div>
 
-    {{-- Modal Konfirmasi Delete --}}
     <x-ui.confirm-modal title="Hapus Materi"
         message="Anda yakin ingin menghapus materi ini? File yang terlampir juga akan dihapus."
         wireConfirmAction="delete" />
 
-    {{-- Pemanggilan komponen modal preview --}}
-    <x-ui.teacher.material-preview-modal :title="$viewingMaterial?->title" :description="$viewingMaterial?->description" :content="$viewingMaterial?->content" :subject="$viewingMaterial?->subject?->name"
-        :class="$viewingMaterial?->class?->class" />
+    @if ($viewingMaterial)
+        <x-ui.teacher.material-preview-modal :title="$viewingMaterial->title" :description="$viewingMaterial->description" :content="$viewingMaterial->content" :filePath="$viewingMaterial->file_path"
+            :materialId="$viewingMaterial->id" :subject="$viewingMaterial->subject?->name" :class="$viewingMaterial->class?->class" />
+    @endif
 </div>

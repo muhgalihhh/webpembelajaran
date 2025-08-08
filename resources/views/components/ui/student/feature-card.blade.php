@@ -8,10 +8,6 @@
     'linkColor' => 'bg-purple-600',
 ])
 
-{{--
-    Komponen kartu fitur yang dapat dikustomisasi.
-    Didesain untuk menjadi tautan yang bisa diklik secara keseluruhan.
---}}
 <a href="{{ $link }}" wire:navigate
     class="{{ $bodyColor }} block overflow-hidden transition-all duration-300 border shadow-lg rounded-2xl hover:shadow-xl hover:-translate-y-1">
 

@@ -77,7 +77,7 @@ Route::middleware(['auth'])->group(function () {
     // Rute untuk Siswa
     Route::middleware(['auth', 'role:siswa'])->prefix('student')->name('student.')->group(function () {
         Route::get('/', \App\Livewire\Student\Index::class)->name('index');
-        Route::get('/dashboard', \App\Livewire\Student\Dashboard::class)->name('dashboard');
+        Route::get('/start', \App\Livewire\Student\Dashboard::class)->name('dashboard');
         Route::get('/subjects', action: \App\Livewire\Student\SubjectList::class)->name('subjects');
         Route::get('/subjects/{subject}/materials', \App\Livewire\Student\MaterialList::class)->name('materials.index');
         Route::get('/materials/{material}', \App\Livewire\Student\MaterialDetail::class)->name('materials.show');
@@ -87,6 +87,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/ranking', \App\Livewire\Student\StudentRanking::class)->name('ranking');
         Route::get('/tasks', \App\Livewire\Student\TaskList::class)->name('tasks');
         Route::get('/games', \App\Livewire\Student\GameList::class)->name('games');
+        Route::get('/profil', \App\Livewire\Student\ProfileSiswa::class)->name('profile');
     });
 
 

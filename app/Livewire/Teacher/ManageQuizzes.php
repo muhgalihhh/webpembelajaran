@@ -194,6 +194,7 @@ class ManageQuizzes extends Component
                 $students = $class->users;
 
                 if ($students->isNotEmpty()) {
+
                     Notification::send($students, new NotificationStudent($quiz));
                 }
 
