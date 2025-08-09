@@ -19,6 +19,8 @@ class Classes extends Model
     protected $fillable = [
         'class',
         'description',
+        'whatsapp_group_id',
+        'whatsapp_group_link',
     ];
 
     // Relasi

@@ -5,8 +5,11 @@ namespace App\Livewire\Teacher;
 use App\Models\Classes;
 use App\Models\Quiz;
 use App\Models\Subject;
+use App\Notifications\NotificationStudent;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -21,46 +24,28 @@ class ManageQuizzes extends Component
     use WithPagination;
 
     // Properti Filter
-    #[Url(as: 'q')]
+    #[Url(as: 'q', keep: true)]
     public string $search = '';
-    #[Url(as: 'mapel')]
+    #[Url(as: 'mapel', keep: true)]
     public string $subjectFilter = '';
-    #[Url(as: 'kelas')]
+    #[Url(as: 'kelas', keep: true)]
     public string $classFilter = '';
-    #[Url(as: 'status')]
+    #[Url(as: 'status', keep: true)]
     public string $statusFilter = '';
     public $itemToDeleteId = null;
 
     // Properti Sorting
     #[Url]
-    public string $sortBy = 'title';
+    public string $sortBy = 'created_at';
     #[Url]
-    public string $sortDirection = 'asc';
+    public string $sortDirection = 'desc';
 
     // Properti Form Modal
     public bool $isEditing = false;
     public ?Quiz $editingQuiz = null;
 
-    public $title, $description, $subject_id, $class_id, $category, $duration_minutes, $passing_score, $status, $start_time, $end_time;
+    public $title, $description, $subject_id, $class_id, $category, $duration_minutes, $passing_score, $status, $start_time, $end_time, $start_date, $end_date;
     public bool $shuffle_questions = false, $shuffle_options = false;
-
-    // Lifecycle Hooks
-    public function updatingSearch()
-    {
-        $this->resetPage();
-    }
-    public function updatingSubjectFilter()
-    {
-        $this->resetPage();
-    }
-    public function updatingClassFilter()
-    {
-        $this->resetPage();
-    }
-    public function updatingStatusFilter()
-    {
-        $this->resetPage();
-    }
 
     protected function rules()
     {
@@ -76,14 +61,14 @@ class ManageQuizzes extends Component
             'shuffle_options' => 'required|boolean',
             'start_time' => 'nullable|date',
             'end_time' => 'nullable|date|after_or_equal:start_time',
-            'status' => 'required|in:draft,published,archived',
+            'status' => 'required|in:draft,publish',
         ];
     }
 
     #[Computed]
     public function quizzes()
     {
-        return Quiz::with(['subject', 'targetClass'])
+        return Quiz::with(['subject', 'targetClass'])->withCount('questions')
             ->where('user_id', Auth::id())
             ->when($this->search, fn($q) => $q->where('title', 'like', '%' . $this->search . '%'))
             ->when($this->subjectFilter, fn($q) => $q->where('subject_id', $this->subjectFilter))
@@ -96,13 +81,17 @@ class ManageQuizzes extends Component
     #[Computed]
     public function subjects()
     {
-        return Subject::orderBy('name')->get();
+        return Subject::orderBy('kurikulum', 'asc')->orderBy('name')->get()
+            ->mapWithKeys(function ($subject) {
+                $displayText = "{$subject->name} - ({$subject->kurikulum})";
+                return [$subject->id => $displayText];
+            });
     }
 
     #[Computed]
     public function classes()
     {
-        return Classes::orderBy('class')->get();
+        return Classes::orderBy('class')->get()->pluck('class', 'id');
     }
 
     public function sortBy(string $field): void
@@ -113,7 +102,7 @@ class ManageQuizzes extends Component
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingQuiz', 'title', 'description', 'subject_id', 'class_id', 'category', 'duration_minutes', 'passing_score', 'status', 'start_time', 'end_time', 'shuffle_questions', 'shuffle_options']);
+        $this->reset(['isEditing', 'editingQuiz', 'title', 'description', 'subject_id', 'class_id', 'category', 'duration_minutes', 'passing_score', 'status', 'start_time', 'end_time', 'shuffle_questions', 'shuffle_options', 'start_date', 'end_date']);
         $this->resetValidation();
     }
 
@@ -149,38 +138,80 @@ class ManageQuizzes extends Component
 
     public function save()
     {
+        $wasPreviouslyPublished = $this->isEditing ? $this->editingQuiz->status === 'publish' : false;
+
         $validatedData = $this->validate();
 
-        // Validasi kustom: Kuis tidak boleh di-publish jika tidak ada soal
-        Validator::make($validatedData, [])->after(function ($validator) {
+        if ($this->status === 'publish') {
             $questionCount = $this->isEditing ? $this->editingQuiz->questions()->count() : 0;
-            if ($this->status === 'published' && $questionCount === 0) {
-                $validator->errors()->add(
-                    'status',
-                    'Kuis tidak dapat dipublikasikan karena belum memiliki soal.'
-                );
+            if ($questionCount === 0) {
+                $this->addError('status', 'Kuis tidak dapat dipublikasikan karena belum ada soal.');
+                return;
             }
-        })->validate();
+        }
 
         $validatedData['user_id'] = Auth::id();
 
-        // --- PERBAIKAN: Menambahkan start_date dan end_date ---
-        $validatedData['start_date'] = $this->start_time ? date('Y-m-d', strtotime($this->start_time)) : null;
-        $validatedData['end_date'] = $this->end_time ? date('Y-m-d', strtotime($this->end_time)) : null;
+
+        if (!empty($this->start_time)) {
+            $validatedData['start_date'] = \Carbon\Carbon::parse($this->start_time)->toDateString();
+        }
+        if (!empty($this->end_time)) {
+            $validatedData['end_date'] = \Carbon\Carbon::parse($this->end_time)->toDateString();
+        }
+
+        $message = 'Kuis berhasil diperbarui.';
 
         if ($this->isEditing) {
             $this->editingQuiz->update($validatedData);
-            $message = 'Kuis berhasil diperbarui.';
+            $quiz = $this->editingQuiz->fresh();
         } else {
-            // Nilai default untuk kuis baru
             $validatedData['total_questions'] = 0;
-            $validatedData['score_weight'] = 100;
-
-            Quiz::create($validatedData);
+            $quiz = Quiz::create($validatedData);
             $message = 'Kuis berhasil ditambahkan.';
         }
+
+        $isNowPublished = $quiz->status === 'publish';
+        if ($isNowPublished && !$wasPreviouslyPublished) {
+            $this->sendNotificationToStudents($quiz);
+            $message .= ' Notifikasi WhatsApp telah dikirim ke siswa.';
+        }
+
         $this->dispatch('flash-message', ['message' => $message, 'type' => 'success']);
         $this->dispatch('close-modal');
+    }
+
+    private function sendNotificationToStudents(Quiz $quiz)
+    {
+        try {
+            $quiz->load('subject', 'targetClass');
+            $class = $quiz->targetClass;
+
+            if ($class && $class->whatsapp_group_id) {
+                $subjectName = $quiz->subject->name;
+                $className = $class->class;
+
+                $students = $class->users;
+
+                if ($students->isNotEmpty()) {
+
+                    Notification::send($students, new NotificationStudent($quiz));
+                }
+
+                $waMessage = "🔔 *Notifikasi Kuis Baru* 🔔\n\n" .
+                    "Sudah siap untuk kuis baru, kelas *{$className}*?\n\n" .
+                    "Ada kuis mata pelajaran *{$subjectName}* dengan judul:\n" .
+                    "*\"{$quiz->title}\"*\n\n" .
+                    "Durasi pengerjaan: *{$quiz->duration_minutes} menit*.\n\n" .
+                    "Ayo, persiapkan dirimu dan kerjakan di web pembelajaran! Good luck! ✨";
+
+                $notificationService = new WhatsAppNotificationService();
+                $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
+            }
+        } catch (\Exception $e) {
+            Log::error('Gagal mengirim notifikasi WhatsApp: ' . $e->getMessage());
+            $this->dispatch('flash-message', ['message' => 'Gagal mengirim notifikasi WhatsApp.', 'type' => 'error']);
+        }
     }
 
     public function confirmDelete($id)

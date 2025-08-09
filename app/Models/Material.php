@@ -19,6 +19,7 @@ class Material extends Model
         'subject_id',
         'user_id',
         'description',
+        'page_count',
         'file_path',
         'content',
         'youtube_url',
@@ -52,5 +53,10 @@ class Material extends Model
     public function class()
     {
         return $this->belongsTo(Classes::class, 'class_id');
+    }
+
+    public function accessLogs()
+    {
+        return $this->hasMany(MaterialAccessLog::class);
     }
 }

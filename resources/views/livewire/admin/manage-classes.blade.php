@@ -1,18 +1,19 @@
 <div>
-    {{-- Header Halaman --}}
+
     <x-slot:pageHeader>
         <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
             <i class="text-xl fa-solid fa-bars"></i>
         </button>
-        <h2 class="text-2xl font-bold text-gray-800">Manajemen Kelas</h2>
+        <h2 class="text-2xl font-bold text-gray-800">
+            Manajemen Kelas
+        </h2>
     </x-slot:pageHeader>
 
-    {{-- Area Filter dan Tombol Aksi --}}
     <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
         <div class="flex flex-col gap-4 md:flex-row md:items-end">
             <div class="flex-1">
-                <x-form.input-group label="Pencarian Kelas" type="search" wireModel="search" id="search"
-                    placeholder="Cari tingkatan kelas..." />
+                <x-form.input-group label="Cari Kelas" name="search" wireModel="search"
+                    placeholder="Cari berdasarkan nama kelas atau ID grup WhatsApp" icon="fa-solid fa-search" />
             </div>
             <div>
                 <x-form.button wireClick="create" icon="fa-solid fa-plus" class="w-full md:w-auto">
@@ -22,49 +23,114 @@
         </div>
     </div>
 
-    {{-- Tabel Data Kelas --}}
-    <div class="overflow-x-auto bg-white rounded-lg shadow-md">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th wire:click="sortBy('class')"
-                        class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
-                        Nama Kelas</th>
-                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Deskripsi
-                    </th>
-                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @forelse ($this->classes as $class)
-                    <tr class="hover:bg-gray-100">
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $class->class }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $class->description ?? '-' }}</td>
-                        <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                            <button wire:click="edit({{ $class->id }})"
-                                class="text-indigo-600 hover:text-indigo-900">Edit</button>
-                            <button wire:click="confirmDelete({{ $class->id }})"
-                                class="ml-4 text-red-600 hover:text-red-900">Hapus</button>
-                        </td>
-                    </tr>
-                @empty
+    {{-- Tampilan Tabel untuk Desktop --}}
+    <div class="hidden bg-white rounded-lg shadow-md lg:block">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <td colspan="3" class="py-4 text-center text-gray-500">Tidak ada data kelas ditemukan.</td>
+                        <th scope="col"
+                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Kelas
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">ID
+                            Grup WhatsApp</th>
+                        {{-- Kolom BARU --}}
+                        <th scope="col"
+                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Link
+                            Grup</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Aksi
+                        </th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse ($this->classes as $classItem)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $classItem->class }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ $classItem->whatsapp_group_id ?? '-' }}</td>
+                            {{-- Data BARU --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if ($classItem->whatsapp_group_link)
+                                    <a href="{{ $classItem->whatsapp_group_link }}" target="_blank"
+                                        class="text-blue-600 hover:underline">
+                                        Lihat Link
+                                    </a>
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <button wire:click="edit({{ $classItem->id }})"
+                                    class="text-blue-500 hover:text-blue-700">Edit</button>
+                                <button wire:click="confirmDelete({{ $classItem->id }})"
+                                    class="ml-2 text-red-500 hover:text-red-700">Hapus</button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            {{-- Sesuaikan colspan --}}
+                            <td colspan="4" class="py-4 text-center text-gray-500">Tidak ada data kelas ditemukan.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4">
+            {{ $this->classes->links() }}
+        </div>
     </div>
 
-    <div class="mt-4">{{ $this->classes->links() }}</div>
+    {{-- Tampilan Kartu untuk Mobile --}}
+    <div class="grid grid-cols-1 gap-4 lg:hidden">
+        @forelse ($this->classes as $classItem)
+            <div class="p-4 bg-white rounded-lg shadow-md">
+                <div class="text-lg font-bold text-gray-800">{{ $classItem->class }}</div>
+                <div class="mt-1 text-sm text-gray-600">
+                    <p><span class="font-semibold">ID Grup WA:</span> {{ $classItem->whatsapp_group_id ?? '-' }}</p>
+                    {{-- Info BARU --}}
+                    <p><span class="font-semibold">Link Grup:</span>
+                        @if ($classItem->whatsapp_group_link)
+                            <a href="{{ $classItem->whatsapp_group_link }}" target="_blank"
+                                class="text-blue-600 hover:underline">
+                                Lihat Link
+                            </a>
+                        @else
+                            -
+                        @endif
+                    </p>
+                </div>
+                <div class="flex justify-end mt-4 space-x-4">
+                    <button wire:click="edit({{ $classItem->id }})"
+                        class="text-blue-500 hover:text-blue-700">Edit</button>
+                    <button wire:click="confirmDelete({{ $classItem->id }})"
+                        class="text-red-500 hover:text-red-700">Hapus</button>
+                </div>
+            </div>
+        @empty
+            <div class="py-4 text-center text-gray-500">Tidak ada data kelas ditemukan.</div>
+        @endforelse
+        <div class="mt-4">
+            {{ $this->classes->links() }}
+        </div>
+    </div>
 
-    {{-- Modal Form --}}
     <x-ui.modal id="class-form-modal">
-        <h2 class="text-2xl font-bold">{{ $isEditing ? 'Edit' : 'Tambah' }} Kelas</h2>
-        <form wire:submit.prevent="save" class="mt-4 space-y-4">
-            <x-form.select-group label="Tingkat Kelas" name="class" wireModel="class" :options="['I' => 'I', 'II' => 'II', 'III' => 'III', 'IV' => 'IV', 'V' => 'V', 'VI' => 'VI']" required />
-            <x-form.textarea-group label="Deskripsi (Opsional)" name="description" wireModel="description" />
-            <div class="flex justify-end pt-4 space-x-4">
+        <h2 class="text-2xl font-bold">{{ $isEditing ? 'Edit Kelas' : 'Tambah Kelas Baru' }}</h2>
+        <form wire:submit.prevent="save" class="mt-4">
+            <div class="space-y-4">
+                <x-form.input-group label="Nama Kelas" name="class" wireModel="class" placeholder="Contoh: 6A" />
+                <x-form.input-group label="ID Grup WhatsApp" name="whatsapp_group_id" wireModel="whatsapp_group_id"
+                    placeholder="Contoh: 12036304@g.us" />
+
+                <x-form.input-group label="Link Grup WhatsApp (Opsional)" name="whatsapp_group_link"
+                    wireModel="whatsapp_group_link" placeholder="Contoh: https://chat.whatsapp.com/..."
+                    type="url" />
+
+                <x-form.textarea-group label="Deskripsi (Opsional)" name="description" wireModel="description" />
+            </div>
+            <div class="flex justify-end pt-4 mt-4 space-x-2 border-t">
                 <button type="button" @click="$dispatch('close-modal')"
                     class="px-4 py-2 font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Batal</button>
                 <button type="submit"
@@ -73,7 +139,6 @@
         </form>
     </x-ui.modal>
 
-    {{-- Modal Konfirmasi Delete --}}
     <x-ui.confirm-modal title="Hapus Kelas" message="Anda yakin ingin menghapus data kelas ini?"
         wireConfirmAction="delete" />
 </div>

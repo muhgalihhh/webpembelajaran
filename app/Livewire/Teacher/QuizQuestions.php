@@ -24,7 +24,6 @@ class QuizQuestions extends Component
     public ?Question $editingQuestion = null;
     public $itemToDeleteId = null;
 
-    // Properti Form dengan Aturan Validasi Livewire 3
     #[Rule('required|string|min:5', as: 'Teks Pertanyaan')]
     public string $question_text = '';
 

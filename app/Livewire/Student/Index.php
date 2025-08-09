@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 
 
-#[Title("Selamat Datang di Sistem Pembelajaran")]
 #[Layout("layouts.landing")]
+#[Title("Selamat Datang di Sistem Pembelajaran")]
 class Index extends Component
 {
     // Properti untuk modal logout

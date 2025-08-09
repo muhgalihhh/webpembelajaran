@@ -79,8 +79,16 @@ class User extends Authenticatable
         return $this->hasMany(TaskSubmission::class, 'user_id');
     }
 
-    public function notifications()
+    // Tambahkan ini di dalam class User
+    public function materialAccessLogs()
     {
-        return $this->hasMany(Notification::class, 'user_id');
+        return $this->hasMany(MaterialAccessLog::class);
+    }
+
+    public function lastAccessedMaterials()
+    {
+        return $this->belongsToMany(Material::class, 'material_access_logs')
+            ->withPivot('accessed_at')
+            ->orderByPivot('accessed_at', 'desc');
     }
 }

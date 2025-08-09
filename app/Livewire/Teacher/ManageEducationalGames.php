@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Teacher;
 
+use App\Models\Classes; // 1. Impor model Classes
 use App\Models\EducationalGame;
 use App\Models\Subject;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +26,8 @@ class ManageEducationalGames extends Component
     public string $search = '';
     #[Url(as: 'mapel')]
     public string $subjectFilter = '';
+    #[Url(as: 'kelas')] // 2. Tambahkan filter kelas
+    public string $classFilter = '';
 
     // Properti State
     public bool $isEditing = false;
@@ -40,7 +43,9 @@ class ManageEducationalGames extends Component
     public string $game_url = '';
     #[Rule('required|exists:subjects,id')]
     public $subject_id = '';
-    #[Rule('nullable|image|max:2048')] // 2MB Max
+    #[Rule('required|exists:classes,id')] // 3. Tambahkan properti & aturan validasi
+    public $class_id = '';
+    #[Rule('nullable|image|max:2048')]
     public $uploadedImage;
     public ?string $currentImagePath = null;
 
@@ -53,26 +58,42 @@ class ManageEducationalGames extends Component
     {
         $this->resetPage();
     }
+    public function updatingClassFilter()
+    {
+        $this->resetPage();
+    } // 4. Tambahkan hook untuk filter kelas
 
     #[Computed]
     public function games()
     {
-        return EducationalGame::with('subject')
+        return EducationalGame::with(['subject', 'class']) // Muat relasi class
             ->when($this->search, fn($q) => $q->where('title', 'like', '%' . $this->search . '%'))
             ->when($this->subjectFilter, fn($q) => $q->where('subject_id', $this->subjectFilter))
+            ->when($this->classFilter, fn($q) => $q->where('class_id', $this->classFilter)) // Terapkan filter kelas
             ->orderBy('title', 'asc')
-            ->paginate(9); // 9 item agar pas di grid 3 kolom
+            ->paginate(9);
     }
 
     #[Computed]
     public function subjects()
     {
-        return Subject::orderBy('name')->get();
+        return Subject::orderBy('kurikulum', 'asc')->orderBy('name')->get()
+            ->mapWithKeys(function ($subject) {
+                $displayText = "{$subject->name} - ({$subject->kurikulum})";
+                return [$subject->id => $displayText];
+            });
+    }
+
+    // 5. Tambahkan computed property untuk mengambil data kelas
+    #[Computed]
+    public function classes()
+    {
+        return Classes::orderBy('class')->get();
     }
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingGame', 'title', 'description', 'game_url', 'subject_id', 'uploadedImage', 'currentImagePath']);
+        $this->reset(['isEditing', 'editingGame', 'title', 'description', 'game_url', 'subject_id', 'class_id', 'uploadedImage', 'currentImagePath']);
         $this->resetValidation();
     }
 
@@ -91,18 +112,19 @@ class ManageEducationalGames extends Component
         $this->description = $game->description;
         $this->game_url = $game->game_url;
         $this->subject_id = $game->subject_id;
+        $this->class_id = $game->class_id; // Isi data class_id saat edit
         $this->currentImagePath = $game->image_path;
         $this->dispatch('open-modal', id: 'game-form-modal');
     }
 
     public function save()
     {
-        // Memastikan aturan validasi gambar hanya wajib saat membuat baru
         $this->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'game_url' => 'required|url',
             'subject_id' => 'required|exists:subjects,id',
+            'class_id' => 'required|exists:classes,id', // Validasi class_id
             'uploadedImage' => $this->isEditing ? 'nullable|image|max:2048' : 'required|image|max:2048',
         ]);
 
@@ -111,6 +133,7 @@ class ManageEducationalGames extends Component
             'description' => $this->description,
             'game_url' => $this->game_url,
             'subject_id' => $this->subject_id,
+            'class_id' => $this->class_id, // Simpan class_id
         ];
 
         if ($this->uploadedImage) {

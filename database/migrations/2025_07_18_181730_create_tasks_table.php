@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->longText('description');
             $table->foreignId('subject_id')->constrained('subjects')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Guru pemberi tugas
-            $table->date('due_date');
+            $table->date('due_date')->nullable();
             $table->time('due_time')->nullable();
             $table->string('attachment_path')->nullable();
             $table->enum('status', ['draft', 'publish'])->default('draft');

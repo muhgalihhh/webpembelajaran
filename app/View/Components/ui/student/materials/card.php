@@ -1,12 +1,12 @@
 <?php
 
-namespace App\View\Components\ui;
+namespace App\View\Components\ui\student\materials;
 
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class globab-loading-indicator extends Component
+class card extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class globab-loading-indicator extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ui.globab-loading-indicator');
+        return view('components.ui.student.materials.card');
     }
 }

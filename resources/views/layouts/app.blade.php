@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Page Title' }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -18,15 +18,6 @@
 </head>
 
 <body x-data="{ pageLoaded: false }" x-init="setTimeout(() => pageLoaded = true, 150)" x-show="pageLoaded" x-transition.opacity.duration.500ms>
-
-    @if (session()->has('success'))
-        <x-ui.alert-popup type="success" :message="session('success')" />
-    @endif
-    @if (session()->has('error'))
-        <x-ui.alert-popup type="error" :message="session('error')" />
-    @endif
-
-
     <!-- Loading Overlay -->
     <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center"
         x-transition.opacity.duration.300ms>
@@ -43,6 +34,7 @@
     </div>
 
     @livewireScripts
+    <x-ui.flash-message />
 
 
     @vite(['resources/js/app.js'])

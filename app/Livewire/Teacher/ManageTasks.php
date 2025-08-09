@@ -5,7 +5,10 @@ namespace App\Livewire\Teacher;
 use App\Models\Classes;
 use App\Models\Subject;
 use App\Models\Task;
+use App\Notifications\NotificationStudent;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -22,28 +25,28 @@ class ManageTasks extends Component
 {
     use WithPagination, WithFileUploads;
 
-    // Properti Filter
+    // Properti untuk filter dan URL
     #[Url(as: 'q')]
     public string $search = '';
     #[Url(as: 'mapel')]
     public string $subjectFilter = '';
     #[Url(as: 'kelas')]
     public string $classFilter = '';
-    #[Url(as: 'status')]
+    #[Url(as: 'status_tugas')]
     public string $statusFilter = '';
     public $itemToDeleteId = null;
 
-    // Properti Sorting
+    // Properti untuk sorting
     #[Url]
-    public string $sortBy = 'due_time';
+    public string $sortBy = 'created_at';
     #[Url]
     public string $sortDirection = 'desc';
 
-    // Properti State
+    // Properti state
     public bool $isEditing = false;
     public ?Task $editingTask = null;
 
-    // Properti Form (disesuaikan dengan model dan database)
+    // Properti Form
     #[Rule('required|string|max:255')]
     public string $title = '';
     #[Rule('required|string')]
@@ -52,22 +55,17 @@ class ManageTasks extends Component
     public $subject_id = '';
     #[Rule('required|exists:classes,id')]
     public $class_id = '';
-    #[Rule('required|date')]
+    #[Rule('nullable|date_format:Y-m-d\TH:i')]
     public $due_time;
-
-    // --- PERBAIKAN: Menyesuaikan aturan validasi status dengan database ---
-    #[Rule('required|in:draft,publish')]
-    public string $status = 'draft';
-
     #[Rule('required|boolean')]
     public bool $is_published = false;
-    #[Rule('nullable|date|required_if:is_published,true')]
+    #[Rule('nullable|date_format:Y-m-d\TH:i|after_or_equal:now', message: 'Jadwal tidak boleh di masa lalu.')]
     public $published_at;
-    #[Rule('nullable|file|mimes:pdf,doc,docx,jpg,png,zip|max:5120')]
+    #[Rule('nullable|file|mimes:pdf,doc,docx,jpg,png,zip,rar|max:5120')]
     public $uploadedFile;
     public ?string $currentFilePath = null;
 
-    // Lifecycle Hooks
+    // Lifecycle hooks
     public function updatingSearch()
     {
         $this->resetPage();
@@ -88,7 +86,7 @@ class ManageTasks extends Component
     #[Computed]
     public function tasks()
     {
-        return Task::with(['subject', 'class'])
+        return Task::with(['subject', 'class', 'creator'])
             ->where('user_id', Auth::id())
             ->when($this->search, fn($q) => $q->where('title', 'like', '%' . $this->search . '%'))
             ->when($this->subjectFilter, fn($q) => $q->where('subject_id', $this->subjectFilter))
@@ -101,7 +99,11 @@ class ManageTasks extends Component
     #[Computed]
     public function subjects()
     {
-        return Subject::orderBy('name')->get();
+        return Subject::orderBy('kurikulum', 'asc')->orderBy('name')->get()
+            ->mapWithKeys(function ($subject) {
+                $displayText = "{$subject->name} - ({$subject->kurikulum})";
+                return [$subject->id => $displayText];
+            });
     }
 
     #[Computed]
@@ -118,7 +120,7 @@ class ManageTasks extends Component
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingTask', 'title', 'description', 'subject_id', 'class_id', 'due_time', 'status', 'is_published', 'published_at', 'uploadedFile', 'currentFilePath']);
+        $this->reset(['isEditing', 'editingTask', 'title', 'description', 'subject_id', 'class_id', 'due_time', 'is_published', 'published_at', 'uploadedFile', 'currentFilePath']);
         $this->resetValidation();
     }
 
@@ -126,7 +128,6 @@ class ManageTasks extends Component
     {
         $this->isEditing = false;
         $this->resetForm();
-        $this->status = 'draft';
         $this->is_published = false;
         $this->dispatch('open-modal', id: 'task-form-modal');
     }
@@ -139,8 +140,7 @@ class ManageTasks extends Component
         $this->description = $task->description;
         $this->subject_id = $task->subject_id;
         $this->class_id = $task->class_id;
-        $this->due_time = $task->due_time ? $task->due_time->format('Y-m-d\TH:i') : null;
-        $this->status = $task->status;
+        $this->due_time = $task->due_date_time ? $task->due_date_time->format('Y-m-d\TH:i') : null;
         $this->is_published = $task->is_published;
         $this->published_at = $task->published_at ? $task->published_at->format('Y-m-d\TH:i') : null;
         $this->currentFilePath = $task->attachment_path;
@@ -151,7 +151,8 @@ class ManageTasks extends Component
     {
         $validatedData = $this->validate();
         $validatedData['user_id'] = Auth::id();
-        $validatedData['due_date'] = $this->due_time ? date('Y-m-d', strtotime($this->due_time)) : null;
+        $validatedData['is_published'] = (bool) $this->is_published;
+        $validatedData['status'] = $validatedData['is_published'] ? 'publish' : 'draft';
 
         if ($this->uploadedFile) {
             if ($this->isEditing && $this->editingTask->attachment_path) {
@@ -160,15 +161,71 @@ class ManageTasks extends Component
             $validatedData['attachment_path'] = $this->uploadedFile->store('task-attachments', 'public');
         }
 
+        if (!empty($this->due_time)) {
+            $dueCarbon = \Carbon\Carbon::parse($this->due_time);
+            $validatedData['due_date'] = $dueCarbon->toDateString();
+            $validatedData['due_time'] = $dueCarbon->toTimeString();
+        } else {
+            $validatedData['due_date'] = null;
+            $validatedData['due_time'] = null;
+        }
+
+
+        $wasPreviouslyPublished = $this->isEditing ? $this->editingTask->is_published : false;
+
         if ($this->isEditing) {
             $this->editingTask->update($validatedData);
+            $task = $this->editingTask->fresh();
             $message = 'Tugas berhasil diperbarui.';
         } else {
-            Task::create($validatedData);
+            $task = Task::create($validatedData);
             $message = 'Tugas berhasil ditambahkan.';
         }
+
+        $isNowPublished = $task->status === 'publish';
+        if ($isNowPublished && !$wasPreviouslyPublished) {
+            $this->sendNewTaskNotification($task);
+            $message .= ' Notifikasi telah dikirim ke siswa.';
+        }
+
+
+
         $this->dispatch('flash-message', message: $message, type: 'success');
         $this->dispatch('close-modal');
+    }
+
+    private function sendNewTaskNotification(Task $task)
+    {
+        try {
+            $task->load('subject', 'class');
+            $class = $task->class;
+
+            if ($class && $class->whatsapp_group_id) {
+                $subjectName = $task->subject->name;
+                $className = $class->class;
+                $students = $class->users;
+                $dueDate = 'Tanpa Batas Waktu';
+                if ($task->due_date_time) {
+                    $dueDate = $task->due_date_time->format('d F Y, H:i');
+                }
+
+                if ($students->isNotEmpty()) {
+                    Notification::send($students, new NotificationStudent($task));
+                }
+
+                $waMessage = "🔔 *Notifikasi Tugas Baru* 🔔\n\n" .
+                    "Halo siswa kelas *{$className}*!\n\n" .
+                    "Ada tugas baru untuk mata pelajaran *{$subjectName}* dengan judul:\n" .
+                    "*\"{$task->title}\"*\n\n" .
+                    "Batas pengumpulan: *{$dueDate}*.\n\n" .
+                    "Yuk, segera cek dan kerjakan di web pembelajaran ya! Semangat! 💪";
+
+                $notificationService = new WhatsAppNotificationService();
+                $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('flash-message', message: 'Tugas berhasil disimpan, tetapi gagal mengirim notifikasi. Error: ' . $e->getMessage(), type: 'warning');
+        }
     }
 
     public function confirmDelete($id)
@@ -179,18 +236,18 @@ class ManageTasks extends Component
 
     public function delete()
     {
-        if ($this->itemToDeleteId) {
-            $task = Task::find($this->itemToDeleteId);
-            if ($task && $task->user_id === Auth::id()) {
-                if ($task->attachment_path) {
-                    Storage::disk('public')->delete($task->attachment_path);
-                }
-                $task->delete();
-                $this->dispatch('flash-message', message: 'Tugas berhasil dihapus.', type: 'success');
+        $task = Task::find($this->itemToDeleteId);
+        if ($task && $task->user_id === Auth::id()) {
+            if ($task->attachment_path) {
+                Storage::disk('public')->delete($task->attachment_path);
             }
+            $task->delete();
+            $this->dispatch('flash-message', message: 'Tugas berhasil dihapus.', type: 'success');
+        } else {
+            $this->dispatch('flash-message', message: 'Gagal menghapus tugas.', type: 'error');
         }
-        $this->dispatch('close-confirm-modal');
         $this->itemToDeleteId = null;
+        $this->dispatch('close-confirm-modal');
     }
 
     public function render()

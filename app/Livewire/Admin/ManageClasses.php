@@ -3,9 +3,9 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Classes;
-use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Rule;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -17,62 +17,44 @@ class ManageClasses extends Component
 {
     use WithPagination;
 
-    #[Url(as: 'q', history: true)]
-    public $search = '';
-    #[Url(history: true)]
-    public $sortBy = 'class'; // Default sort by 'class'
-    #[Url(history: true)]
-    public $sortDirection = 'asc';
-    public $perPage = 10;
-
-    // Properti Form disederhanakan
-    public $class;
-    public $description;
-
-    public $isEditing = false;
+    // Properti filter dan state
+    #[Url(as: 'q')]
+    public string $search = '';
+    public bool $isEditing = false;
     public ?Classes $editingClass = null;
-    public $itemToDeleteId = null;
+    public ?int $itemToDeleteId = null;
 
+    // Properti Form
+    #[Rule('required|string|max:255', as: 'Nama Kelas')]
+    public string $class = '';
+    #[Rule('nullable|string|max:255', as: 'ID Grup WhatsApp')]
+    public string $whatsapp_group_id = '';
+
+    // Properti BARU untuk link grup
+    #[Rule('nullable|url', as: 'Link Grup WhatsApp')]
+    public string $whatsapp_group_link = '';
+
+    #[Rule('nullable|string', as: 'Deskripsi')]
+    public string $description = '';
+
+    // Lifecycle hooks
     public function updatingSearch()
     {
         $this->resetPage();
-    }
-
-    protected function rules()
-    {
-        $classId = $this->editingClass ? $this->editingClass->id : null;
-        return [
-            'class' => ['required', 'string', 'max:10', Rule::unique('classes')->ignore($classId)],
-            'description' => 'nullable|string',
-        ];
     }
 
     #[Computed]
     public function classes()
     {
         return Classes::where('class', 'like', '%' . $this->search . '%')
-            ->orderBy($this->sortBy, $this->sortDirection)
-            ->paginate($this->perPage);
-    }
-
-    public function render()
-    {
-        return view('livewire.admin.manage-classes');
-    }
-
-    public function sortBy($field)
-    {
-        if ($this->sortBy === $field) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortDirection = 'asc';
-        }
-        $this->sortBy = $field;
+            ->orWhere('whatsapp_group_id', 'like', '%' . $this->search . '%')
+            ->orderBy('class')
+            ->paginate(10);
     }
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingClass', 'class', 'description']);
+        $this->reset(['isEditing', 'editingClass', 'class', 'whatsapp_group_id', 'whatsapp_group_link', 'description']);
         $this->resetValidation();
     }
 
@@ -88,6 +70,8 @@ class ManageClasses extends Component
         $this->isEditing = true;
         $this->editingClass = $class;
         $this->class = $class->class;
+        $this->whatsapp_group_id = $class->whatsapp_group_id;
+        $this->whatsapp_group_link = $class->whatsapp_group_link ?? '';
         $this->description = $class->description;
         $this->dispatch('open-modal', id: 'class-form-modal');
     }
@@ -95,13 +79,15 @@ class ManageClasses extends Component
     public function save()
     {
         $validatedData = $this->validate();
+
         if ($this->isEditing) {
             $this->editingClass->update($validatedData);
-            $message = 'Data kelas berhasil diperbarui.';
+            $message = 'Kelas berhasil diperbarui.';
         } else {
             Classes::create($validatedData);
-            $message = 'Data kelas berhasil ditambahkan.';
+            $message = 'Kelas berhasil ditambahkan.';
         }
+
         $this->dispatch('flash-message', message: $message, type: 'success');
         $this->dispatch('close-modal');
     }
@@ -115,11 +101,14 @@ class ManageClasses extends Component
     public function delete()
     {
         if ($this->itemToDeleteId) {
-            Classes::findOrFail($this->itemToDeleteId)->delete();
-            $this->dispatch('flash-message', message: 'Data kelas berhasil dihapus.', type: 'success');
+            Classes::find($this->itemToDeleteId)->delete();
+            $this->dispatch('flash-message', message: 'Kelas berhasil dihapus.', type: 'success');
         }
-        $this->dispatch('close-confirm-modal');
-        $this->itemToDeleteId = null;
-        $this->resetPage();
+        $this->dispatch('close-modal');
+    }
+
+    public function render()
+    {
+        return view('livewire.admin.manage-classes');
     }
 }

@@ -26,19 +26,27 @@
                         placeholder="Tulis ringkasan singkat tentang materi ini..."
                         error="{{ $errors->first('description') }}" />
 
+                    {{-- ======================= PERUBAHAN UTAMA DI SINI ======================= --}}
                     {{-- Trix Editor untuk Konten Lengkap --}}
                     <div wire:ignore x-data="{
                         value: @entangle('content'),
                         isFocused: false,
                         init() {
                             let trixEditor = this.$refs.trix;
+                    
+                            // 1. Ambil konten dari Livewire dan masukkan ke Trix Editor
+                            trixEditor.editor.loadHTML(this.value);
+                    
                             trixEditor.addEventListener('trix-focus', () => this.isFocused = true);
                             trixEditor.addEventListener('trix-blur', () => this.isFocused = false);
+                    
+                            // 2. Saat konten di Trix berubah, kirim balik ke Livewire
                             trixEditor.addEventListener('trix-change', (e) => {
                                 this.value = e.target.value;
                             });
                         }
                     }" x-init="init()" class="mt-1">
+
                         <label for="content" class="block text-sm font-medium text-gray-700">Konten Lengkap
                             Materi</label>
                         <input id="content" type="hidden" :value="value">
@@ -48,6 +56,8 @@
                             <span class="mt-2 text-sm text-red-600">{{ $message }}</span>
                         @enderror
                     </div>
+                    {{-- ======================= AKHIR DARI PERUBAHAN ======================= --}}
+
 
                     {{-- Mata Pelajaran, Kelas & Bab --}}
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -62,20 +72,50 @@
                     </div>
 
                     <x-form.input-group label="URL Video Youtube (Opsional)" name="url" wireModel="url"
-                        placeholder="https://youtube.com/watch?v=xxxx" error="{{ $errors->first('url') }}" />
+                        placeholder="http://googleusercontent.com/youtube.com/2..."
+                        error="{{ $errors->first('url') }}" />
+
+                    {{-- Input File --}}
                     <div>
                         <label for="uploadedFile" class="block text-sm font-medium text-gray-700">File Materi
-                            (Opsional)</label>
+                            (PDF, Doc, PPT, ZIP)</label>
                         <input type="file" id="uploadedFile" wire:model="uploadedFile"
                             class="w-full mt-1 file-input file-input-bordered">
+
                         <div wire:loading wire:target="uploadedFile" class="mt-2 text-sm text-gray-500">Uploading...
                         </div>
-                        @if ($currentFileUrl)
+
+                        @if ($page_count)
                             <div class="mt-2 text-sm">
-                                File saat ini: <a href="{{ $currentFileUrl }}" target="_blank"
-                                    class="text-blue-600 hover:underline">Lihat File</a>
+                                <span class="font-medium text-gray-700">Hasil Deteksi PDF:</span>
+                                <span
+                                    class="px-2 py-1 ml-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">
+                                    {{ $page_count }} Halaman
+                                </span>
                             </div>
                         @endif
+
+                        @if ($material->exists && $currentFileUrl && !$uploadedFile)
+                            <div class="mt-2 text-sm">
+                                File saat ini:
+
+                                <a href="{{ route('materials.view', $material) }}" target="_blank"
+                                    class="text-blue-600 hover:underline">
+                                    <i class="mr-1 fas fa-eye"></i> Lihat File
+                                </a>
+
+                                <span class="mx-1 text-gray-300">|</span>
+                                <a href="{{ route('materials.download', $material) }}"
+                                    class="text-blue-600 hover:underline">
+                                    <i class="mr-1 fas fa-download"></i> Unduh
+                                </a>
+
+                                @if ($material->page_count)
+                                    <span class="ml-2 text-gray-500">({{ $material->page_count }} Halaman)</span>
+                                @endif
+                            </div>
+                        @endif
+
                         @error('uploadedFile')
                             <span class="mt-2 text-sm text-red-600">{{ $message }}</span>
                         @enderror
@@ -87,14 +127,6 @@
                                 class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                             <label for="is_published" class="block ml-2 text-sm text-gray-900">Publikasikan
                                 Materi</label>
-                        </div>
-
-                        <div x-show="isPublished" x-transition.opacity.duration.500ms class="mt-4">
-                            <x-form.input-group type="datetime-local" label="Jadwalkan Tanggal Publikasi (Opsional)"
-                                name="published_at" wireModel="published_at"
-                                error="{{ $errors->first('published_at') }}">
-                                <p class="mt-1 text-xs text-gray-500">Kosongkan untuk publikasi segera.</p>
-                            </x-form.input-group>
                         </div>
                     </div>
                 </div>

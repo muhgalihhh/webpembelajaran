@@ -28,6 +28,15 @@ class LoginAdmin extends Component
         $this->validate();
 
         if (!Auth::attempt(['username' => $this->username, 'password' => $this->password])) {
+            session()->flash('flash-message', [
+                'message' => 'Username atau password tidak sesuai.',
+                'type' => 'error'
+            ]);
+            $this->dispatch('flash-message', [
+                'message' => 'Username atau password tidak sesuai.',
+                'type' => 'error'
+            ]);
+            $this->addError('username', 'Username atau password tidak sesuai.');
             return;
         }
 
@@ -35,12 +44,24 @@ class LoginAdmin extends Component
 
         if (!$user->hasRole('admin')) {
             Auth::logout();
+            session()->flash('flash-message', [
+                'message' => 'Anda tidak memiliki akses sebagai Admin.',
+                'type' => 'error'
+            ]);
+            $this->dispatch('flash-message', [
+                'message' => 'Anda tidak memiliki akses sebagai Admin.',
+                'type' => 'error'
+            ]);
+            $this->addError('username', 'Anda tidak memiliki akses sebagai Admin.');
             return;
         }
+
+
         session()->regenerate();
-
-
-        session()->flash('success', 'Selamat datang, ' . $user->name . '!');
+        session()->flash('flash-message', [
+            'message' => 'Selamat datang, ' . $user->name . '!',
+            'type' => 'success'
+        ]);
 
         return $this->redirect(route('admin.index'), navigate: true);
     }

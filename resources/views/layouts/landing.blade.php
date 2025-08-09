@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Media Pembelajaran Digital' }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -19,15 +19,6 @@
 
 <body x-data="{ pageLoaded: false }" x-init="setTimeout(() => pageLoaded = true, 100)" x-show="pageLoaded" x-transition.opacity.duration.500ms
     class="bg-[#EBF3FF] text-gray-900 min-h-screen flex flex-col">
-
-    @if (session()->has('success'))
-        <x-ui.alert-popup type="success" :message="session('success')" />
-    @endif
-
-    @if (session()->has('error'))
-        <x-ui.alert-popup type="error" :message="session('error')" />
-    @endif
-
     <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center"
         x-transition.opacity.duration.300ms>
         <div class="flex items-center p-6 space-x-3 bg-white rounded-lg" x-transition.scale.80.opacity.duration.400ms>
@@ -35,8 +26,6 @@
             <span class="text-gray-700">Loading...</span>
         </div>
     </div>
-
-    <!-- Main content wrapper yang akan grow -->
     <div class="flex flex-col flex-1" x-data="{
         loaded: false,
         init() {
@@ -48,20 +37,17 @@
     }" x-cloak>
 
         <x-ui.landing-nav />
-
-        <!-- Content area yang akan mengambil sisa ruang -->
         <main class="flex-1">
             {{ $slot }}
         </main>
-
     </div>
-
-    <!-- Footer yang akan selalu di bawah -->
     <footer class="w-full py-4 mx-auto text-xs font-bold text-center text-white bg-[#4A90E2] rounded-t-lg mt-auto">
         &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
     </footer>
 
     @livewireScripts
+    {{-- <x-ui.alert-popup /> --}}
+    <x-ui.flash-message />
     <x-ui.logout-confirmation />
     @vite(['resources/js/app.js'])
 </body>

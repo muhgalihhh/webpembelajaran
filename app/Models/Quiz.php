@@ -48,8 +48,8 @@ class Quiz extends Model
         'shuffle_options' => 'boolean',
         'start_date' => 'date',
         'end_date' => 'date',
-        'start_time' => 'datetime', // Cast to datetime to use Carbon methods
-        'end_time' => 'datetime',   // Cast to datetime to use Carbon methods
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
     ];
 
     // Relasi

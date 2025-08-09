@@ -1,11 +1,12 @@
 <div>
     <x-slot:pageHeader>
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between w-full">
             <div>
                 <h2 class="text-2xl font-bold text-gray-800">Manajemen Soal</h2>
                 <p class="text-sm text-gray-500">Kuis: {{ $quiz->title }}</p>
             </div>
-            <a href="{{ route('teacher.quizzes') }}" wire:navigate class="btn btn-sm">
+            <a href="{{ route('teacher.quizzes') }}" wire:navigate
+                class="px-3 py-2 text-black transition-colors bg-gray-200 rounded-lg btn btn-sm hover:bg-gray-300">
                 <i class="fa-solid fa-arrow-left"></i>
                 Kembali ke Daftar Kuis
             </a>

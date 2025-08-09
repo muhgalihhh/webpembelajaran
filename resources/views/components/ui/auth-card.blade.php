@@ -1,9 +1,9 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-100 p-4 ">
+<div class="flex items-center justify-center min-h-screen p-4 bg-gray-100">
     <div
-        {{ $attributes->merge(['class' => 'relative bg-white p-8 rounded-lg shadow-xl w-full max-w-sm overflow-hidden border border-blue-700']) }}>
+        {{ $attributes->merge(['class' => 'relative bg-white p-8 rounded-lg shadow-xl  overflow-hidden border border-blue-700']) }}>
         {{-- Background Logo SD --}}
-        <div class="absolute inset-0 flex items-center justify-center opacity-10 z-0">
-            <img src="{{ asset('images/logo sd.png') }}" alt="SD Logo Background" class="w-full object-contain">
+        <div class="absolute inset-0 z-0 flex items-center justify-center opacity-10">
+            <img src="{{ asset('images/logo sd.png') }}" alt="SD Logo Background" class="object-contain w-full">
         </div>
         <div class="relative z-10">
             {{ $slot }}

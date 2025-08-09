@@ -39,7 +39,7 @@
 </head>
 
 <body class="bg-[#EBF3FF] text-gray-800">
-    <!-- Loading overlay untuk Livewire -->
+
     <div wire:loading.delay class="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center">
         <div class="flex items-center p-6 space-x-3 bg-white rounded-lg">
             <div class="w-6 h-6 border-2 border-blue-600 rounded-full animate-spin border-t-transparent"></div>
@@ -47,7 +47,6 @@
         </div>
     </div>
 
-    <!-- Main container dengan Alpine.js transisi -->
     <div class="h-screen-auto-overflow" x-data="{
         loaded: false,
         init() {
@@ -79,13 +78,13 @@
                 </a>
             </div>
         </header>
-        <!-- Main section dengan transisi -->
+
         <main class="relative flex items-center justify-center flex-grow px-6 py-8 md:py-12 fade-in"
             :class="{ 'show': loaded }" x-transition:enter="transition ease-out duration-800 delay-200"
             x-transition:enter-start="opacity-0 transform translate-y-8"
             x-transition:enter-end="opacity-100 transform translate-y-0">
 
-            {{-- Div untuk logo latar belakang. Penting: posisinya di sini agar bisa diatur z-index di belakang konten. --}}
+
             <div class="bg-school-logo"></div>
 
             <div
@@ -97,7 +96,7 @@
                     x-transition:enter-end="opacity-100 transform translate-x-0">
 
                     <h1 class="mb-4 text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
-                        MASUK ATAU DAFTAR AKUN MEDIA PEMBELAJARAN DIGITAL SEKOLAH DASAR | KELAS VI
+                        MASUK ATAU DAFTAR AKUN MEDIA PEMBELAJARAN DIGITAL SEKOLAH DASAR
                     </h1>
                     <p class="max-w-xl mb-8 text-base italic text-gray-600 sm:text-lg">
                         "Belajar hari ini adalah investasi untuk masa depan yang lebih cerah. Jadilah yang terbaik

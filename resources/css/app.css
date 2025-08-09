@@ -10,3 +10,21 @@
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
 }
+
+.bg-school-logo::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("/images/logo sd.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 50%;
+
+    opacity: 0.1;
+
+    /* Taruh di belakang konten */
+    z-index: -1;
+}
