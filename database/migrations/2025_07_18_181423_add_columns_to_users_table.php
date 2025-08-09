@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('username')->unique()->after('name');
             $table->foreignId('class_id')->nullable()->constrained('classes')->onDelete('set null'); // Hanya untuk siswa
             $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('gender', ['L', 'P'])->nullable();
             $table->string('profile_picture')->nullable();
             $table->string('phone_number')->nullable();
         });

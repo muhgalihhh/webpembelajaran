@@ -8,7 +8,7 @@
             class="relative z-10 flex flex-col items-center justify-center w-full max-w-6xl lg:flex-row lg:items-center">
             <div class="flex flex-col items-center text-center lg:items-start lg:text-left lg:w-1/2 lg:pr-8">
                 <h1 class="text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
-                    HALOO BU {{ Auth::user()->name }}
+HALO {{ Auth::user()->gender == 'L' ? 'PAK' : 'BU' }} {{ Auth::user()->name }}
                 </h1>
                 <h1 class="mb-4 text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
                     SELAMAT DATANG DI MEDIA PEMBELAJARAN DIGITAL SEKOLAH DASAR || KELAS VI
