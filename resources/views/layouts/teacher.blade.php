@@ -14,6 +14,10 @@
 </head>
 
 <body class="font-sans bg-gray-100">
+    {{-- Loader Livewire --}}
+    <div wire:loading class="fixed inset-0 z-50 flex items-center justify-center bg-gray-100 bg-opacity-75">
+        <div class="w-16 h-16 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+    </div>
     <div x-data="{ sidebarCollapsed: false, mobileSidebarOpen: false }" @keydown.escape.window="mobileSidebarOpen = false" class="flex flex-col h-screen">
         <x-ui.teacher.navbar />
         <div class="flex flex-1 overflow-hidden">
@@ -39,7 +43,6 @@
         </div>
     </div>
     <x-ui.alert-popup />
-    <x-ui.globab-loading-indicator />
     <x-ui.logout-confirmation />
 
     <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>

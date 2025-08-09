@@ -11,10 +11,11 @@
     </a>
 
     <form wire:submit="login('siswa')" class="mt-6">
-        <x-form.input-group type="text" id="username" placeholder="Masukkan Username" wireModel="username" autofocus />
+        <x-form.input-group type="text" id="username" placeholder="Masukkan Username" wireModel="username" autofocus
+            label="Username" icon="fa-solid fa-user" />
 
         <x-form.input-group type="password" id="password" placeholder="Masukkan Kata Sandi" wireModel="password"
-            passwordToggle />
+            passwordToggle label="Kata Sandi" icon="fa-solid fa-lock" />
 
         <div class="pr-4 mb-6 text-sm text-right text-gray-600">
             Lupa Kata Sandi? <a href="#" class="font-bold text-blue-600 hover:underline">Ubah Kata Sandi</a>

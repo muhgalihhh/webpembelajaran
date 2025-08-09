@@ -4,18 +4,19 @@
     </x-slot:pageHeader>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {{-- Kolom Informasi Profil --}}
         <div class="lg:col-span-2">
             <div class="p-6 bg-white rounded-lg shadow-md">
                 <h3 class="pb-3 text-lg font-medium text-gray-900 border-b">Informasi Profil</h3>
                 <form wire:submit.prevent="updateProfile" class="mt-6 space-y-4">
 
+                    {{-- Bagian Foto Profil --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Foto Profil</label>
                         <div class="flex items-center mt-2 gap-x-3">
                             @if ($photo)
                                 <img src="{{ $photo->temporaryUrl() }}" alt="Preview"
                                     class="object-cover w-20 h-20 rounded-full">
-                                {{-- Menggunakan 'profile_picture' sesuai nama kolom di database Anda --}}
                             @elseif (Auth::user()->profile_picture)
                                 <img src="{{ Storage::url(Auth::user()->profile_picture) }}" alt="Foto Profil"
                                     class="object-cover w-20 h-20 rounded-full">

@@ -7,13 +7,16 @@
     {{-- Kontainer untuk menu dan ikon --}}
     <div class="flex items-center space-x-3">
         @auth
-
             <nav class="hidden space-x-4 md:flex">
                 @role('siswa')
+                    <a href="{{ route('student.index') }}" wire:navigate
+                        class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.index') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Beranda</a>
+                    <a href="{{ route('student.dashboard') }}" wire:navigate
+                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.dashboard') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Pembelajaran</a>
+                    <a href="{{ route('student.subjects') }}" wire:navigate
+                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.subjects') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Materi</a>
                     <a href="#" wire:navigate
-                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Materi</a>
-                    <a href="#" wire:navigate
-                        class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Kuis</a>
+                        class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.quiz') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Kuis</a>
                     <a href="#" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Game Edukatif</a>
                     <a href="#" wire:navigate
