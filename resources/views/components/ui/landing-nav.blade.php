@@ -16,7 +16,7 @@
                     <a href="{{ route('student.tasks') }} " wire:navigate
                         class="px-3 py-2 text-black border rounded-md hover:text-gray-200 {{ request()->routeIs('student.tasks*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Tugas</a>
                     <a href="{{ route('student.games') }}" wire:navigate
-                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.games*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Game
+                        class="px-3 py-2 text-black  border rounded-md hover:text-gray-200 {{ request()->routeIs('student.games*') ? 'bg-blue-200 font-bold' : 'bg-white' }}">Referensi Game
                         Edukatif</a>
 
                     <a href="{{ route('student.ranking') }}" wire:navigate
