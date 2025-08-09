@@ -9,6 +9,7 @@
             <i class="fa-solid fa-house fa-lg"></i>
             <span class="hidden sm:inline">Halaman Awal</span>
         </a>
+        @livewire('teacher.notification-dropdown')
         <x-ui.profile-dropdown />
     </div>
 </header>

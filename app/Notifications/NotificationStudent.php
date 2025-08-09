@@ -13,17 +13,37 @@ use App\Models\Task;
 class NotificationStudent extends Notification implements ShouldBroadcast
 {
     protected $model;
+    protected $type;
 
-    public function __construct(object $model)
+    /**
+     * Create a new notification instance.
+     *
+     * @param object $model
+     * @param string|null $type
+     */
+    public function __construct(object $model, string $type = null)
     {
         $this->model = $model;
+        $this->type = $type;
     }
 
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @param object $notifiable
+     * @return array
+     */
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
     }
 
+    /**
+     * Get the array representation of the notification.
+     *
+     * @param object $notifiable
+     * @return array
+     */
     public function toDatabase(object $notifiable): array
     {
         $type = 'Konten Baru';
@@ -32,16 +52,22 @@ class NotificationStudent extends Notification implements ShouldBroadcast
 
         if ($this->model instanceof Material) {
             $type = 'Materi Baru';
-            $link = route('materials.show', $this->model->id);
+            $link = 'student.materials';
             $title = $this->model->title;
         } elseif ($this->model instanceof Task) {
             $type = 'Tugas Baru';
-            $link = route('tasks');
+            $link = 'student.tasks';
             $title = $this->model->title;
         } elseif ($this->model instanceof Quiz) {
-            $type = 'Kuis Baru';
-            $link = route('quizzes');
-            $title = $this->model->title;
+            if ($this->type === 'quiz_reminder') {
+                $type = 'Pengingat Kuis';
+                $title = 'Kuis "' . $this->model->title . '" akan segera berakhir!';
+                $link = 'student.quizzes';
+            } else {
+                $type = 'Kuis Baru';
+                $link = 'student.quizzes';
+                $title = $this->model->title;
+            }
         }
 
         return [
@@ -52,6 +78,11 @@ class NotificationStudent extends Notification implements ShouldBroadcast
         ];
     }
 
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     * @return array
+     */
     public function broadcastOn(): array
     {
         return [
@@ -60,7 +91,9 @@ class NotificationStudent extends Notification implements ShouldBroadcast
     }
 
     /**
-     * Menentukan nama event siaran.
+     * The type of the notification being broadcast.
+     *
+     * @return string
      */
     public function broadcastType(): string
     {
@@ -68,7 +101,10 @@ class NotificationStudent extends Notification implements ShouldBroadcast
     }
 
     /**
-     * Mengambil representasi siaran dari notifikasi.
+     * Get the broadcastable representation of the notification.
+     *
+     * @param object $notifiable
+     * @return BroadcastMessage
      */
     public function toBroadcast($notifiable): BroadcastMessage
     {

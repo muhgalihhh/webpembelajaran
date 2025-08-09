@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 
 Schedule::command('tasks:update-status')->everyMinute();
+Schedule::command('quiz:send-reminders')->hourly();

@@ -6,6 +6,7 @@ use App\Models\Curriculum;
 use App\Models\Subject;
 use App\Models\Task;
 use App\Models\TaskSubmission;
+use App\Notifications\NotificationTeacher; // <-- 1. Tambahkan use statement ini
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
@@ -25,24 +26,20 @@ class TaskList extends Component
     #[Url(as: 'tab', history: true)]
     public string $activeTab = 'semua';
 
-    // Properti BARU untuk filter
     #[Url(as: 'mapel')]
     public string $subjectFilter = '';
     #[Url(as: 'kurikulum')]
     public string $kurikulumFilter = '';
 
-    // Properti untuk modal
     public ?Task $selectedTask = null;
     public $submissionFile;
     public $submissionNotes;
 
-    // Properti untuk modal lihat nilai dan file
     public ?TaskSubmission $viewingSubmission = null;
     public ?string $fileViewerUrl = null;
     public ?string $fileViewerType = null;
     public ?string $fileViewerTitle = null;
 
-    // Lifecycle hooks BARU
     public function updatingSubjectFilter()
     {
         $this->resetPage();
@@ -50,7 +47,7 @@ class TaskList extends Component
     public function updatingKurikulumFilter()
     {
         $this->resetPage();
-        $this->reset('subjectFilter'); // Reset filter mapel jika kurikulum berubah
+        $this->reset('subjectFilter');
     }
 
     protected function rules()
@@ -74,13 +71,12 @@ class TaskList extends Component
         return Task::where('class_id', $student->class_id)
             ->where('status', 'publish')
             ->with(['subject', 'submissions' => fn($q) => $q->where('user_id', $student->id)])
-            ->when($this->subjectFilter, fn($q) => $q->where('subject_id', $this->subjectFilter))
+            ->when($this->subjectFilter, fn($q) => $q->where('subject_id', this->subjectFilter))
             ->whereHas('subject', function ($query) {
                 $query->when($this->kurikulumFilter, function ($q) {
                     $q->where('kurikulum', $this->kurikulumFilter);
                 });
             })
-            // ---
             ->when($this->activeTab === 'belum', fn($q) => $q->whereNotIn('id', $submittedTaskIds))
             ->when($this->activeTab === 'sudah', fn($q) => $q->whereIn('id', $submittedTaskIds))
             ->latest('due_date')
@@ -104,7 +100,6 @@ class TaskList extends Component
         ];
     }
 
-    // Computed property BARU untuk opsi kurikulum
     #[Computed]
     public function kurikulumOptions()
     {
@@ -142,6 +137,19 @@ class TaskList extends Component
             'submitted_at' => now(),
             'status' => 'submitted',
         ]);
+
+        // --- 👇 Blok Kode Notifikasi untuk Guru Dimulai Di Sini 👇 ---
+
+        // 2. Dapatkan data guru dari tugas yang dipilih
+        $teacher = $this->selectedTask->teacher;
+        $student = Auth::user();
+
+        // 3. Kirim notifikasi jika guru ditemukan
+        if ($teacher) {
+            $teacher->notify(new NotificationTeacher($student, $this->selectedTask, 'task_submission'));
+        }
+
+        // --- 👆 Blok Kode Notifikasi Selesai 👆 ---
 
         $this->reset(['selectedTask', 'submissionFile', 'submissionNotes']);
         $this->dispatch('close-modal');

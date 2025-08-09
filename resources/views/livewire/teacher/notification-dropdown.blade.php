@@ -47,7 +47,7 @@
                     <div class="flex-grow">
                         <p class="font-bold text-gray-800">{{ $notification->data['type'] ?? 'Notifikasi' }}</p>
                         <p class="text-gray-700">
-                            <span class="font-semibold">{{ $notification->data['title'] ?? 'Ada konten baru' }}</span>
+                            <span class="font-semibold">{{ $notification->data['message'] ?? 'Ada konten baru' }}</span>
                             di mapel {{ $notification->data['subject_name'] ?? '' }}.
                         </p>
                         <p class="mt-1 text-xs text-right text-gray-400">

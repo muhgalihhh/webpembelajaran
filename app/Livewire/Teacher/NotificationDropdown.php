@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Student;
+namespace App\Livewire\Teacher;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -80,6 +80,7 @@ class NotificationDropdown extends Component
     {
         $user = Auth::user();
         $notification = $user->notifications()->find($notificationId);
+
         $link = $notification->data['link'] ?? '#';
         if ($notification && is_null($notification->read_at)) {
             $notification->markAsRead();
@@ -89,7 +90,6 @@ class NotificationDropdown extends Component
                 return $this->redirect(route($link), navigate: true);
             }
         }
-
         return $this->redirect(route($link), navigate: true);
     }
 
@@ -146,6 +146,6 @@ class NotificationDropdown extends Component
 
     public function render()
     {
-        return view('livewire.student.notification-dropdown');
+        return view('livewire.teacher.notification-dropdown');
     }
 }

@@ -182,13 +182,13 @@ class ManageTasks extends Component
             $message = 'Tugas berhasil ditambahkan.';
         }
 
-        $isNowPublished = $task->is_published;
-        if ($isNowPublished && !$wasPreviouslyPublished && !$task->published_at) {
+        $isNowPublished = $task->status === 'publish';
+        if ($isNowPublished && !$wasPreviouslyPublished) {
             $this->sendNewTaskNotification($task);
             $message .= ' Notifikasi telah dikirim ke siswa.';
         }
 
-        // --- AKHIR LOGIKA PERBAIKAN ---
+
 
         $this->dispatch('flash-message', message: $message, type: 'success');
         $this->dispatch('close-modal');
@@ -197,7 +197,6 @@ class ManageTasks extends Component
     private function sendNewTaskNotification(Task $task)
     {
         try {
-            dd('Sending notification for task:', $task->title);
             $task->load('subject', 'class');
             $class = $task->class;
 

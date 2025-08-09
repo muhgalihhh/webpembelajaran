@@ -6,6 +6,7 @@ use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\QuizAttempt as Attempt;
 use App\Models\StudentAnswer;
+use App\Notifications\NotificationTeacher; // <-- 1. Tambahkan use statement ini
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -25,7 +26,6 @@ class QuizAttempt extends Component
     public ?int $timeRemaining = null;
     public bool $showFinishConfirmation = false;
 
-    // Properti untuk menyimpan pemetaan urutan pilihan yang sudah diacak
     private array $shuffledOptionMaps = [];
 
     public function mount(Quiz $quiz)
@@ -115,19 +115,9 @@ class QuizAttempt extends Component
                 return array_search($question->id, $questionOrder);
             });
 
-        // --- PERBAIKAN AKURASI WAKTU ---
-        // 1. Ambil waktu mulai dari database.
         $startTime = $this->attempt->start_time;
-
-        // 2. Hitung waktu deadline kuis (waktu mulai + durasi).
-        //    Ini menciptakan titik akhir yang tetap dan tidak berubah saat di-refresh.
         $deadline = $startTime->copy()->addMinutes($this->quiz->duration_minutes);
-
-        // 3. Hitung sisa detik dari SEKARANG hingga waktu deadline.
-        //    Argumen `false` memungkinkan hasil negatif jika waktu sudah habis.
         $remainingSeconds = now()->diffInSeconds($deadline, false);
-
-        // 4. Pastikan sisa waktu tidak kurang dari 0.
         $this->timeRemaining = max(0, $remainingSeconds);
 
         $this->loadExistingAnswers();
@@ -195,16 +185,12 @@ class QuizAttempt extends Component
             'E' => $question->option_e,
         ];
         $options = array_filter($options, fn($val) => !is_null($val) && $val !== '');
-
         $originalKeys = array_keys($options);
-
         $seed = crc32($this->attempt->id . '-' . $questionId);
         mt_srand($seed);
         shuffle($originalKeys);
         mt_srand();
-
         $displayKeys = array_slice(['A', 'B', 'C', 'D', 'E'], 0, count($originalKeys));
-
         return $this->shuffledOptionMaps[$questionId] = array_combine($displayKeys, $originalKeys);
     }
 
@@ -216,7 +202,6 @@ class QuizAttempt extends Component
         }
 
         $currentQuestion = $this->questions[$this->currentQuestionIndex];
-
         $options = [
             'A' => $currentQuestion->option_a,
             'B' => $currentQuestion->option_b,
@@ -291,6 +276,14 @@ class QuizAttempt extends Component
             'duration_taken' => $durationTaken,
             'is_completed' => true,
         ]);
+
+        $teacher = $this->quiz->creator;
+        $student = Auth::user();
+
+        if ($teacher) {
+            $teacher->notify(new NotificationTeacher($student, $this->quiz, 'quiz_completion'));
+        }
+
 
         $this->showFinishConfirmation = false;
         return $this->redirect(route('student.quizzes.result', $this->attempt->id), navigate: true);

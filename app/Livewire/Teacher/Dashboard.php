@@ -37,6 +37,8 @@ class Dashboard extends Component
     #[Url(history: true)]
     public $sortDirection = 'desc';
 
+    public ?int $itemToDeleteId = null;
+
     public function setActivityType($type)
     {
         $this->activityType = $type;
@@ -78,11 +80,7 @@ class Dashboard extends Component
         ];
     }
 
-    /**
-     * ==========================================================
-     * ==== BAGIAN STATISTIK YANG SUDAH DIBUAT DINAMIS ====
-     * ==========================================================
-     */
+
     #[Computed]
     public function stats()
     {
@@ -123,23 +121,31 @@ class Dashboard extends Component
         return view('livewire.teacher.dashboard');
     }
 
-    public function deleteAttempt($id)
+    public function prepareToDelete(int $id)
     {
-        try {
-            if ($this->activityType === 'quiz') {
-                QuizAttempt::findOrFail($id)->delete();
-            } else {
-                TaskSubmission::findOrFail($id)->delete();
-            }
-            session()->flash('flash-message', [
-                'type' => 'success',
-                'message' => 'Data pengerjaan berhasil dihapus.',
-            ]);
-        } catch (\Exception $e) {
-            session()->flash('flash-message', [
-                'type' => 'error',
-                'message' => 'Gagal menghapus data pengerjaan: ' . $e->getMessage(),
-            ]);
-        }
+        $this->itemToDeleteId = $id;
+        $this->dispatch('open-confirm-modal');
     }
+
+    public function delete()
+    {
+
+        if ($this->itemToDeleteId) {
+            if ($this->activityType === 'quiz') {
+
+                \App\Models\QuizAttempt::find($this->itemToDeleteId)->delete();
+            } else {
+
+                \App\Models\TaskSubmission::find($this->itemToDeleteId)->delete();
+            }
+
+            // Reset ID dan tampilkan pesan sukses
+            $this->itemToDeleteId = null;
+            session()->flash('flash-message', ['message' => 'Data berhasil dihapus.', 'type' => 'success']);
+        }
+
+        // Tutup modal setelah selesai
+        $this->dispatch('close-confirm-modal');
+    }
+
 }

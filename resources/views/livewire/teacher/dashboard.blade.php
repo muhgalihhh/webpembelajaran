@@ -1,5 +1,5 @@
 <div>
-    {{-- Header Halaman --}}
+    {{-- (Bagian Header dan Statistik tidak berubah) --}}
     <x-slot:pageHeader>
         <button @click.stop="mobileSidebarOpen = !mobileSidebarOpen" class="mr-4 text-gray-600 lg:hidden">
             <i class="text-xl fa-solid fa-bars"></i>
@@ -7,7 +7,6 @@
         <h2 class="text-2xl font-bold text-gray-800">Dasbor Guru</h2>
     </x-slot:pageHeader>
 
-    {{-- Tombol Lihat Nilai dipindah ke dalam grid statistik untuk layout yang lebih rapi di semua ukuran layar --}}
     <div class="grid grid-cols-1 gap-5 mt-6 sm:grid-cols-2 lg:grid-cols-4">
         <div class="p-4 overflow-hidden bg-white rounded-lg shadow">
             <p class="font-medium text-gray-500 truncate">Siswa Aktif</p>
@@ -21,8 +20,8 @@
             <p class="font-medium text-gray-500 truncate">Rata-rata Skor</p>
             <p class="mt-1 text-3xl font-semibold text-gray-900">{{ round($this->stats['averageScore']) }}</p>
         </div>
-        {{-- Tombol ini sekarang menjadi bagian dari grid --}}
-        <div classa="p-4 flex items-center justify-center overflow-hidden bg-white rounded-lg shadow">
+        {{-- Perbaikan typo: 'classa' menjadi 'class' --}}
+        <div class="flex items-center justify-center p-4 overflow-hidden bg-white rounded-lg shadow">
             <a href="{{ route('teacher.rankings') }}" wire:navigate
                 class="flex items-center justify-center w-full h-full px-4 py-2 font-bold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600">
                 <i class="mr-2 fa-solid fa-trophy"></i>
@@ -31,14 +30,12 @@
         </div>
     </div>
 
-    {{-- Bagian Aktivitas Siswa --}}
+    {{-- (Bagian Filter Aktivitas Siswa tidak berubah) --}}
     <div class="p-4 mt-8 bg-white rounded-lg shadow sm:p-6">
-
         <div>
             <h2 class="text-xl font-bold text-gray-800">Aktivitas Siswa</h2>
             <p class="text-sm text-gray-500 sm:text-base">Pilih untuk melihat hasil kuis atau tugas yang telah
                 dikerjakan siswa.</p>
-            {{-- Tombol di-wrap agar bisa responsif --}}
             <div class="flex flex-col mt-4 sm:flex-row">
                 <button wire:click="setActivityType('quiz')"
                     class="px-6 py-2 font-semibold text-gray-700 transition-colors duration-200 focus:outline-none rounded-t-lg sm:rounded-l-lg sm:rounded-t-none {{ $activityType === 'quiz' ? 'bg-blue-500 text-white shadow-inner' : 'bg-gray-200 hover:bg-gray-300' }}">
@@ -59,11 +56,12 @@
                 :options="$this->filterOptions['subjects']" placeholder="Semua Mata Pelajaran" optionLabel="name" />
         </div>
 
-        {{-- Tabel Hasil Aktivitas (Hanya untuk Desktop) --}}
+        {{-- Tabel Hasil Aktivitas (Desktop) --}}
         <div class="hidden mt-4 -mx-6 lg:block">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
+                        {{-- (Header tabel tidak berubah) --}}
                         <tr>
                             <th scope="col"
                                 class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
@@ -91,6 +89,7 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse ($this->results as $result)
                             <tr class="hover:bg-gray-50">
+                                {{-- (Konten tabel tidak berubah) --}}
                                 @if ($activityType === 'quiz')
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         {{ $result->user->name ?? 'Siswa tidak ditemukan' }}</td>
@@ -119,14 +118,15 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-center whitespace-nowrap">
-                                    <button wire:click="deleteAttempt({{ $result->id }})"
-                                        wire:confirm="Anda yakin ingin menghapus data pengerjaan ini? Tindakan ini tidak dapat dibatalkan."
+                                    {{-- PERUBAHAN DI SINI: Tombol Hapus memanggil metode untuk membuka modal --}}
+                                    <button wire:click="prepareToDelete({{ $result->id }})"
                                         class="text-red-600 transition-colors duration-150 hover:text-red-800 focus:outline-none">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </td>
                             </tr>
                         @empty
+                            {{-- (Tampilan kosong tidak berubah) --}}
                             <tr>
                                 <td colspan="7" class="py-10 text-center text-gray-500">
                                     <i class="mb-2 text-4xl fas fa-box-open"></i>
@@ -142,11 +142,12 @@
             </div>
         </div>
 
-        {{-- Tampilan Kartu (Hanya untuk Mobile) --}}
+        {{-- Tampilan Kartu (Mobile) --}}
         <div class="grid grid-cols-1 gap-4 mt-6 lg:hidden">
             @forelse ($this->results as $result)
                 <div class="p-4 bg-white border rounded-lg shadow">
                     @if ($activityType === 'quiz')
+                        {{-- (Konten kartu tidak berubah) --}}
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <p class="font-bold text-gray-800">{{ $result->quiz->title ?? 'Judul tidak tersedia' }}
@@ -161,13 +162,14 @@
                                 <p>{{ $result->quiz->subject->name ?? 'Mapel tidak tersedia' }}</p>
                                 <p>{{ $result->created_at?->format('d M Y, H:i') ?? 'N/A' }}</p>
                             </div>
-                            <button wire:click="deleteAttempt({{ $result->id }})"
-                                wire:confirm="Anda yakin ingin menghapus data pengerjaan ini? Tindakan ini tidak dapat dibatalkan."
+                            {{-- PERUBAHAN DI SINI: Tombol Hapus memanggil metode untuk membuka modal --}}
+                            <button wire:click="prepareToDelete({{ $result->id }})"
                                 class="text-red-600 transition-colors duration-150 hover:text-red-800 focus:outline-none">
                                 <i class="fas fa-trash-alt"></i> Hapus
                             </button>
                         </div>
                     @else
+                        {{-- (Konten kartu tidak berubah) --}}
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <p class="font-bold text-gray-800">{{ $result->task->title ?? 'Judul tidak tersedia' }}
@@ -183,8 +185,8 @@
                                 <p>{{ $result->task->subject->name ?? 'Mapel tidak tersedia' }}</p>
                                 <p>{{ $result->submission_date?->format('d M Y, H:i') ?? 'N/A' }}</p>
                             </div>
-                            <button wire:click="deleteAttempt({{ $result->id }})"
-                                wire:confirm="Anda yakin ingin menghapus data pengerjaan ini? Tindakan ini tidak dapat dibatalkan."
+                            {{-- PERUBAHAN DI SINI: Tombol Hapus memanggil metode untuk membuka modal --}}
+                            <button wire:click="prepareToDelete({{ $result->id }})"
                                 class="text-red-600 transition-colors duration-150 hover:text-red-800 focus:outline-none">
                                 <i class="fas fa-trash-alt"></i> Hapus
                             </button>
@@ -192,15 +194,19 @@
                     @endif
                 </div>
             @empty
+
                 <div class="col-span-1 py-10 text-center text-gray-500">
                     <i class="mb-2 text-4xl fas fa-box-open"></i>
                     <p>Tidak ada data untuk ditampilkan.</p>
                 </div>
             @endforelse
-
             <div class="col-span-1 py-4">
                 {{ $this->results->links() }}
             </div>
         </div>
     </div>
+
+    <x-ui.confirm-modal title="Konfirmasi Hapus"
+        message="Anda yakin ingin menghapus data pengerjaan ini? Tindakan ini tidak dapat dibatalkan."
+        wireConfirmAction="delete" />
 </div>

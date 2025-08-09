@@ -32,6 +32,7 @@
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Buat Kuis</a>
                     <a href="{{ route('teacher.about-us') }}" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">About Us</a>
+                    @livewire('teacher.notification-dropdown')
                 @endrole
 
                 @role('admin')
@@ -108,6 +109,7 @@
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">Buat Kuis</a>
                     <a href="{{ route('teacher.about-us') }}" wire:navigate
                         class="px-3 py-2 text-black bg-white border rounded-md hover:text-gray-200">About Us</a>
+                    @livewire('teacher.notification-dropdown')
                 @endrole
                 @role('admin')
                     <a href="{{ route('admin.dashboard') }}" wire:navigate @click="mobileMenuOpen = false"
