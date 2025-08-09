@@ -84,6 +84,7 @@ class NotificationDropdown extends Component
         if ($notification && is_null($notification->read_at)) {
             $notification->markAsRead();
             $this->refreshNotificationData();
+            dd('Notification marked as read', $notification->data['link'] ?? '#');
 
             $link = $notification->data['link'] ?? '#';
             if ($link !== '#') {

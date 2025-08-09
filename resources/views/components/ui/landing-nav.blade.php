@@ -63,11 +63,11 @@
             </div>
         @else
             <a href="{{ route('admin.login') }}" wire:navigate
-                class="hidden sm:inline-block bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">
+                class="hidden sm:inline-block bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 {{ Auth::user() ? 'hidden' : '' }}">
                 Admin
             </a>
             <a href="{{ route('register') }}" wire:navigate
-                class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">
+                class="bg-white text-[#4A90E2] px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 {{ Auth::user() ? 'hidden' : '' }}">
                 Daftar
             </a>
         @endauth

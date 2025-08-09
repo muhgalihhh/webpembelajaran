@@ -4,6 +4,8 @@ namespace App\Livewire\Teacher;
 
 use App\Models\Task;
 use App\Models\TaskSubmission;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Notification as FacadesNotification;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -70,6 +72,7 @@ class ScoreTaskSubmissions extends Component
     {
         $this->validateOnly('score');
         $this->validateOnly('feedback');
+        $student = $this->scoringSubmission->student;
 
         if ($this->scoringSubmission) {
             $this->scoringSubmission->update([
@@ -77,6 +80,9 @@ class ScoreTaskSubmissions extends Component
                 'feedback' => $this->feedback,
                 'status' => 'graded',
             ]);
+
+            // Kirim notifikasi ke siswa
+            FacadesNotification::send($student, new \App\Notifications\ScoringNotification($this->scoringSubmission));
 
             $this->dispatch('flash-message', message: 'Nilai berhasil disimpan.', type: 'success');
             $this->dispatch('close-modal');

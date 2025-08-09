@@ -6,11 +6,9 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
-use App\Models\Material;
-use App\Models\Quiz;
-use App\Models\Task;
 
-class NotificationStudent extends Notification implements ShouldBroadcast
+
+class ScoringNotification extends Notification implements ShouldBroadcast
 {
     protected $model;
 
@@ -26,29 +24,16 @@ class NotificationStudent extends Notification implements ShouldBroadcast
 
     public function toDatabase(object $notifiable): array
     {
-        $type = 'Konten Baru';
-        $title = 'Konten Baru Ditambahkan!';
-        $link = '#';
 
-        if ($this->model instanceof Material) {
-            $type = 'Materi Baru';
-            $link = route('materials.show', $this->model->id);
-            $title = $this->model->title;
-        } elseif ($this->model instanceof Task) {
-            $type = 'Tugas Baru';
-            $link = route('tasks');
-            $title = $this->model->title;
-        } elseif ($this->model instanceof Quiz) {
-            $type = 'Kuis Baru';
-            $link = route('quizzes');
-            $title = $this->model->title;
-        }
+        $type = 'Tugas Anda telah dinilai!';
+        $title = '' . $this->model->task->title . ' telah dinilai oleh ' . $this->model->task->creator->name;
+        $link = route('tasks');
 
         return [
             'type' => $type,
             'title' => $title,
             'link' => $link,
-            'subject_name' => $this->model->subject->name ?? 'Umum',
+            'subject_name' => $this->model->task->subject->name ?? 'Umum',
         ];
     }
 

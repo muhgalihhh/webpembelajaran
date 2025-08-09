@@ -182,7 +182,6 @@ class ManageTasks extends Component
             $message = 'Tugas berhasil ditambahkan.';
         }
 
-        // 2. Cek apakah status berubah dari 'draft' ke 'publish' dan tidak dijadwalkan
         $isNowPublished = $task->is_published;
         if ($isNowPublished && !$wasPreviouslyPublished && !$task->published_at) {
             $this->sendNewTaskNotification($task);

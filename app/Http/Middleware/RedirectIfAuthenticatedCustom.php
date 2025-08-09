@@ -28,7 +28,6 @@ class RedirectIfAuthenticatedCustom
                 } elseif (Auth::user()->hasRole('siswa')) {
                     return redirect()->route('student.index'); // Sesuaikan dengan nama rute siswa Anda
                 }
-                // Fallback jika role tidak ditemukan atau tidak cocok, arahkan ke dashboard umum
                 return redirect('/');
             }
         }
