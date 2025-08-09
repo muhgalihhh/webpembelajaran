@@ -138,7 +138,7 @@ class TaskList extends Component
             'user_id' => Auth::id(),
             'file_path' => $filePath,
             'notes' => $this->submissionNotes,
-            'submitted_at' => now(),
+            'submission_date' => now(),
             'status' => 'submitted',
         ]);
 
