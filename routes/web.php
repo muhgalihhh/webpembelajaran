@@ -101,6 +101,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+// Fonnte API Routes untuk mengelola grup WhatsApp
+
 
 Route::get('/update_gruplist', function () {
     $token = config('services.fonnte.token');
