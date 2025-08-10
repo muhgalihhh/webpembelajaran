@@ -1,6 +1,6 @@
 <div class="min-h-screen px-4 py-10 bg-blue-100"
     style="background-image: url('/images/transparent bg.png'); background-size: cover; background-position: center;">
-    <x-ui.student.container title="Halaman Game Edukatif" icon="fa fa-gamepad" header_color="bg-blue-500">
+    <x-ui.student.container title="Referensi Game Edukatif" icon="fa fa-gamepad" header_color="bg-blue-500">
 
 
         <div class="flex flex-wrap items-center justify-between gap-4 mb-6">

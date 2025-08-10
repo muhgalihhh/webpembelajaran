@@ -19,6 +19,7 @@ class Register extends Component
     public string $username = '';
     public string $email = '';
     public string $phone_number = ''; // Kolom baru
+    public string $gender = ''; // Kolom gender baru
     public string $password = '';
     public string $password_confirmation = '';
     public $class_id = ''; // Kolom baru untuk siswa
@@ -67,6 +68,7 @@ class Register extends Component
             'username' => 'required|string|max:255|unique:users,username',
             'email' => 'required|string|email|max:255|unique:users,email',
             'phone_number' => 'required|string|max:15|unique:users,phone_number',
+            'gender' => 'required|string|in:L,P', // Validasi gender
             'password' => 'required|string|min:8|confirmed',
             'class_id' => 'required|exists:classes,id', // Wajib untuk siswa
         ]);
@@ -76,6 +78,7 @@ class Register extends Component
             'username' => $validated['username'],
             'email' => $validated['email'],
             'phone_number' => $validated['phone_number'],
+            'gender' => $validated['gender'],
             'class_id' => $validated['class_id'],
             'password' => Hash::make($validated['password']),
         ]);
@@ -99,6 +102,7 @@ class Register extends Component
             'username' => 'required|string|max:255|unique:users,username',
             'email' => 'required|string|email|max:255|unique:users,email',
             'phone_number' => 'required|string|max:15|unique:users,phone_number',
+            'gender' => 'required|string|in:L,P', // Validasi gender
             'password' => 'required|string|min:8|confirmed',
         ]);
 
@@ -107,6 +111,7 @@ class Register extends Component
             'username' => $validated['username'],
             'email' => $validated['email'],
             'phone_number' => $validated['phone_number'],
+            'gender' => $validated['gender'],
             'password' => Hash::make($validated['password']),
         ]);
 
