@@ -71,7 +71,7 @@ class TaskList extends Component
         return Task::where('class_id', $student->class_id)
             ->where('status', 'publish')
             ->with(['subject', 'submissions' => fn($q) => $q->where('user_id', $student->id)])
-            ->when($this->subjectFilter, fn($q) => $q->where('subject_id', $this->subjectFilter))
+            ->when($this->subjectFilter, fn($q) => $q->where('subject_id', this->subjectFilter))
             ->whereHas('subject', function ($query) {
                 $query->when($this->kurikulumFilter, function ($q) {
                     $q->where('kurikulum', $this->kurikulumFilter);
@@ -80,7 +80,7 @@ class TaskList extends Component
             ->when($this->activeTab === 'belum', fn($q) => $q->whereNotIn('id', $submittedTaskIds))
             ->when($this->activeTab === 'sudah', fn($q) => $q->whereIn('id', $submittedTaskIds))
             ->latest('due_date')
-            ->paginate(2);
+            ->paginate(5);
     }
 
     #[Computed]
@@ -110,11 +110,7 @@ class TaskList extends Component
     public function subjects()
     {
         return Subject::query()
-            ->whereHas('materials', function ($query) {
-                $query->where('class_id', auth()->user()->class_id)
-                    ->where('is_published', true)
-                    ->where(fn($subQuery) => $subQuery->whereNull('published_at')->orWhere('published_at', '<=', now()));
-            })
+            ->when($this->kurikulumFilter, fn($q) => $q->where('kurikulum', $this->kurikulumFilter))
             ->orderBy('name')
             ->get();
     }
