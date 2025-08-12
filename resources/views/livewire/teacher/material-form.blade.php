@@ -89,7 +89,7 @@
                         <div x-show="inputType === 'file'" class="mt-4">
                             <div class="flex items-center justify-between">
                                 <label for="uploadedFile" class="block text-sm font-medium text-gray-700">File Materi
-                                    (PDF, Doc, Ppt, dll)</label>
+                                    (Opsional)</label>
                                 <span class="text-xs text-gray-500">Maks: 10MB</span>
                             </div>
                             <x-form.input-group type="file" id="uploadedFile" wireModel="uploadedFile"
