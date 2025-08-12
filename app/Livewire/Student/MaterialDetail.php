@@ -61,21 +61,35 @@ class MaterialDetail extends Component
 
     public function viewFile(int $materialId)
     {
-        $material = Material::find($materialId);
+        $material = Material::findOrFail($materialId);
 
-        if (!$material || !$material->file_path || !Storage::disk('local')->exists($material->file_path)) {
-            $this->dispatch('flash-message', message: 'File materi tidak ditemukan.', type: 'error');
+        if (!$material->file_path) {
+            $this->dispatch('flash-message', message: 'File materi tidak tersedia.', type: 'error');
+            return;
+        }
+
+        // 1. Cek apakah file_path adalah URL eksternal
+        if (filter_var($material->file_path, FILTER_VALIDATE_URL)) {
+            // Jika ya, langsung arahkan pengguna ke URL tersebut di new tabs windows
+            return redirect()->away($material->file_path);
+        }
+
+        // 2. Jika bukan URL, anggap sebagai file lokal di storage 'private'
+        if (!Storage::disk('private')->exists($material->file_path)) {
+            $this->dispatch('flash-message', message: 'File materi tidak ditemukan di server.', type: 'error');
             return;
         }
 
         $this->fileViewerTitle = 'Materi: ' . $material->title;
-        $mimeType = Storage::disk('local')->mimeType($material->file_path);
+        $mimeType = Storage::disk('private')->mimeType($material->file_path);
 
+        // 3. Tampilkan di modal jika file adalah PDF atau gambar
         if ($mimeType === 'application/pdf' || str_starts_with($mimeType, 'image/')) {
             $this->fileViewerType = $mimeType === 'application/pdf' ? 'pdf' : 'image';
             $this->fileViewerUrl = route('materials.view', $material);
             $this->dispatch('open-modal', id: 'file-viewer-modal');
         } else {
+            // 4. Untuk tipe file lain (doc, ppt, zip), arahkan untuk diunduh
             return redirect()->route('materials.view', $material);
         }
     }

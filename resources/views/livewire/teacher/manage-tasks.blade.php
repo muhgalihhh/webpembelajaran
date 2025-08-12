@@ -7,7 +7,6 @@
         <h2 class="text-2xl font-bold text-gray-800">Manajemen Tugas</h2>
     </x-slot:pageHeader>
 
-    {{-- Area Filter dan Tombol Aksi --}}
     <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
         <div class="grid items-end grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <x-form.input-group label="Pencarian Tugas" type="search" wireModel="search" id="search"
@@ -53,9 +52,6 @@
                     <tr class="hover:bg-gray-100">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">{{ $task->title }}</div>
-                            <div class="text-xs {{ $task->is_published ? 'text-green-600' : 'text-yellow-600' }}">
-                                {{ $task->is_published ? 'Published' : 'Draft' }}
-                            </div>
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                             <div>{{ $task->subject?->name ?? 'N/A' }}</div>
@@ -84,11 +80,17 @@
                         </td>
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                             <a href="{{ route('teacher.scores.submissions', $task) }}" wire:navigate
-                                class="text-blue-600 hover:text-blue-900">Pengumpulan</a>
+                                class="text-blue-600 hover:text-blue-900">
+                                <i class="mr-2 fa-solid fa-pen-to-square"></i>
+                                Pengumpulan</a>
                             <button wire:click="edit({{ $task->id }})"
-                                class="ml-4 text-indigo-600 hover:text-indigo-900">Edit</button>
+                                class="ml-4 text-indigo-600 hover:text-indigo-900">
+                                <i class="mr-2 fa-solid fa-edit"></i>
+                                Edit</button>
                             <button wire:click="confirmDelete({{ $task->id }})"
-                                class="ml-4 text-red-600 hover:text-red-900">Hapus</button>
+                                class="ml-4 text-red-600 hover:text-red-900">
+                                <i class="mr-2 fa-solid fa-trash"></i>
+                                Hapus</button>
                         </td>
                     </tr>
                 @empty
@@ -107,8 +109,6 @@
                 <div class="flex items-start justify-between">
                     <div class="flex-1">
                         <h3 class="font-bold text-gray-800">{{ $task->title }}</h3>
-                        <p class="text-xs {{ $task->is_published ? 'text-green-600' : 'text-yellow-600' }}">
-                            {{ $task->is_published ? 'Published' : 'Draft' }}</p>
                     </div>
                     <span @class([
                         'ml-2 flex-shrink-0 px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
@@ -129,13 +129,13 @@
                         @endif
                     </p>
                 </div>
-                <div class="flex items-center justify-end pt-3 mt-4 space-x-4 border-t">
+                <div class="flex items-center justify-end pt-3 mt-4 space-x-4 ">
                     <a href="{{ route('teacher.scores.submissions', $task) }}" wire:navigate
-                        class="text-sm font-medium text-blue-600 hover:text-blue-900">Pengumpulan</a>
+                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-700 transition-colors bg-blue-100 rounded-md hover:bg-blue-200">Pengumpulan</a>
                     <button wire:click="edit({{ $task->id }})"
-                        class="text-sm font-medium text-indigo-600 hover:text-indigo-900">Edit</button>
+                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-700 transition-colors bg-indigo-100 rounded-md hover:bg-indigo-200">Edit</button>
                     <button wire:click="confirmDelete({{ $task->id }})"
-                        class="text-sm font-medium text-red-600 hover:text-red-900">Hapus</button>
+                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-red-700 transition-colors bg-red-100 rounded-md hover:bg-red-200">Hapus</button>
                 </div>
             </div>
         @empty
@@ -163,10 +163,10 @@
                 <x-form.input-group label="Tenggat Waktu (Opsional)" type="datetime-local" wireModel="due_time"
                     id="due_time" />
 
-                <x-form.select-group label="Status Publikasi" name="is_published" wireModel="is_published"
-                    :options="['0' => 'Draft', '1' => 'Publish']" required />
+                <x-form.select-group label="Status Publikasi" name="status" wireModel="status" :options="['draft' => 'Draft', 'publish' => 'Publish']"
+                    required />
 
-                @if ($is_published)
+                @if ($status === 'publish')
                     <div class="md:col-span-2">
                         <x-form.input-group label="Jadwalkan Publikasi (Opsional)" type="datetime-local"
                             wireModel="published_at" id="published_at" />
@@ -176,7 +176,7 @@
                 <div class="md:col-span-2">
                     <label for="uploadedFile" class="block text-sm font-medium text-gray-700">File Lampiran
                         (Opsional)</label>
-                    <input type="file" id="uploadedFile" wireModel="uploadedFile"
+                    <input type="file" id="uploadedFile" wire:model="uploadedFile"
                         class="w-full mt-1 file-input file-input-bordered">
                     @if ($currentFilePath && !$uploadedFile)
                         <div class="mt-1 text-xs text-gray-500">File saat ini: {{ basename($currentFilePath) }}</div>
@@ -186,8 +186,9 @@
                 </div>
             </div>
             <div class="flex justify-end pt-4 mt-4 space-x-4 border-t">
-                <button type="button" @click="$dispatch('close-modal')" class="btn btn-secondary">Batal</button>
-                <button type="submit" class="btn btn-primary">Simpan</button>
+                <x-form.button type="button" wireClick="$dispatch('close-modal')" variant="secondary"
+                    class="btn btn-secondary">Batal</x-form.button>
+                <x-form.button type="submit" class="btn btn-primary">Simpan</x-form.button>
             </div>
         </form>
     </x-ui.modal>

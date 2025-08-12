@@ -24,7 +24,6 @@ class Task extends Model
         'due_time',
         'attachment_path',
         'status',
-        'is_published',
         'published_at',
     ];
 
@@ -35,8 +34,6 @@ class Task extends Model
      */
     protected $casts = [
         'due_date' => 'date',
-        // PERBAIKAN: Hapus cast time karena Laravel tidak support, biarkan sebagai string
-        'is_published' => 'boolean',
         'published_at' => 'datetime',
     ];
 
@@ -79,5 +76,10 @@ class Task extends Model
             return \Carbon\Carbon::createFromFormat('H:i:s', $this->due_time)->format('H:i');
         }
         return null;
+    }
+
+    public function getIsPublishedAttribute(): bool
+    {
+        return $this->status === 'publish';
     }
 }

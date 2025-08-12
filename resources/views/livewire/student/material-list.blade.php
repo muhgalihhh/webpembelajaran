@@ -2,7 +2,6 @@
     style="background-image: url('/images/transparent bg.png'); background-size: 30rem; background-position: center;"
     x-data="{ isLoaded: false }" x-init="setTimeout(() => { isLoaded = true }, 50)">
     <x-ui.student.container title="Daftar Materi" :subject="$subject">
-        {{-- @include('livewire.student.partials._header', ['subject' => $subject]) --}}
         <div class="pt-6 sm:pt-8">
             @include('livewire.student.partials._tabs', ['activeTab' => $activeTab])
         </div>

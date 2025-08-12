@@ -4,6 +4,7 @@
     'icon' => '',
     'wireClick' => '',
     'name' => '',
+    'wireLoadingAttr' => 'disabled',
 ])
 
 @php
@@ -18,7 +19,7 @@
 @endphp
 
 <button type="{{ $type }}" @if ($wireClick) wire:click="{{ $wireClick }}" @endif
-    {{-- Atribut `class` digabungkan, memungkinkan kustomisasi dari luar --}}
+    wire:loading.attr="{{ $wireLoadingAttr }}" {{-- Atribut `class` digabungkan, memungkinkan kustomisasi dari luar --}}
     {{ $attributes->merge(['class' => $baseClasses . ' ' . ($variantClasses[$variant] ?? $variantClasses['primary'])]) }}>
     @if ($icon)
         <i class="{{ $icon }} @if ($slot->isNotEmpty()) -ml-1 mr-2 @endif"></i>

@@ -75,7 +75,11 @@ class Dashboard extends Component
     public function filterOptions()
     {
         return [
-            'subjects' => Subject::orderBy('name')->get(),
+            'subjects' => Subject::orderBy('kurikulum', 'asc')->orderBy('name')->get()
+                ->mapWithKeys(function ($subject) {
+                    $displayText = "{$subject->name} - ({$subject->kurikulum})";
+                    return [$subject->id => $displayText];
+                }),
             'classes' => Classes::orderBy('class')->get(),
         ];
     }

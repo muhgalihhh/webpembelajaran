@@ -57,31 +57,13 @@ class ManageTasks extends Component
     public $class_id = '';
     #[Rule('nullable|date_format:Y-m-d\TH:i')]
     public $due_time;
-    #[Rule('required|boolean')]
-    public bool $is_published = false;
+    #[Rule('required|in:draft,publish')]
+    public string $status = 'draft';
     #[Rule('nullable|date_format:Y-m-d\TH:i|after_or_equal:now', message: 'Jadwal tidak boleh di masa lalu.')]
     public $published_at;
     #[Rule('nullable|file|mimes:pdf,doc,docx,jpg,png,zip,rar|max:5120')]
     public $uploadedFile;
     public ?string $currentFilePath = null;
-
-    // Lifecycle hooks
-    public function updatingSearch()
-    {
-        $this->resetPage();
-    }
-    public function updatingSubjectFilter()
-    {
-        $this->resetPage();
-    }
-    public function updatingClassFilter()
-    {
-        $this->resetPage();
-    }
-    public function updatingStatusFilter()
-    {
-        $this->resetPage();
-    }
 
     #[Computed]
     public function tasks()
@@ -112,6 +94,26 @@ class ManageTasks extends Component
         return Classes::orderBy('class')->get();
     }
 
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSubjectFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedClassFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedStatusFilter()
+    {
+        $this->resetPage();
+    }
+
     public function sortBy(string $field): void
     {
         $this->sortDirection = $this->sortBy === $field ? ($this->sortDirection === 'asc' ? 'desc' : 'asc') : 'asc';
@@ -120,7 +122,7 @@ class ManageTasks extends Component
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingTask', 'title', 'description', 'subject_id', 'class_id', 'due_time', 'is_published', 'published_at', 'uploadedFile', 'currentFilePath']);
+        $this->reset(['isEditing', 'editingTask', 'title', 'description', 'subject_id', 'class_id', 'due_time', 'status', 'published_at', 'uploadedFile', 'currentFilePath']);
         $this->resetValidation();
     }
 
@@ -128,7 +130,7 @@ class ManageTasks extends Component
     {
         $this->isEditing = false;
         $this->resetForm();
-        $this->is_published = false;
+        $this->status = 'draft';
         $this->dispatch('open-modal', id: 'task-form-modal');
     }
 
@@ -141,7 +143,7 @@ class ManageTasks extends Component
         $this->subject_id = $task->subject_id;
         $this->class_id = $task->class_id;
         $this->due_time = $task->due_date_time ? $task->due_date_time->format('Y-m-d\TH:i') : null;
-        $this->is_published = $task->is_published;
+        $this->status = $task->status;
         $this->published_at = $task->published_at ? $task->published_at->format('Y-m-d\TH:i') : null;
         $this->currentFilePath = $task->attachment_path;
         $this->dispatch('open-modal', id: 'task-form-modal');
@@ -151,8 +153,7 @@ class ManageTasks extends Component
     {
         $validatedData = $this->validate();
         $validatedData['user_id'] = Auth::id();
-        $validatedData['is_published'] = (bool) $this->is_published;
-        $validatedData['status'] = $validatedData['is_published'] ? 'publish' : 'draft';
+        $validatedData['status'] = $this->status;
 
         if ($this->uploadedFile) {
             if ($this->isEditing && $this->editingTask->attachment_path) {
@@ -171,57 +172,72 @@ class ManageTasks extends Component
         }
 
 
-        $wasPreviouslyPublished = $this->isEditing ? $this->editingTask->is_published : false;
+        $wasPreviouslyPublished = $this->isEditing ? $this->editingTask->status === 'publish' : false;
 
         if ($this->isEditing) {
             $this->editingTask->update($validatedData);
-            $task = $this->editingTask->fresh();
+            $task = $this->editingTask->fresh(); // Ambil data terbaru dari database
             $message = 'Tugas berhasil diperbarui.';
         } else {
             $task = Task::create($validatedData);
             $message = 'Tugas berhasil ditambahkan.';
         }
 
+        // 2. Tentukan apakah notifikasi perlu dikirim dan apa tipenya
         $isNowPublished = $task->status === 'publish';
-        if ($isNowPublished && !$wasPreviouslyPublished) {
-            $this->sendNewTaskNotification($task);
-            $message .= ' Notifikasi telah dikirim ke siswa.';
+        $notificationType = null;
+
+        if ($isNowPublished) {
+            if (!$wasPreviouslyPublished) {
+                // Dari draft menjadi publish, atau tugas baru yang langsung publish
+                $notificationType = 'new';
+                $message .= ' Notifikasi telah dikirim ke siswa.';
+            } elseif ($wasPreviouslyPublished) {
+                // Tugas yang sudah publish diedit (tetap publish)
+                $notificationType = 'updated';
+                $message .= ' Notifikasi pembaruan telah dikirim ke siswa.';
+            }
+        }
+
+        // 3. Kirim notifikasi jika ada tipe yang ditentukan
+        if ($notificationType) {
+            $this->sendTaskNotification($task, $notificationType);
         }
 
 
-
+        $this->dispatch('$refresh');
         $this->dispatch('flash-message', message: $message, type: 'success');
         $this->dispatch('close-modal');
     }
 
-    private function sendNewTaskNotification(Task $task)
+
+    private function sendTaskNotification(Task $task, string $actionType)
     {
         try {
             $task->load('subject', 'class');
             $class = $task->class;
+            $students = $class?->users()->whereHas('roles', fn($q) => $q->where('name', 'siswa'))->get();
 
-            if ($class && $class->whatsapp_group_id) {
-                $subjectName = $task->subject->name;
-                $className = $class->class;
-                $students = $class->users;
-                $dueDate = 'Tanpa Batas Waktu';
-                if ($task->due_date_time) {
-                    $dueDate = $task->due_date_time->format('d F Y, H:i');
+            if ($students && $students->isNotEmpty()) {
+
+                Notification::send($students, new NotificationStudent($task, $actionType));
+
+
+                if ($class->whatsapp_group_id && $actionType === 'new') {
+                    $subjectName = $task->subject->name;
+                    $className = $class->class;
+                    $dueDate = $task->due_date_time ? $task->due_date_time->format('d F Y, H:i') : 'Tanpa Batas Waktu';
+
+                    $waMessage = "🔔 *Notifikasi Tugas Baru* 🔔\n\n" .
+                        "Halo siswa kelas *{$className}*!\n\n" .
+                        "Ada tugas baru untuk mata pelajaran *{$subjectName}* dengan judul:\n" .
+                        "*\"{$task->title}\"*\n\n" .
+                        "Batas pengumpulan: *{$dueDate}*.\n\n" .
+                        "Yuk, segera cek dan kerjakan di web pembelajaran ya! Semangat! 💪";
+
+                    $notificationService = new WhatsAppNotificationService();
+                    $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
                 }
-
-                if ($students->isNotEmpty()) {
-                    Notification::send($students, new NotificationStudent($task));
-                }
-
-                $waMessage = "🔔 *Notifikasi Tugas Baru* 🔔\n\n" .
-                    "Halo siswa kelas *{$className}*!\n\n" .
-                    "Ada tugas baru untuk mata pelajaran *{$subjectName}* dengan judul:\n" .
-                    "*\"{$task->title}\"*\n\n" .
-                    "Batas pengumpulan: *{$dueDate}*.\n\n" .
-                    "Yuk, segera cek dan kerjakan di web pembelajaran ya! Semangat! 💪";
-
-                $notificationService = new WhatsAppNotificationService();
-                $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
             }
         } catch (\Exception $e) {
             $this->dispatch('flash-message', message: 'Tugas berhasil disimpan, tetapi gagal mengirim notifikasi. Error: ' . $e->getMessage(), type: 'warning');
@@ -242,6 +258,7 @@ class ManageTasks extends Component
                 Storage::disk('public')->delete($task->attachment_path);
             }
             $task->delete();
+            $this->dispatch('$refresh');
             $this->dispatch('flash-message', message: 'Tugas berhasil dihapus.', type: 'success');
         } else {
             $this->dispatch('flash-message', message: 'Gagal menghapus tugas.', type: 'error');

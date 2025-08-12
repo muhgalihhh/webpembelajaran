@@ -43,8 +43,7 @@ class ManageQuizzes extends Component
     // Properti Form Modal
     public bool $isEditing = false;
     public ?Quiz $editingQuiz = null;
-
-    public $title, $description, $subject_id, $class_id, $category, $duration_minutes, $passing_score, $status, $start_time, $end_time, $start_date, $end_date;
+    public $title, $description, $subject_id, $class_id, $category, $duration_minutes, $passing_score, $status, $start_time, $end_time;
     public bool $shuffle_questions = false, $shuffle_options = false;
 
     protected function rules()
@@ -102,7 +101,7 @@ class ManageQuizzes extends Component
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingQuiz', 'title', 'description', 'subject_id', 'class_id', 'category', 'duration_minutes', 'passing_score', 'status', 'start_time', 'end_time', 'shuffle_questions', 'shuffle_options', 'start_date', 'end_date']);
+        $this->reset(['isEditing', 'editingQuiz', 'title', 'description', 'subject_id', 'class_id', 'category', 'duration_minutes', 'passing_score', 'status', 'start_time', 'end_time', 'shuffle_questions', 'shuffle_options']);
         $this->resetValidation();
     }
 
@@ -138,8 +137,6 @@ class ManageQuizzes extends Component
 
     public function save()
     {
-        $wasPreviouslyPublished = $this->isEditing ? $this->editingQuiz->status === 'publish' : false;
-
         $validatedData = $this->validate();
 
         if ($this->status === 'publish') {
@@ -152,65 +149,70 @@ class ManageQuizzes extends Component
 
         $validatedData['user_id'] = Auth::id();
 
-
-        if (!empty($this->start_time)) {
-            $validatedData['start_date'] = \Carbon\Carbon::parse($this->start_time)->toDateString();
-        }
-        if (!empty($this->end_time)) {
-            $validatedData['end_date'] = \Carbon\Carbon::parse($this->end_time)->toDateString();
-        }
-
-        $message = 'Kuis berhasil diperbarui.';
+        $isNewRecord = !$this->isEditing;
+        $wasPreviouslyPublished = $this->isEditing ? $this->editingQuiz->status === 'publish' : false;
 
         if ($this->isEditing) {
             $this->editingQuiz->update($validatedData);
             $quiz = $this->editingQuiz->fresh();
+            $message = 'Kuis berhasil diperbarui.';
         } else {
-            $validatedData['total_questions'] = 0;
             $quiz = Quiz::create($validatedData);
             $message = 'Kuis berhasil ditambahkan.';
         }
 
+
         $isNowPublished = $quiz->status === 'publish';
-        if ($isNowPublished && !$wasPreviouslyPublished) {
-            $this->sendNotificationToStudents($quiz);
-            $message .= ' Notifikasi WhatsApp telah dikirim ke siswa.';
+        $notificationType = null;
+
+        if ($isNowPublished) {
+            if (!$wasPreviouslyPublished) {
+                $notificationType = 'new';
+                $message .= ' Notifikasi telah dikirim ke siswa.';
+            } elseif ($wasPreviouslyPublished) {
+                $notificationType = 'updated';
+                $message .= ' Notifikasi pembaruan telah dikirim ke siswa.';
+            }
+        }
+
+        if ($notificationType) {
+            $this->sendNotificationToStudents($quiz, $notificationType);
         }
 
         $this->dispatch('flash-message', ['message' => $message, 'type' => 'success']);
         $this->dispatch('close-modal');
     }
 
-    private function sendNotificationToStudents(Quiz $quiz)
+    private function sendNotificationToStudents(Quiz $quiz, string $actionType)
     {
         try {
             $quiz->load('subject', 'targetClass');
             $class = $quiz->targetClass;
+            $students = $class?->users()->whereHas('roles', fn($q) => $q->where('name', 'siswa'))->get();
 
-            if ($class && $class->whatsapp_group_id) {
-                $subjectName = $quiz->subject->name;
-                $className = $class->class;
+            if ($students && $students->isNotEmpty()) {
 
-                $students = $class->users;
+                Notification::send($students, new NotificationStudent($quiz, $actionType));
 
-                if ($students->isNotEmpty()) {
+                // (Opsional) Kirim WA hanya untuk kuis baru
+                if ($actionType === 'new' && $class->whatsapp_group_id) {
+                    $subjectName = $quiz->subject->name;
+                    $className = $class->class;
 
-                    Notification::send($students, new NotificationStudent($quiz));
+                    $waMessage = "🔔 *Notifikasi Kuis Baru* 🔔\n\n" .
+                        "Sudah siap untuk kuis baru, kelas *{$className}*?\n\n" .
+                        "Ada kuis mata pelajaran *{$subjectName}* dengan judul:\n" .
+                        "*\"{$quiz->title}\"*\n\n" .
+                        "Durasi pengerjaan: *{$quiz->duration_minutes} menit*.\n\n" .
+                        "Ayo, persiapkan dirimu dan kerjakan di web pembelajaran! Good luck! ✨";
+
+                    $notificationService = new WhatsAppNotificationService();
+                    $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
                 }
-
-                $waMessage = "🔔 *Notifikasi Kuis Baru* 🔔\n\n" .
-                    "Sudah siap untuk kuis baru, kelas *{$className}*?\n\n" .
-                    "Ada kuis mata pelajaran *{$subjectName}* dengan judul:\n" .
-                    "*\"{$quiz->title}\"*\n\n" .
-                    "Durasi pengerjaan: *{$quiz->duration_minutes} menit*.\n\n" .
-                    "Ayo, persiapkan dirimu dan kerjakan di web pembelajaran! Good luck! ✨";
-
-                $notificationService = new WhatsAppNotificationService();
-                $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
             }
         } catch (\Exception $e) {
-            Log::error('Gagal mengirim notifikasi WhatsApp: ' . $e->getMessage());
-            $this->dispatch('flash-message', ['message' => 'Gagal mengirim notifikasi WhatsApp.', 'type' => 'error']);
+            Log::error('Gagal mengirim notifikasi: ' . $e->getMessage());
+            $this->dispatch('flash-message', ['message' => 'Gagal mengirim notifikasi.', 'type' => 'error']);
         }
     }
 

@@ -1,49 +1,71 @@
 <div class="relative w-full" x-data="{ sidebarOpen: window.innerWidth >= 1024 }">
 
-    {{-- Tombol untuk membuka/menutup sidebar --}}
-    <button @click="sidebarOpen = !sidebarOpen"
-        class="fixed z-50 p-2 text-white transition-all duration-300 bg-gray-800 rounded-full shadow-lg top-24 hover:bg-gray-900"
-        :class="sidebarOpen ? 'left-4 lg:left-72' : 'left-4'">
-        <i class="w-6 h-6 fas fa-bars"></i>
-    </button>
-
+    {{-- Latar belakang overlay untuk tampilan mobile, aktif saat sidebar terbuka --}}
     <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-in-out duration-300"
         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
         x-transition:leave="transition-opacity ease-in-out duration-300" x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0" @click="sidebarOpen = false"
-        class="fixed inset-0 z-30 bg-black/60 lg:hidden"></div>
+        x-transition:leave-end="opacity-0" @click="sidebarOpen = false" class="fixed inset-0 z-30 bg-black/60 lg:hidden">
+    </div>
 
-    {{-- Sidebar Daftar Materi --}}
+
     <aside
-        class="fixed left-0 z-40 flex-shrink-0 h-full pt-4 overflow-y-auto text-black transition-transform duration-300 ease-in-out bg-white rounded-lg shadow-lg top-20 w-72"
-        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
+        class="fixed left-0 z-40 flex-shrink-0 h-full pt-4 overflow-y-auto text-black transition-all duration-300 ease-in-out bg-white rounded-lg shadow-lg top-20"
+        :class="sidebarOpen ? 'w-72' : 'w-20'">
 
-        <div class="flex items-center justify-between p-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">
+        <div class="flex items-center p-4 border-b border-gray-200"
+            :class="sidebarOpen ? 'justify-between' : 'justify-center'">
+            <h3 class="text-lg font-semibold text-gray-800 whitespace-nowrap" x-show="sidebarOpen" x-transition>
                 Daftar Materi
             </h3>
-            <button @click="sidebarOpen = false" class="p-1 rounded-full hover:bg-gray-200">
-                <i class="w-6 h-6 fas fa-times"></i>
+            <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-full hover:bg-gray-200 focus:outline-none">
+                <i class="w-6 h-6 fas fa-times" x-show="sidebarOpen"></i>
+                <i class="w-6 h-6 fas fa-bars" x-show="!sidebarOpen"></i>
             </button>
         </div>
 
-        <nav class="p-4 space-y-1">
+        <nav class="p-2 mt-2 space-y-1">
             @foreach ($subjectMaterials as $item)
                 <a href="{{ route('student.materials.show', $item) }}" wire:navigate
-                    class="flex items-center gap-3 px-3 py-2 text-sm transition-colors duration-200 rounded-md group
-                    @if ($item->id === $material->id) bg-blue-600 font-bold text-white @else text-gray-700 hover:bg-gray-100 @endif">
+                    class="flex items-center gap-4 px-3 py-2 text-sm transition-colors duration-200 rounded-md group"
+                    title="{{ $item->title }}"
+                    :class="{
+                        'bg-blue-600 font-bold text-white shadow-lg': {{ $item->id === $material->id ? 'true' : 'false' }},
+                        'text-gray-700 hover:bg-gray-100': {{ $item->id !== $material->id ? 'true' : 'false' }},
+                        'justify-center': !sidebarOpen
+                    }">
+
+
+                    @php
+                        $icon = 'fa-file-alt'; // Default
+                        $color = 'text-gray-500';
+                        if ($item->youtube_url) {
+                            $icon = 'fab fa-youtube';
+                            $color = 'text-red-500';
+                        } elseif (Str::startsWith($item->file_path, 'http')) {
+                            $icon = 'fas fa-link';
+                            $color = 'text-green-500';
+                        } elseif ($item->file_path) {
+                            $icon = 'fas fa-file-pdf';
+                            $color = 'text-blue-500';
+                        } else {
+                            $icon = 'fas fa-file-alt';
+                            $color = 'text-gray-500';
+                        }
+                    @endphp
                     <i @class([
-                        'w-5 text-center fas fa-file-alt',
-                        'text-white' => $item->id === $material->id,
-                        'text-blue-500' => $item->id !== $material->id,
+                        'flex-shrink-0 w-5 text-center',
+                        $icon,
+                        $item->id === $material->id ? 'text-white' : $color,
                     ])></i>
-                    <span>{{ $item->title }}</span>
+
+                    <span x-show="sidebarOpen" class="whitespace-nowrap" x-transition>{{ $item->title }}</span>
                 </a>
             @endforeach
         </nav>
     </aside>
 
-    <main class="w-full transition-all duration-300" :class="sidebarOpen ? 'lg:pl-72' : ''">
+    {{-- Konten Utama yang padding-nya menyesuaikan lebar sidebar --}}
+    <main class="w-full transition-all duration-300" :class="sidebarOpen ? 'lg:pl-72' : 'lg:pl-20'">
         <div class="container w-full p-4 mx-auto my-8">
             <div class="overflow-hidden bg-white border shadow-xl rounded-2xl">
                 {{-- Header Materi --}}
@@ -73,33 +95,42 @@
                         Sumber Belajar
                     </h3>
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+
                         @if ($material->file_path)
+                            @php
+                                $isLink = Str::startsWith($material->file_path, 'http');
+                            @endphp
                             <div
-                                class="p-6 transition-all duration-300 border border-black bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl hover:shadow-[6px_6px_0px_rgba(0,0,0,0.2)] group">
+                                class="p-6 transition-all duration-300 border border-black rounded-xl hover:shadow-[6px_6px_0px_rgba(0,0,0,0.2)] group
+                                {{ $isLink ? 'bg-gradient-to-br from-green-50 to-green-100' : 'bg-gradient-to-br from-blue-50 to-blue-100' }}">
                                 <div class="flex items-center gap-4 mb-3">
-                                    <div class="p-3 transition-colors bg-blue-500 rounded-full group-hover:bg-blue-600">
-                                        <i class="text-xl text-white fas fa-file-pdf"></i>
+                                    <div
+                                        class="p-3 transition-colors rounded-full group-hover:bg-opacity-80 {{ $isLink ? 'bg-green-500' : 'bg-blue-500' }}">
+                                        <i class="text-xl text-white fas {{ $isLink ? 'fa-link' : 'fa-file-pdf' }}"></i>
                                     </div>
                                     <div>
-                                        <h4 class="font-semibold text-gray-800">Materi PDF</h4>
-                                        <p class="text-sm text-gray-600">Unduh dan baca secara offline</p>
+                                        <h4 class="font-semibold text-gray-800">
+                                            {{ $isLink ? 'Link Eksternal' : 'Materi Tambahan' }}</h4>
+                                        <p class="text-sm text-gray-600">
+                                            {{ $isLink ? 'Buka tautan di tab baru' : 'Unduh atau baca online' }}</p>
                                     </div>
                                 </div>
                                 <button type="button" wire:click="viewFile({{ $material->id }})"
-                                    class="inline-flex items-center gap-2 px-4 py-2 font-medium text-white transition-colors duration-200 transform bg-blue-500 rounded-lg hover:bg-blue-600 hover:scale-105">
-                                    <i class="fas fa-eye"></i>
-                                    <span>Baca Materi</span>
+                                    class="inline-flex items-center gap-2 px-4 py-2 font-medium text-white transition-colors duration-200 transform rounded-lg hover:scale-105 {{ $isLink ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600' }}">
+                                    <i class="fas {{ $isLink ? 'fa-external-link-alt' : 'fa-eye' }}"></i>
+                                    <span>{{ $isLink ? 'Buka Tautan' : 'Lihat Materi' }}</span>
                                 </button>
                             </div>
                         @else
+                            {{-- Kartu fallback jika tidak ada file/link --}}
                             <div
                                 class="p-6 border bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl hover:shadow-[6px_6px_0px_rgba(0,0,0,0.2)]">
                                 <div class="flex items-center gap-4 mb-3">
                                     <div class="p-3 bg-gray-400 rounded-full">
-                                        <i class="text-xl text-white fas fa-file-pdf"></i>
+                                        <i class="text-xl text-white fas fa-times-circle"></i>
                                     </div>
                                     <div>
-                                        <h4 class="font-semibold text-gray-600">Materi PDF</h4>
+                                        <h4 class="font-semibold text-gray-600">File Tambahan</h4>
                                         <p class="text-sm text-gray-500">Belum tersedia</p>
                                     </div>
                                 </div>
@@ -110,10 +141,11 @@
                                 </div>
                             </div>
                         @endif
+                        {{-- --- AKHIR PERUBAHAN --- --}}
 
                         @if ($material->youtube_url)
                             <div
-                                class="p-6 transition-all duration-300 border border-red-black bg-gradient-to-br from-red-50 to-red-100 rounded-xl hover:shadow-[6px_6px_0px_rgba(0,0,0,0.2)] group">
+                                class="p-6 transition-all duration-300 border border-red-900 bg-gradient-to-br from-red-50 to-red-100 rounded-xl hover:shadow-[6px_6px_0px_rgba(0,0,0,0.2)] group">
                                 <div class="flex items-center gap-4 mb-3">
                                     <div class="p-3 transition-colors bg-red-500 rounded-full group-hover:bg-red-600">
                                         <i class="text-xl text-white fab fa-youtube"></i>
@@ -140,7 +172,7 @@
                                 Video Pembelajaran
                             </h3>
                             <div
-                                class="relative overflow-hidden bg-gray-900 border-2 border-black shadow-lg hover:shadow-[6px_6px_0px_rgba(0,0,0,0.2)] rounded-2xl group transition-all duration-300 hover:scale-101 hover:translate-0.5">
+                                class="relative overflow-hidden bg-gray-900 border-2 border-black shadow-lg hover:shadow-[6px_6px_0px_rgba(0,0,0,0.2)] rounded-2xl group transition-all duration-300 hover:scale-101 hover:translate-y-[-2px]">
                                 <div class="aspect-w-16 aspect-h-9">
                                     <iframe
                                         src="https://www.youtube.com/embed/{{ $this->extractYoutubeId($material->youtube_url) }}"

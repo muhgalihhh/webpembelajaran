@@ -1,22 +1,15 @@
 <div x-data="{
     notificationOpen: false,
     unreadCount: @entangle('notificationCount').live
-}" @click.away="notificationOpen = false"
-    @notification-updated.window="
-        unreadCount = $event.detail.count;
-        // Auto refresh component setiap kali ada notifikasi baru
-        $wire.$refresh();
-    "
-    class="relative">
+}" @click.away="notificationOpen = false" class="relative">
 
-    {{-- Tombol Notifikasi --}}
     <button @click="notificationOpen = !notificationOpen"
-        class="relative px-3 py-2 text-black bg-white border rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        class="relative px-3 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
         <i class="fas fa-bell"></i>
-        {{-- Badge untuk notifikasi yang belum dibaca --}}
+
         <template x-if="unreadCount > 0">
             <span
-                class="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-xs font-bold text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full"
+                class="absolute top-0 right-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 border-2 border-white rounded-full"
                 x-text="unreadCount">
             </span>
         </template>
@@ -27,57 +20,89 @@
         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-150 transform" x-transition:leave-start="opacity-100 scale-100"
         x-transition:leave-end="opacity-0 scale-95"
-        class="absolute right-0 z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-80 top-full">
+        class="absolute right-0 z-50 flex flex-col mt-2 bg-white border border-gray-200 rounded-lg shadow-xl w-80 sm:w-96 top-full">
 
-        <div class="px-4 py-2 font-bold text-gray-800 border-b">
-            Notifikasi
-            <span x-show="unreadCount > 0" class="ml-2 text-sm font-normal text-gray-500"
-                x-text="'(' + unreadCount + ' baru)'"></span>
+        <div class="px-4 py-3 border-b">
+            <div class="flex items-center justify-between">
+                <h3 class="font-bold text-gray-800">Notifikasi</h3>
+                @if ($unreadCount > 0)
+                    <button wire:click="markAllAsRead"
+                        class="text-xs font-semibold text-indigo-600 hover:underline focus:outline-none">
+                        Tandai semua dibaca
+                    </button>
+                @endif
+            </div>
         </div>
 
-        <div class="py-1 overflow-y-auto max-h-96">
-            @forelse ($this->notifications as $notification)
-                <a href="" wire:click.prevent="markAsReadAndRedirect('{{ $notification->id }}')"
-                    class="flex items-start px-4 py-3 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100
-                      @if (is_null($notification->read_at)) bg-blue-50 hover:bg-blue-100 @endif">
+        <div class="flex p-1 bg-gray-100 border-b">
+            <button wire:click.prevent="setFilter('all')"
+                class="flex items-center justify-center w-full gap-2 px-2 py-1 text-xs rounded-md focus:outline-none {{ $filter === 'all' ? 'font-bold bg-white shadow text-indigo-600' : 'text-gray-600 hover:bg-gray-200' }}">
+                Semua
+                @if ($unreadCount > 0)
+                    <span
+                        class="flex items-center justify-center w-4 h-4 text-white bg-gray-400 rounded-full text-[10px]">{{ $unreadCount }}</span>
+                @endif
+            </button>
+            <button wire:click.prevent="setFilter('new')"
+                class="flex items-center justify-center w-full gap-2 px-2 py-1 text-xs rounded-md focus:outline-none {{ $filter === 'new' ? 'font-bold bg-white shadow text-indigo-600' : 'text-gray-600 hover:bg-gray-200' }}">
+                Baru
+                @if ($unreadNewCount > 0)
+                    <span
+                        class="flex items-center justify-center w-4 h-4 text-white bg-blue-500 rounded-full text-[10px]">{{ $unreadNewCount }}</span>
+                @endif
+            </button>
+            <button wire:click.prevent="setFilter('updated')"
+                class="flex items-center justify-center w-full gap-2 px-2 py-1 text-xs rounded-md focus:outline-none {{ $filter === 'updated' ? 'font-bold bg-white shadow text-indigo-600' : 'text-gray-600 hover:bg-gray-200' }}">
+                Update
+                @if ($unreadUpdatedCount > 0)
+                    <span
+                        class="flex items-center justify-center w-4 h-4 text-white bg-green-500 rounded-full text-[10px]">{{ $unreadUpdatedCount }}</span>
+                @endif
+            </button>
+        </div>
 
-                    <div class="pt-1 mr-3 text-blue-500">
-                        <i class="fa-solid fa-circle-info fa-lg"></i>
+        <div class="flex-grow overflow-y-auto max-h-80" wire:key="notification-list-{{ $filter }}">
+            @forelse ($notifications as $notification)
+                @php
+                    $data = $notification->data;
+                    $icon = 'fa-bell';
+                    $iconColor = 'bg-gray-400';
+                    if (Str::contains($data['type'], 'Materi')) {
+                        $icon = 'fa-book-open';
+                        $iconColor = 'bg-indigo-500';
+                    } elseif (Str::contains($data['type'], 'Kuis')) {
+                        $icon = 'fa-pencil-ruler';
+                        $iconColor = 'bg-amber-500';
+                    } elseif (Str::contains($data['type'], 'Tugas')) {
+                        $icon = 'fa-clipboard-list';
+                        $iconColor = 'bg-sky-500';
+                    }
+                @endphp
+                <a href="#" wire:click.prevent="markAsReadAndRedirect('{{ $notification->id }}')"
+                    class="flex items-start px-4 py-3 transition-colors duration-200 border-b border-gray-100 last:border-b-0 hover:bg-gray-100 @if (is_null($notification->read_at)) bg-indigo-50 @endif">
+                    <div class="flex-shrink-0 mr-4">
+                        <div
+                            class="flex items-center justify-center w-10 h-10 text-white rounded-full {{ $iconColor }}">
+                            <i class="fas {{ $icon }}"></i>
+                        </div>
                     </div>
                     <div class="flex-grow">
-                        <p class="font-bold text-gray-800">{{ $notification->data['type'] ?? 'Notifikasi' }}</p>
-                        <p class="text-gray-700">
-                            <span class="font-semibold">{{ $notification->data['title'] ?? 'Ada konten baru' }}</span>
-                            di mapel {{ $notification->data['subject_name'] ?? '' }}.
-                        </p>
-                        <p class="mt-1 text-xs text-right text-gray-400">
-                            {{ $notification->created_at->diffForHumans() }}
-                        </p>
+                        <p class="text-sm font-semibold text-gray-800">{{ $data['title'] ?? 'Notifikasi Baru' }}</p>
+                        <p class="text-xs text-gray-600">{{ $data['message'] ?? 'Ada konten baru untukmu.' }}</p>
+                        <p class="mt-1 text-xs text-gray-400">{{ $notification->created_at->diffForHumans() }}</p>
                     </div>
                     @if (is_null($notification->read_at))
-                        <div class="w-2 h-2 mt-2 bg-blue-500 rounded-full"></div>
+                        <div class="flex-shrink-0 ml-2">
+                            <div class="w-2.5 h-2.5 mt-1 bg-indigo-500 rounded-full" title="Baru"></div>
+                        </div>
                     @endif
                 </a>
             @empty
-                <div class="px-4 py-3 text-sm text-center text-gray-500">
-                    Tidak ada notifikasi baru.
+                <div class="px-4 py-8 text-center">
+                    <i class="mb-2 text-4xl text-gray-300 fas fa-check-circle"></i>
+                    <p class="text-sm text-gray-500">Tidak ada notifikasi untuk filter ini.</p>
                 </div>
             @endforelse
         </div>
-
-        @if ($this->notifications->count() > 0)
-            <div class="py-2 text-center border-t">
-                <button wire:click="markAllAsRead" class="text-sm font-semibold text-blue-600 hover:underline">
-                    Tandai Semua Dibaca
-                </button>
-            </div>
-        @endif
     </div>
-
-    {{-- Debug Info (hapus setelah selesai debugging) --}}
-    @if (config('app.debug'))
-        <div class="fixed p-2 text-xs text-white bg-gray-800 rounded bottom-4 right-4">
-            Debug: Count = {{ $this->notificationCount }} | User Class = {{ Auth::user()->class_id ?? 'null' }}
-        </div>
-    @endif
 </div>

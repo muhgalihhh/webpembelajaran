@@ -107,30 +107,98 @@
         x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100"
         x-transition:leave-end="transform opacity-0 scale-95"
-        class="absolute z-100 w-full mt-1 bg-white rounded-md shadow-lg" style="display: none;">
-        <div class="p-2">
+        class="absolute z-[1000] mt-1 bg-white border border-gray-300 rounded-md shadow-lg min-w-max max-w-xs"
+        style="display: none;">
+        {{-- Search Input --}}
+        <div class="sticky top-0 z-10 p-3 bg-white border-b border-gray-200 rounded-t-md">
             <input type="search" x-model.debounce.300ms="search" placeholder="Cari..."
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                @keydown.escape="open = false">
+                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                @keydown.escape="open = false" @keydown.enter.prevent="">
         </div>
 
-        {{-- Daftar Opsi --}}
-        <ul
-            class="py-1 overflow-auto text-base max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-            <template x-for="([key, option]) in Object.entries(filteredOptions)" :key="key">
-                <li @click="selectOption(key, typeof option === 'object' ? ('{{ $optionLabel }}' ? option['{{ $optionLabel }}'] : (option.name || option.label)) : option)"
-                    class="px-3 py-2 text-gray-900 cursor-pointer select-none hover:bg-indigo-600 hover:text-white"
-                    :class="{ 'bg-indigo-100': value == key }">
-                    <span class="block font-normal truncate"
-                        x-text="typeof option === 'object' ? ('{{ $optionLabel }}' ? option['{{ $optionLabel }}'] : (option.name || option.label)) : option"></span>
-                </li>
-            </template>
+        {{-- Dropdown List dengan tinggi tetap --}}
+        <div class="relative">
+            <ul
+                class="py-1 overflow-y-auto text-sm bg-white rounded-b-md max-h-48 ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <template x-for="([key, option]) in Object.entries(filteredOptions)" :key="key">
+                    <li @click="selectOption(key, typeof option === 'object' ? ('{{ $optionLabel }}' ? option['{{ $optionLabel }}'] : (option.name || option.label)) : option)"
+                        class="relative px-4 py-2 text-gray-900 cursor-pointer select-none hover:bg-indigo-100 focus:bg-indigo-100 whitespace-nowrap"
+                        :class="{
+                            'bg-indigo-600 text-white hover:bg-indigo-700': value == key && key !== '',
+                            'bg-gray-50': value == key && key === '',
+                            'font-medium': key === ''
+                        }">
+                        <span class="block truncate"
+                            x-text="typeof option === 'object' ? ('{{ $optionLabel }}' ? option['{{ $optionLabel }}'] : (option.name || option.label)) : option"></span>
 
-            {{-- Pesan Jika Tidak Ada Hasil --}}
-            <template x-if="Object.keys(filteredOptions).length === 1 && Object.keys(filteredOptions)[0] === ''">
-                <li class="px-3 py-2 text-gray-500 select-none">Tidak ada hasil ditemukan.</li>
+                        {{-- Checkmark untuk item yang dipilih --}}
+                        <span x-show="value == key && key !== ''"
+                            class="absolute inset-y-0 right-0 flex items-center pr-4 text-white">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </span>
+                    </li>
+                </template>
+
+                {{-- Pesan Jika Tidak Ada Hasil --}}
+                <template x-if="Object.keys(filteredOptions).length === 1 && Object.keys(filteredOptions)[0] === ''">
+                    <li class="px-4 py-3 text-center text-gray-500 select-none">
+                        <div class="flex flex-col items-center space-y-1">
+                            <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.462-.881-6.065-2.33C5.93 12.658 6 12.34 6 12c0-.34-.07-.658-.065-.67A7.962 7.962 0 0112 9c2.34 0 4.462.881 6.065 2.33.005.012-.065.33-.065.67 0 .34.07.658.065.67z">
+                                </path>
+                            </svg>
+                            <span class="text-sm">Tidak ada hasil ditemukan</span>
+                        </div>
+                    </li>
+                </template>
+
+                {{-- Loading state (opsional) --}}
+                <template x-if="false">
+                    <li class="px-4 py-3 text-center text-gray-500 select-none">
+                        <div class="flex items-center justify-center space-x-2">
+                            <div class="w-4 h-4 border-2 border-gray-300 rounded-full animate-spin border-t-indigo-600">
+                            </div>
+                            <span class="text-sm">Memuat...</span>
+                        </div>
+                    </li>
+                </template>
+            </ul>
+
+            {{-- Scrollbar custom styling --}}
+            <style>
+                /* Custom scrollbar untuk dropdown */
+                .max-h-48::-webkit-scrollbar {
+                    width: 6px;
+                }
+
+                .max-h-48::-webkit-scrollbar-track {
+                    background: #f1f5f9;
+                    border-radius: 3px;
+                }
+
+                .max-h-48::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 3px;
+                }
+
+                .max-h-48::-webkit-scrollbar-thumb:hover {
+                    background: #94a3b8;
+                }
+            </style>
+        </div>
+
+        <div x-show="Object.keys(filteredOptions).length > 1"
+            class="px-3 py-2 text-xs text-gray-500 border-t border-gray-200 bg-gray-50 rounded-b-md">
+            <span x-text="`${Object.keys(filteredOptions).length - 1} item tersedia`"></span>
+            <template x-if="search !== ''">
+                <span x-text="`dari pencarian '${search}'`"></span>
             </template>
-        </ul>
+        </div>
     </div>
 
     @error($name)

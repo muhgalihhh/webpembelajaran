@@ -17,7 +17,6 @@
                 <x-form.select-group label="Filter Mata Pelajaran" name="subjectFilter" wireModel="subjectFilter"
                     :options="$this->subjects" placeholder="Semua Mapel" />
             </div>
-            {{-- Filter Kelas Baru --}}
             <div class="flex-1">
                 <x-form.select-group label="Filter Kelas" name="classFilter" wireModel="classFilter" :options="$this->classes"
                     optionValue="id" optionLabel="class" placeholder="Semua Kelas" />
@@ -43,14 +42,19 @@
                     </div>
                     <h3 class="mt-1 text-lg font-bold text-gray-800">{{ $game->title }}</h3>
                     <p class="flex-grow mt-2 text-sm text-gray-600">{{ Str::limit($game->description, 100) }}</p>
-                    <div class="flex items-center justify-between pt-4 mt-4 border-t">
+                    <div class="flex items-center justify-between pt-4 mt-4">
                         <a href="{{ $game->game_url }}" target="_blank"
-                            class="text-sm text-blue-500 hover:underline">Mainkan Game &rarr;</a>
+                            class="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-700 transition-colors bg-indigo-100 rounded-md hover:bg-indigo-200">Mainkan
+                            Game &rarr;</a>
                         <div>
                             <button wire:click="edit({{ $game->id }})"
-                                class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                                class="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-700 transition-colors bg-indigo-100 rounded-md hover:bg-indigo-200">
+                                <i class="mr-1 fa-solid fa-pencil-alt"></i>
+                                Edit</button>
                             <button wire:click="confirmDelete({{ $game->id }})"
-                                class="ml-4 text-red-600 hover:text-red-900">Hapus</button>
+                                class="inline-flex items-center px-3 py-1 text-xs font-medium text-red-700 transition-colors bg-red-100 rounded-md hover:bg-red-200">
+                                <i class="mr-1 fa-solid fa-trash-alt"></i>
+                                Hapus</button>
                         </div>
                     </div>
                 </div>

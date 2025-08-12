@@ -30,15 +30,27 @@
                 </div>
             </a>
         @else
-            {{-- Tampilan Ikon PDF --}}
+            {{-- PERUBAHAN DI SINI: Ikon PDF atau Link --}}
             <a href="{{ route('student.materials.show', $material) }}" wire:navigate>
                 <div class="text-center">
-                    <div class="relative p-8 mb-6 text-center bg-red-100 border-2 border-red-200 rounded-lg">
-                        <div
-                            class="flex items-center justify-center w-20 h-20 mx-auto bg-red-600 border-2 border-red-700 rounded-lg">
-                            <i class="text-4xl text-white fas fa-file-pdf"></i>
+                    {{-- Cek apakah file_path adalah URL --}}
+                    @if (Str::startsWith($material->file_path, 'http'))
+                        {{-- Tampilan Ikon Link Eksternal --}}
+                        <div class="relative p-8 mb-6 text-center bg-green-100 border-2 border-green-200 rounded-lg">
+                            <div
+                                class="flex items-center justify-center w-20 h-20 mx-auto bg-green-600 border-2 border-green-700 rounded-lg">
+                                <i class="text-4xl text-white fas fa-link"></i>
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        {{-- Tampilan Ikon PDF/File Lokal --}}
+                        <div class="relative p-8 mb-6 text-center bg-red-100 border-2 border-red-200 rounded-lg">
+                            <div
+                                class="flex items-center justify-center w-20 h-20 mx-auto bg-red-600 border-2 border-red-700 rounded-lg">
+                                <i class="text-4xl text-white fas fa-file-pdf"></i>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </a>
         @endif
@@ -53,34 +65,40 @@
                 Video
             </span>
         @else
-            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">
-                <i class="mr-1.5 fas fa-file-pdf"></i>
-                PDF
-            </span>
+            @if (Str::startsWith($material->file_path, 'http'))
+                <span
+                    class="inline-flex items-center px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                    <i class="mr-1.5 fas fa-link"></i>
+                    Link Eksternal
+                </span>
+            @else
+                <span
+                    class="inline-flex items-center px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">
+                    <i class="mr-1.5 fas fa-file-pdf"></i>
+                    Materi
+                </span>
+            @endif
         @endif
     </div>
 
     {{-- [3] Konten Teks (Selalu Tampil) --}}
     <div class="flex-grow space-y-2">
         <h3 class="text-lg font-bold text-gray-900">{{ $material->title }}</h3>
-        <p class="text-sm text-gray-600">{{ $material->description }}</p>
+        <p class="text-sm text-gray-600 line-clamp-2">{{ $material->description }}</p>
         @if ($material->page_count)
             <p class="text-xs text-gray-500">{{ $material->page_count }} Halaman</p>
-        @else
-            <p class="text-xs text-gray-500">Jumlah halaman tidak tersedia</p>
         @endif
     </div>
 
     {{-- Tombol Aksi (Selalu Tampil) --}}
-    @if ($context === 'video')
+    <div class="mt-4">
         <a href="{{ route('student.materials.show', $material) }}" wire:navigate
-            class="block w-full py-3 mt-4 font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-            Tonton Video
+            class="block w-full py-3 font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+            @if ($context === 'video')
+                Tonton Video
+            @else
+                Lihat Materi
+            @endif
         </a>
-    @else
-        <a href="{{ route('student.materials.show', $material) }}" wire:navigate
-            class="block w-full py-3 mt-4 font-medium text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-            Baca Materi
-        </a>
-    @endif
+    </div>
 </div>

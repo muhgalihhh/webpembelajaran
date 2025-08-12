@@ -38,21 +38,27 @@ class MaterialForm extends Component
     public string $content = '';
     public ?string $currentFileUrl = null;
     public ?int $page_count = null;
+    public ?string $file_path = null;
+    public string $inputType = 'file';
 
-    // Track status untuk notifikasi
+    // Properti untuk melacak status publikasi awal
     private bool $originalPublishStatus = false;
 
-    protected $rules = [
-        'title' => 'required|string|max:255',
-        'description' => 'required|string',
-        'subject_id' => 'required|exists:subjects,id',
-        'class_id' => 'required|exists:classes,id',
-        'chapter' => 'required|string|max:100',
-        'content' => 'nullable|string',
-        'is_published' => 'required|boolean',
-        'url' => 'nullable|url',
-        'uploadedFile' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,zip|max:10240',
-    ];
+    protected function rules()
+    {
+        return [
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'subject_id' => 'required|exists:subjects,id',
+            'class_id' => 'required|exists:classes,id',
+            'chapter' => 'nullable|string|max:100',
+            'content' => 'nullable|string',
+            'is_published' => 'required|boolean',
+            'url' => 'nullable|url',
+            'uploadedFile' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,zip|max:10240',
+            'file_path' => 'nullable|url',
+        ];
+    }
 
     protected $messages = [
         'title.required' => 'Judul materi wajib diisi.',
@@ -61,7 +67,8 @@ class MaterialForm extends Component
         'class_id.required' => 'Kelas wajib dipilih.',
         'uploadedFile.mimes' => 'File harus berformat PDF, DOC, DOCX, PPT, PPTX, atau ZIP.',
         'uploadedFile.max' => 'Ukuran file maksimal 10MB.',
-        'url.url' => 'Format URL tidak valid.',
+        'file_path.url' => 'Format URL file tidak valid.',
+        'url.url' => 'Format URL Youtube tidak valid.',
     ];
 
     public function mount(Material $material)
@@ -73,8 +80,14 @@ class MaterialForm extends Component
             $this->url = $this->material->youtube_url;
             $this->originalPublishStatus = $this->material->is_published;
 
-            if ($this->material->file_path && Storage::disk('private')->exists($this->material->file_path)) {
-                $this->currentFileUrl = $this->material->file_path;
+            if ($this->material->file_path) {
+                if (filter_var($this->material->file_path, FILTER_VALIDATE_URL)) {
+                    $this->inputType = 'link';
+                    $this->file_path = $this->material->file_path;
+                } elseif (Storage::disk('private')->exists($this->material->file_path)) {
+                    $this->inputType = 'file';
+                    $this->currentFileUrl = $this->material->file_path;
+                }
             }
         }
     }
@@ -82,10 +95,7 @@ class MaterialForm extends Component
     public function updatedUploadedFile($file)
     {
         $this->validateOnly('uploadedFile');
-
-        // Reset page count
         $this->page_count = null;
-
         if ($file && strtolower($file->getClientOriginalExtension()) === 'pdf') {
             $this->countPdfPages($file);
         }
@@ -94,22 +104,17 @@ class MaterialForm extends Component
     private function countPdfPages($file)
     {
         try {
-            // Method 1: Pure PHP - Manual PDF parsing (TANPA dependencies)
             $content = file_get_contents($file->getRealPath());
             if ($content !== false) {
-                // Cari pattern /Type /Page untuk menghitung halaman
                 $pageCount = preg_match_all('/\/Type\s*\/Page[^s]/i', $content);
                 if ($pageCount > 0) {
                     $this->page_count = $pageCount;
                     return;
                 }
-
                 if (preg_match('/\/Count\s+(\d+)/', $content, $matches)) {
                     $this->page_count = (int) $matches[1];
                     return;
                 }
-
-                // Alternative: cari /N (number of pages)
                 if (preg_match('/\/N\s+(\d+)/', $content, $matches)) {
                     $this->page_count = (int) $matches[1];
                     return;
@@ -120,7 +125,6 @@ class MaterialForm extends Component
         }
 
         try {
-            // Method 2: Menggunakan Spatie PdfToText (jika tersedia)
             if (class_exists('\Spatie\PdfToText\Pdf')) {
                 $pdf = new Pdf();
                 $this->page_count = $pdf->setPdf($file->getRealPath())->getNumberOfPages();
@@ -131,7 +135,6 @@ class MaterialForm extends Component
         }
 
         try {
-            // Method 3: Menggunakan imagick jika tersedia
             if (extension_loaded('imagick')) {
                 $imagick = new \Imagick();
                 $imagick->readImage($file->getRealPath());
@@ -143,10 +146,6 @@ class MaterialForm extends Component
         } catch (\Exception $e) {
             Log::warning('Imagick method failed: ' . $e->getMessage());
         }
-
-        // Jika semua method gagal, biarkan null (tidak error)
-        Log::warning('All PDF page counting methods failed for file: ' . $file->getClientOriginalName());
-        $this->page_count = null; // Tidak menampilkan error ke user
     }
 
     #[Computed]
@@ -183,53 +182,47 @@ class MaterialForm extends Component
                 'page_count' => $this->page_count,
             ];
 
-            // Handle file upload
             if ($this->uploadedFile) {
-                // Hapus file lama jika ada
-                if ($this->material->exists && $this->material->file_path) {
+                if ($this->material->exists && $this->material->file_path && !filter_var($this->material->file_path, FILTER_VALIDATE_URL)) {
                     Storage::disk('private')->delete($this->material->file_path);
                 }
-
                 $subject = Subject::find($this->subject_id);
                 $subjectName = Str::slug($subject?->name ?: 'mapel', '_');
                 $chapterName = Str::slug($this->chapter ?: 'bab', '_');
                 $extension = $this->uploadedFile->getClientOriginalExtension();
                 $fileName = "{$chapterName}_{$subjectName}_" . Str::random(10) . ".{$extension}";
-
                 $dataToSave['file_path'] = $this->uploadedFile->storeAs('materi', $fileName, 'private');
-
-                // Jika masih belum ada page_count dan ini PDF, coba hitung lagi setelah file tersimpan
                 if (!$this->page_count && strtolower($extension) === 'pdf') {
                     $this->countPdfPagesFromStorage($dataToSave['file_path']);
                     $dataToSave['page_count'] = $this->page_count;
                 }
+            } elseif ($this->inputType === 'link') {
+                if ($this->material->exists && $this->material->file_path && !filter_var($this->material->file_path, FILTER_VALIDATE_URL)) {
+                    Storage::disk('private')->delete($this->material->file_path);
+                }
+                $dataToSave['file_path'] = trim($this->file_path) ?: null;
+                $dataToSave['page_count'] = null;
             }
 
-            // Simpan material
             $isNewRecord = !$this->material->exists;
-            $material = Material::updateOrCreate(['id' => $this->material->id], $dataToSave);
-            $material->refresh();
+            $wasPreviouslyPublished = $this->material->exists ? $this->material->is_published : false;
 
-            // === LOGIKA NOTIFIKASI BARU ===
-            $isNowPublished = $this->is_published;
-            $wasPreviouslyPublished = $this->originalPublishStatus;
+            $material = Material::updateOrCreate(['id' => $this->material->id], $dataToSave);
+
+            $isNowPublished = $material->is_published;
             $notificationType = null;
             $message = $isNewRecord ? 'Materi berhasil ditambahkan.' : 'Materi berhasil diperbarui.';
 
             if ($isNowPublished) {
-                // Kasus 1: Materi dipublikasikan untuk PERTAMA KALI (sebelumnya draft atau baru dibuat).
                 if (!$wasPreviouslyPublished) {
                     $notificationType = 'new';
-                    $message = 'Materi berhasil dipublikasikan. Notifikasi materi baru telah dikirim ke siswa.';
-                }
-                // Kasus 2: Materi yang SUDAH PUBLISH diperbarui.
-                elseif (!$isNewRecord && $wasPreviouslyPublished) {
+                    $message .= ' Notifikasi telah dikirim ke siswa.';
+                } elseif ($wasPreviouslyPublished) {
                     $notificationType = 'updated';
-                    $message = 'Materi berhasil diperbarui. Notifikasi pembaruan telah dikirim ke siswa.';
+                    $message .= ' Notifikasi pembaruan telah dikirim ke siswa.';
                 }
             }
 
-            // Kirim notifikasi jika tipe notifikasi sudah ditentukan
             if ($notificationType) {
                 $this->sendNotificationToStudents($material, $notificationType);
             }
@@ -242,16 +235,8 @@ class MaterialForm extends Component
             return $this->redirectRoute('teacher.materials', navigate: true);
 
         } catch (\Exception $e) {
-            Log::error('Error saving material: ' . $e->getMessage(), [
-                'user_id' => Auth::id(),
-                'material_id' => $this->material->id ?? null,
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            session()->flash('flash_message', [
-                'message' => 'Terjadi kesalahan saat menyimpan materi. Silakan coba lagi.',
-                'type' => 'error'
-            ]);
+            Log::error('Error saving material: ' . $e->getMessage(), ['user_id' => Auth::id(), 'material_id' => $this->material->id ?? null, 'trace' => $e->getTraceAsString()]);
+            session()->flash('flash_message', ['message' => 'Terjadi kesalahan saat menyimpan materi. Silakan coba lagi.', 'type' => 'error']);
         }
     }
 
@@ -260,18 +245,11 @@ class MaterialForm extends Component
         try {
             $fullPath = Storage::disk('private')->path($filePath);
             if (file_exists($fullPath)) {
-                // Gunakan method yang sama seperti sebelumnya
-                $tempFile = new \stdClass();
-                $tempFile->path = $fullPath;
-
-                // Method dengan Spatie
                 if (class_exists('\Spatie\PdfToText\Pdf')) {
                     $pdf = new Pdf();
                     $this->page_count = $pdf->setPdf($fullPath)->getNumberOfPages();
                     return;
                 }
-
-                // Method lainnya bisa ditambahkan di sini jika diperlukan
             }
         } catch (\Exception $e) {
             Log::warning('Failed to count pages from storage: ' . $e->getMessage());
@@ -282,37 +260,24 @@ class MaterialForm extends Component
     {
         try {
             if ($class = Classes::find($material->class_id)) {
-                $students = $class->users()
-                    ->whereHas('roles', fn($q) => $q->where('name', 'siswa'))
-                    ->get();
+                $students = $class->users()->whereHas('roles', fn($q) => $q->where('name', 'siswa'))->get();
 
                 if ($students->isNotEmpty()) {
-                    // Kirim tipe notifikasi ke constructor
                     Notification::send($students, new NotificationStudent($material, $notificationType));
-                    Log::info('Notification sent to students', [
-                        'material_id' => $material->id,
-                        'notification_type' => $notificationType,
-                        'class_id' => $material->class_id,
-                        'student_count' => $students->count(),
-                    ]);
 
-                    $waMessage = "🔔 *Notifikasi Materi Baru* 🔔\n\n" .
-                        "Kelas *{$class->class}* telah menerima materi baru:\n" .
-                        "*\"{$material->title}\"*\n" .
-                        "Mata Pelajaran: *{$material->subject->name}*\n" .
-                        "Kurikulum: *{$material->subject->kurikulum}*\n" .
-                        "Deskripsi: {$material->description}\n\n" .
-                        "Silakan cek di web pembelajaran untuk detail lebih lanjut.";
-
-                    $notificationService = new WhatsAppNotificationService();
-                    $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
+                    if ($notificationType === 'new' && $class->whatsapp_group_id) {
+                        $waMessage = "🔔 *Notifikasi Materi Baru* 🔔\n\n" .
+                            "Kelas *{$class->class}* telah menerima materi baru:\n" .
+                            "*\"{$material->title}\"*\n" .
+                            "Mata Pelajaran: *{$material->subject->name}*\n\n" .
+                            "Silakan cek di web pembelajaran untuk detail lebih lanjut.";
+                        $notificationService = new WhatsAppNotificationService();
+                        $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
+                    }
                 }
             }
         } catch (\Exception $e) {
-            Log::error('Failed to send notification: ' . $e->getMessage(), [
-                'material_id' => $material->id,
-                'trace' => $e->getTraceAsString()
-            ]);
+            Log::error('Failed to send notification: ' . $e->getMessage(), ['material_id' => $material->id]);
         }
     }
 

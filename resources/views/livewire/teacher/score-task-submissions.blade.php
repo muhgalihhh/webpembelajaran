@@ -36,10 +36,14 @@
                 @forelse ($this->submissions as $submission)
                     <tr class="hover:bg-gray-100">
                         <td class="px-6 py-4 whitespace-nowrap">{{ $submission->student->name }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                            {{ $submission->created_at->format('d M Y, H:i') }}
+                        <td class="flex items-center px-6 py-4 space-x-2 text-sm text-gray-500 ">
+                            <span>
+                                {{ $submission->created_at->format('d M Y, H:i') }}
+                            </span>
                             @if ($task->due_date_time && $submission->created_at->gt($task->due_date_time))
-                                <span class="ml-2 text-xs text-red-600">(Terlambat)</span>
+                                <span class="p-1 font-bold text-red-600 bg-red-100 rounded-lg">(Terlambat)</span>
+                            @else
+                                <span class="p-1 font-bold text-white bg-green-400 rounded-lg">(Tepat Waktu)</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -57,10 +61,12 @@
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                             <button wire:click="scoreTask({{ $submission->id }})"
                                 class="text-indigo-600 hover:text-indigo-900">
+                                <i class="mr-1 fa fa-solid fa-pen-to-square"></i>
                                 {{ $submission->score ? 'Edit Nilai' : 'Beri Nilai' }}
                             </button>
                             <button wire:click="confirmDelete({{ $submission->id }})"
                                 class="ml-4 text-red-600 hover:text-red-900">
+                                <i class="mr-1 fa fa-solid fa-trash"></i>
                                 Hapus
                             </button>
                         </td>
@@ -85,7 +91,9 @@
                         <p class="text-xs text-gray-500">
                             Mengumpulkan: {{ $submission->created_at->format('d M Y, H:i') }}
                             @if ($task->due_date_time && $submission->created_at->gt($task->due_date_time))
-                                <span class="font-bold text-red-600">(Terlambat)</span>
+                                <span class="p-1 font-bold text-red-600 bg-red-100 rounded-lg">(Terlambat)</span>
+                            @else
+                                <span class="p-1 font-bold text-white bg-green-600 rounded-lg">(Tepat Waktu)</span>
                             @endif
                         </p>
                     </div>

@@ -89,12 +89,17 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                            <button wire:click="view({{ $material->id }})"
-                                class="text-green-600 hover:text-green-900">Lihat</button>
+                            <button wire:click="view({{ $material->id }})" class="text-green-600 hover:text-green-900">
+                                <i class="fa-solid fa-eye"></i>
+                                Lihat</button>
                             <a href="{{ route('teacher.materials.edit', $material) }}" wire:navigate
-                                class="ml-4 text-indigo-600 hover:text-indigo-900">Edit</a>
+                                class="ml-4 text-indigo-600 hover:text-indigo-900">
+                                <i class="fa-solid fa-edit"></i>
+                                Edit</a>
                             <button wire:click="confirmDelete({{ $material->id }})"
-                                class="ml-4 text-red-600 hover:text-red-900">Hapus</button>
+                                class="ml-4 text-red-600 hover:text-red-900">
+                                <i class="fa-solid fa-trash"></i>
+                                Hapus</button>
                         </td>
                     </tr>
                 @empty
@@ -123,13 +128,20 @@
                     <span class="font-semibold">Mapel:</span> {{ $material->subject?->name ?? 'N/A' }} |
                     <span class="font-semibold">Kelas:</span> {{ $material->class?->class ?? 'N/A' }}
                 </div>
-                <div class="flex items-center justify-end mt-4 space-x-4">
+                <div class="flex items-center justify-end mt-4 space-x-1">
                     <button wire:click="view({{ $material->id }})"
-                        class="text-sm font-medium text-green-600 hover:text-green-900">Lihat</button>
+                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-green-700 transition-colors bg-green-100 rounded-md hover:bg-green-200">
+                        <i class="mr-1 fa-solid fa-eye"></i> Lihat
+
+                    </button>
                     <a href="{{ route('teacher.materials.edit', $material) }}" wire:navigate
-                        class="text-sm font-medium text-indigo-600 hover:text-indigo-900">Edit</a>
+                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-700 transition-colors bg-indigo-100 rounded-md hover:bg-indigo-200">
+                        <i class="mr-1 fa-solid fa-edit"></i> Edit
+                    </a>
                     <button wire:click="confirmDelete({{ $material->id }})"
-                        class="text-sm font-medium text-red-600 hover:text-red-900">Hapus</button>
+                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-red-700 transition-colors bg-red-100 rounded-md hover:bg-red-200">
+                        <i class="mr-1 fa-solid fa-trash"></i> Delete
+                    </button>
                 </div>
             </div>
         @empty

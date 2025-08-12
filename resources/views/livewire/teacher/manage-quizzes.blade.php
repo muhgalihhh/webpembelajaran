@@ -86,14 +86,18 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-                            <div class="flex space-x-2">
+                            <div class="flex space-x-1">
                                 <a href="{{ route('teacher.quizzes.questions', $quiz) }}" wire:navigate
-                                    class="inline-flex items-center px-3 py-1 text-xs font-medium text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700">Kelola
+                                    class="flex items-center gap-1 px-3 py-1 text-xs font-medium text-blue-600 transition-colors duration-200 justify center hover:text-blue-400">
+                                    <i class="fa-solid fa-list"></i>
+                                    Kelola
                                     Soal</a>
                                 <button wire:click="edit({{ $quiz->id }})"
-                                    class="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-700 transition-colors bg-indigo-100 rounded-md hover:bg-indigo-200">Edit</button>
+                                    class="flex items-center justify-center gap-1 px-3 py-1 text-xs font-medium text-indigo-700 transition-colors duration-200 hover:text-indigo-500">
+                                    <i class="fa-solid fa-edit"></i> Edit</button>
                                 <button wire:click="confirmDelete({{ $quiz->id }})"
-                                    class="inline-flex items-center px-3 py-1 text-xs font-medium text-red-700 transition-colors bg-red-100 rounded-md hover:bg-red-200">Hapus</button>
+                                    class="flex items-center justify-center gap-1 px-3 py-1 text-xs font-medium text-red-700 transition-colors duration-200 hover:text-red-500">
+                                    <i class="fa-solid fa-trash"></i> Hapus</button>
                             </div>
                         </td>
                     </tr>
@@ -135,12 +139,17 @@
                 </div>
                 <div class="flex flex-wrap justify-end gap-2 mt-4">
                     <a href="{{ route('teacher.quizzes.questions', $quiz) }}" wire:navigate
-                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700">Kelola
-                        Soal</a>
+                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700">
+                        <i class="mr-1 fa-solid fa-list"></i> Kelola Soal
+                    </a>
                     <button wire:click="edit({{ $quiz->id }})"
-                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-700 transition-colors bg-indigo-100 rounded-md hover:bg-indigo-200">Edit</button>
+                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-indigo-700 transition-colors bg-indigo-100 rounded-md hover:bg-indigo-200">
+                        <i class="mr-1 fa-solid fa-edit"></i> Edit
+                    </button>
                     <button wire:click="confirmDelete({{ $quiz->id }})"
-                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-red-700 transition-colors bg-red-100 rounded-md hover:bg-red-200">Hapus</button>
+                        class="inline-flex items-center px-3 py-1 text-xs font-medium text-red-700 transition-colors bg-red-100 rounded-md hover:bg-red-200">
+                        <i class="mr-1 fa-solid fa-trash"></i> Hapus
+                    </button>
                 </div>
             </div>
         @empty
@@ -158,7 +167,8 @@
         <form wire:submit.prevent="save" class="mt-4">
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div class="md:col-span-2">
-                    <x-form.input-group label="Judul Kuis" type="text" wireModel="title" id="title" required />
+                    <x-form.input-group label="Judul Kuis" type="text" wireModel="title" id="title"
+                        required />
                 </div>
                 <x-form.select-group label="Mata Pelajaran" name="subject_id" wireModel="subject_id"
                     :options="$this->subjects" required optionLabel="name" />

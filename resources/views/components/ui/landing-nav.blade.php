@@ -1,17 +1,16 @@
-<header x-data="{ mobileMenuOpen: false, profileDropdownOpen: false }"
-    class="bg-[#4A90E2] text-white shadow-md w-full sticky top-0 z-50">
+<header x-data="{ mobileMenuOpen: false, profileDropdownOpen: false }" class="bg-[#4A90E2] text-white shadow-md w-full sticky top-0 z-50">
 
     <!-- Main Header -->
     <div class="px-4 py-3 sm:px-6">
         <div class="flex items-center justify-between">
             <!-- Logo Section (Left) -->
-            <div class="flex items-center space-x-3 flex-shrink-0">
+            <div class="flex items-center flex-shrink-0 space-x-3">
                 <x-ui.logo-nav />
             </div>
 
             <!-- Center Navigation (Desktop Only) -->
             @auth
-                <div class="hidden lg:flex flex-1 justify-center">
+                <div class="justify-center flex-1 hidden lg:flex">
                     <nav class="flex items-center space-x-1">
                         @role('siswa')
                             <a href="{{ route('student.index') }}" wire:navigate
@@ -75,13 +74,13 @@
             @endauth
 
             <!-- Right Actions (Desktop) -->
-            <div class="hidden lg:flex items-center space-x-3 flex-shrink-0">
+            <div class="items-center flex-shrink-0 hidden space-x-3 lg:flex">
                 @auth
                     @role('siswa')
-                        @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
+                        @livewire('student.notification-dropdown')
                     @endrole
                     @role('guru')
-                        @livewire('teacher.notification-dropdown')
+                        {{-- @livewire('teacher.notification-dropdown') --}}
                     @endrole
                     <x-ui.profile-dropdown />
                 @else
@@ -97,32 +96,37 @@
             </div>
 
             <!-- Mobile Menu Button -->
-            <div class="lg:hidden">
+            <div class="flex space-x-2 lg:hidden">
+                @role('siswa')
+                    @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
+                @endrole
+
                 <button @click="mobileMenuOpen = !mobileMenuOpen"
                     class="p-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                     <span class="sr-only">Buka menu</span>
-                    <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
-                    <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
                     </svg>
                 </button>
             </div>
         </div>
+
+
     </div>
 
     <!-- Mobile Menu -->
-    <div x-show="mobileMenuOpen"
-         x-cloak
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 -translate-y-1"
-         x-transition:enter-end="opacity-100 translate-y-0"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100 translate-y-0"
-         x-transition:leave-end="opacity-0 -translate-y-1"
-         @click.away="mobileMenuOpen = false"
-         class="lg:hidden border-t border-blue-400/30 bg-[#4A90E2]">
+    <div x-show="mobileMenuOpen" x-cloak x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 -translate-y-1" @click.away="mobileMenuOpen = false"
+        class="lg:hidden border-t border-blue-400/30 bg-[#4A90E2]">
 
         <div class="px-4 py-3 space-y-1">
             @auth
@@ -157,8 +161,8 @@
                     </a>
 
                     <!-- Mobile Actions for Students -->
-                    <div class="pt-3 mt-3 border-t border-blue-400/30 space-y-2">
-                        @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
+                    <div class="pt-3 mt-3 space-y-2 border-t border-blue-400/30">
+
                         <div class="pt-2">
                             <x-ui.profile-dropdown />
                         </div>
@@ -184,7 +188,7 @@
                     </a>
 
                     <!-- Mobile Actions for Teachers -->
-                    <div class="pt-3 mt-3 border-t border-blue-400/30 space-y-2">
+                    <div class="pt-3 mt-3 space-y-2 border-t border-blue-400/30">
                         @livewire('teacher.notification-dropdown')
                         <div class="pt-2">
                             <x-ui.profile-dropdown />
@@ -208,11 +212,11 @@
                 <!-- Guest Mobile Menu -->
                 <div class="space-y-2">
                     <a href="{{ route('admin.login') }}" wire:navigate @click="mobileMenuOpen = false"
-                        class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-500 transition-colors">
+                        class="block px-3 py-2 text-base font-medium text-white transition-colors rounded-md hover:bg-blue-500">
                         Admin
                     </a>
                     <a href="{{ route('register') }}" wire:navigate @click="mobileMenuOpen = false"
-                        class="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-500 transition-colors">
+                        class="block px-3 py-2 text-base font-medium text-white transition-colors rounded-md hover:bg-blue-500">
                         Daftar
                     </a>
                 </div>
