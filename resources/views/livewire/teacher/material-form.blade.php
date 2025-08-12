@@ -33,13 +33,13 @@
                         isFocused: false,
                         init() {
                             let trixEditor = this.$refs.trix;
-                    
+
                             // 1. Ambil konten dari Livewire dan masukkan ke Trix Editor
                             trixEditor.editor.loadHTML(this.value);
-                    
+
                             trixEditor.addEventListener('trix-focus', () => this.isFocused = true);
                             trixEditor.addEventListener('trix-blur', () => this.isFocused = false);
-                    
+
                             // 2. Saat konten di Trix berubah, kirim balik ke Livewire
                             trixEditor.addEventListener('trix-change', (e) => {
                                 this.value = e.target.value;

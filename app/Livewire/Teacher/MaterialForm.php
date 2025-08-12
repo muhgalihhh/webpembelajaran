@@ -47,7 +47,7 @@ class MaterialForm extends Component
         'description' => 'required|string',
         'subject_id' => 'required|exists:subjects,id',
         'class_id' => 'required|exists:classes,id',
-        'chapter' => 'nullable|string|max:100',
+        'chapter' => 'required|string|max:100',
         'content' => 'nullable|string',
         'is_published' => 'required|boolean',
         'url' => 'nullable|url',
