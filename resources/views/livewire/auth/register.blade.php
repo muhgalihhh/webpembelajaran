@@ -47,8 +47,8 @@
             <div class="space-y-4">
                 {{-- Baris 1: Nama dan Username --}}
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <x-form.input-group type="text" id="full_name" placeholder="Masukkan Nama Lengkap" wireModel="name"
-                        icon="fa-solid fa-user" required />
+                    <x-form.input-group type="text" id="full_name" placeholder="Masukkan Nama Lengkap"
+                        wireModel="name" icon="fa-solid fa-user" required />
                     <x-form.input-group type="text" id="reg_username" placeholder="Masukkan Username"
                         wireModel="username" icon="fa-solid fa-id-badge" required />
                 </div>
@@ -87,8 +87,8 @@
                     wireModel="phone_number" icon="fa-solid fa-phone" required />
 
                 {{-- Baris 4: Password --}}
-                <x-form.input-group type="password" id="reg_password" placeholder="Masukkan Kata Sandi" wireModel="password"
-                    icon="fa-solid fa-lock" passwordToggle required />
+                <x-form.input-group type="password" id="reg_password" placeholder="Masukkan Kata Sandi"
+                    wireModel="password" icon="fa-solid fa-lock" passwordToggle required />
 
                 {{-- Baris 5: Konfirmasi Password --}}
                 <x-form.input-group type="password" id="reg_password_confirmation" placeholder="Konfirmasi Kata Sandi"
@@ -99,14 +99,8 @@
                     <div wire:key="student-fields" class="relative z-10">
                         {{-- Tambahan margin bottom untuk memberi ruang dropdown --}}
                         <div class="pb-32 mb-4">
-                            <x-form.select-group
-                                label="Pilih Kelas Anda"
-                                name="class_id"
-                                wireModel="class_id"
-                                :options="$this->classes"
-                                wire:model.live='class_id'
-                                optionLabel="class"
-                                required
+                            <x-form.select-group label="Pilih Kelas Anda" name="class_id" wireModel="class_id"
+                                :options="$this->classes" wire:model.live='class_id' optionLabel="class" required
                                 class="dropdown-container" />
                         </div>
                     </div>
@@ -198,7 +192,7 @@
         }
 
         /* Better spacing for form rows */
-        .space-y-4 > * + * {
+        .space-y-4>*+* {
             margin-top: 1rem;
         }
     </style>
