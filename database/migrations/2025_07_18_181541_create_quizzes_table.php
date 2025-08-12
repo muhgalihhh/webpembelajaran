@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->foreignId('class_id')->constrained('classes')->onDelete('cascade'); // Kelas target
             $table->text('description')->nullable();
             $table->enum('category', ['Ulangan Harian', 'Latihan']);
-            $table->integer('total_questions');
+            $table->integer('total_questions')->nullable();
             $table->integer('duration_minutes');
             $table->integer('score_weight')->default(100);
             $table->integer('passing_score')->default(70);

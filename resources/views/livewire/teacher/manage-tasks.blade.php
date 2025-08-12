@@ -158,7 +158,7 @@
                 <x-form.select-group label="Kelas" name="class_id" wireModel="class_id" :options="$this->classes"
                     optionValue="id" optionLabel="class" required />
                 <div class="md:col-span-2">
-                    <x-form.textarea-group label="Deskripsi" name="description" wireModel="description" required />
+                    <x-form.textarea-group label="Deskripsi" placeholder="Deskripsi wajib diisi" name="description" wireModel="description" required />
                 </div>
                 <x-form.input-group label="Tenggat Waktu (Opsional)" type="datetime-local" wireModel="due_time"
                     id="due_time" />
