@@ -3,90 +3,94 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
+use App\Models\QuizAttempt;
+use App\Models\TaskSubmission;
+use Illuminate\Support\Str;
 
 class NotificationTeacher extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
-    protected $student;
     protected $model;
-    protected $type;
 
-    /**
-     * Create a new notification instance.
-     *
-     * @param object $student
-     * @param object $model
-     * @param string $type
-     */
-    public function __construct(object $student, object $model, string $type)
+    public function __construct(object $model)
     {
-        $this->student = $student;
         $this->model = $model;
-        $this->type = $type;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
     public function toDatabase(object $notifiable): array
     {
-        $message = '';
-        $link = '#';
-
-        if ($this->type === 'task_submission') {
-            $message = $this->student->name . ' telah mengumpulkan tugas: ' . $this->model->title;
-            $link = 'teacher.tasks';
-        } elseif ($this->type === 'quiz_completion') {
-            $message = $this->student->name . ' telah menyelesaikan kuis: ' . $this->model->title;
-            $link = 'teacher.quizzes';
-        }
-
-        return [
-            'message' => $message,
-            'link' => $link,
-            'student_name' => $this->student->name,
-        ];
+        return $this->generateNotificationData();
     }
 
-    /**
-     * Get the broadcastable representation of the notification.
-     */
-    public function toBroadcast(object $notifiable): BroadcastMessage
+    protected function generateNotificationData(): array
     {
-        return new BroadcastMessage([
-            'data' => $this->toDatabase($notifiable)
-        ]);
+        $modelName = class_basename($this->model);
+
+        switch ($modelName) {
+            case 'TaskSubmission':
+                $studentName = $this->model->user->name;
+                $taskTitle = Str::limit($this->model->task->title, 40);
+                return [
+                    'type' => 'Tugas Dikumpulkan',
+                    'title' => "Tugas Baru dari {$studentName}",
+                    'message' => "Telah mengumpulkan tugas '{$taskTitle}'.",
+                    'link' => route('teacher.scores.submissions', $this->model->task_id),
+                ];
+
+            case 'QuizAttempt':
+                $studentName = $this->model->user->name;
+                $quizTitle = Str::limit($this->model->quiz->title, 40);
+                return [
+                    'type' => 'Kuis Selesai',
+                    'title' => "Hasil Kuis dari {$studentName}",
+                    'message' => "Telah menyelesaikan kuis '{$quizTitle}'.",
+                    'link' => route('teacher.quizzes')
+                ];
+
+            default:
+                return [
+                    'type' => 'Pemberitahuan Umum',
+                    'title' => 'Aktivitas Baru',
+                    'message' => 'Ada aktivitas baru yang memerlukan perhatian Anda.',
+                    'link' => route('teacher.dashboard'), // Tautan aman sebagai fallback
+                ];
+
+        }
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
-        // Notifikasi dikirim ke channel privat milik guru
-        return [
-            new PrivateChannel('teachers.' . $this->model->teacher_id),
-        ];
+        $teacherId = null;
+        if ($this->model instanceof TaskSubmission) {
+            $teacherId = $this->model->task->user_id;
+        } elseif ($this->model instanceof QuizAttempt) {
+            $teacherId = $this->model->quiz->user_id;
+        }
+
+        // Hindari error jika teacherId null
+        if (!$teacherId)
+            return [];
+
+        return [new PrivateChannel('teacher.' . $teacherId)];
+    }
+
+    public function broadcastType(): string
+    {
+        return 'teacher-notification';
+    }
+
+    public function toBroadcast($notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage($this->toDatabase($notifiable));
     }
 }
