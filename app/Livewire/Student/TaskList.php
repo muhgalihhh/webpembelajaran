@@ -6,8 +6,9 @@ use App\Models\Curriculum;
 use App\Models\Subject;
 use App\Models\Task;
 use App\Models\TaskSubmission;
-use App\Notifications\NotificationTeacher; // <-- 1. Tambahkan use statement ini
+use App\Notifications\NotificationTeacher; // Pastikan ini di-import
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification; // Pastikan ini di-import
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -71,7 +72,7 @@ class TaskList extends Component
         return Task::where('class_id', $student->class_id)
             ->where('status', 'publish')
             ->with(['subject', 'submissions' => fn($q) => $q->where('user_id', $student->id)])
-            ->when($this->subjectFilter, fn($q) => $q->where('subject_id', this->subjectFilter))
+            ->when($this->subjectFilter, fn($q) => $q->where('subject_id', $this->subjectFilter))
             ->whereHas('subject', function ($query) {
                 $query->when($this->kurikulumFilter, function ($q) {
                     $q->where('kurikulum', $this->kurikulumFilter);
@@ -123,13 +124,15 @@ class TaskList extends Component
         $this->dispatch('open-modal', id: 'submission-modal');
     }
 
+
     public function submitTask()
     {
         $this->validate();
 
         $filePath = $this->submissionFile->store('task_submissions', 'public');
 
-        TaskSubmission::create([
+        // 1. Buat record pengumpulan tugas terlebih dahulu
+        $submission = TaskSubmission::create([
             'task_id' => $this->selectedTask->id,
             'user_id' => Auth::id(),
             'file_path' => $filePath,
@@ -138,18 +141,14 @@ class TaskList extends Component
             'status' => 'submitted',
         ]);
 
-        // --- 👇 Blok Kode Notifikasi untuk Guru Dimulai Di Sini 👇 ---
-
-        // 2. Dapatkan data guru dari tugas yang dipilih
-        $teacher = $this->selectedTask->teacher;
-        $student = Auth::user();
+        // 2. Dapatkan data guru dari relasi tugas
+        $teacher = $this->selectedTask->creator; // Pastikan relasi 'creator' ada di model Task
 
         // 3. Kirim notifikasi jika guru ditemukan
         if ($teacher) {
-            $teacher->notify(new NotificationTeacher($student, $this->selectedTask, 'task_submission'));
-        }
 
-        // --- 👆 Blok Kode Notifikasi Selesai 👆 ---
+            Notification::send($teacher, new NotificationTeacher($submission));
+        }
 
         $this->reset(['selectedTask', 'submissionFile', 'submissionNotes']);
         $this->dispatch('close-modal');

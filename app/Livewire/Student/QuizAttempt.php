@@ -6,9 +6,10 @@ use App\Models\Question;
 use App\Models\Quiz;
 use App\Models\QuizAttempt as Attempt;
 use App\Models\StudentAnswer;
-use App\Notifications\NotificationTeacher; // <-- 1. Tambahkan use statement ini
+use App\Notifications\NotificationTeacher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification; // <-- Pastikan ini di-import
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -44,9 +45,7 @@ class QuizAttempt extends Component
                 ]);
                 return $this->redirect(route('student.quizzes.result', $anyAttempt->id), navigate: true);
             }
-
             $this->resumeQuiz($anyAttempt);
-
         } else {
             $this->startNewQuiz();
         }
@@ -97,13 +96,8 @@ class QuizAttempt extends Component
 
         if (!is_array($questionOrder) || empty($questionOrder)) {
             $allQuestionsQuery = $this->quiz->questions();
-            if ($this->quiz->shuffle_questions) {
-                $questionsCollection = $allQuestionsQuery->inRandomOrder()->get();
-            } else {
-                $questionsCollection = $allQuestionsQuery->get();
-            }
+            $questionsCollection = $this->quiz->shuffle_questions ? $allQuestionsQuery->inRandomOrder()->get() : $allQuestionsQuery->get();
             $questionOrder = $questionsCollection->pluck('id')->toArray();
-
             $this->attempt->update(['question_order' => $questionOrder]);
             $this->attempt->refresh();
             $questionOrder = $this->attempt->question_order;
@@ -111,9 +105,7 @@ class QuizAttempt extends Component
 
         $this->questions = Question::whereIn('id', $questionOrder)
             ->get()
-            ->sortBy(function ($question) use ($questionOrder) {
-                return array_search($question->id, $questionOrder);
-            });
+            ->sortBy(fn($question) => array_search($question->id, $questionOrder));
 
         $startTime = $this->attempt->start_time;
         $deadline = $startTime->copy()->addMinutes($this->quiz->duration_minutes);
@@ -158,14 +150,8 @@ class QuizAttempt extends Component
 
         if ($originalAnswerKey) {
             StudentAnswer::updateOrCreate(
-                [
-                    'quiz_attempt_id' => $this->attempt->id,
-                    'question_id' => $question->id,
-                ],
-                [
-                    'chosen_option' => $originalAnswerKey,
-                    'is_correct' => ($originalAnswerKey === $question->correct_option),
-                ]
+                ['quiz_attempt_id' => $this->attempt->id, 'question_id' => $question->id],
+                ['chosen_option' => $originalAnswerKey, 'is_correct' => ($originalAnswerKey === $question->correct_option)]
             );
         }
     }
@@ -177,14 +163,14 @@ class QuizAttempt extends Component
             return $this->shuffledOptionMaps[$questionId];
         }
 
-        $options = [
+        $options = array_filter([
             'A' => $question->option_a,
             'B' => $question->option_b,
             'C' => $question->option_c,
             'D' => $question->option_d,
             'E' => $question->option_e,
-        ];
-        $options = array_filter($options, fn($val) => !is_null($val) && $val !== '');
+        ], fn($val) => !is_null($val) && $val !== '');
+
         $originalKeys = array_keys($options);
         $seed = crc32($this->attempt->id . '-' . $questionId);
         mt_srand($seed);
@@ -197,19 +183,16 @@ class QuizAttempt extends Component
     #[Computed]
     public function currentQuestionOptions(): array
     {
-        if (!isset($this->questions[$this->currentQuestionIndex])) {
+        if (!isset($this->questions[$this->currentQuestionIndex]))
             return [];
-        }
-
         $currentQuestion = $this->questions[$this->currentQuestionIndex];
-        $options = [
+        $options = array_filter([
             'A' => $currentQuestion->option_a,
             'B' => $currentQuestion->option_b,
             'C' => $currentQuestion->option_c,
             'D' => $currentQuestion->option_d,
             'E' => $currentQuestion->option_e,
-        ];
-        $options = array_filter($options, fn($val) => !is_null($val) && $val !== '');
+        ], fn($val) => !is_null($val) && $val !== '');
 
         if ($this->quiz->shuffle_options) {
             $map = $this->getShuffledOptionMap($currentQuestion);
@@ -219,7 +202,6 @@ class QuizAttempt extends Component
             }
             return $shuffledDisplayOptions;
         }
-
         return $options;
     }
 
@@ -255,13 +237,8 @@ class QuizAttempt extends Component
 
         $allQuestionsInQuiz = $this->questions;
         $maxPossibleWeight = $allQuestionsInQuiz->sum('weight');
-        $correctlyAnsweredQuestionIds = $this->attempt
-            ->studentAnswers()
-            ->where('is_correct', true)
-            ->pluck('question_id');
-        $totalEarnedWeight = $allQuestionsInQuiz
-            ->whereIn('id', $correctlyAnsweredQuestionIds)
-            ->sum('weight');
+        $correctlyAnsweredQuestionIds = $this->attempt->studentAnswers()->where('is_correct', true)->pluck('question_id');
+        $totalEarnedWeight = $allQuestionsInQuiz->whereIn('id', $correctlyAnsweredQuestionIds)->sum('weight');
         $score = ($maxPossibleWeight > 0) ? ($totalEarnedWeight / $maxPossibleWeight) * 100 : 0;
         $correctAnswersCount = $correctlyAnsweredQuestionIds->count();
         $totalQuestionsCount = $allQuestionsInQuiz->count();
@@ -277,14 +254,12 @@ class QuizAttempt extends Component
             'is_completed' => true,
         ]);
 
+
         $teacher = $this->quiz->creator;
-        $student = Auth::user();
-
         if ($teacher) {
-            $teacher->notify(new NotificationTeacher($student, $this->quiz, 'quiz_completion'));
+            // Kirim notifikasi dengan objek $this->attempt (QuizAttempt)
+            Notification::send($teacher, new NotificationTeacher($this->attempt));
         }
-
-
         $this->showFinishConfirmation = false;
         return $this->redirect(route('student.quizzes.result', $this->attempt->id), navigate: true);
     }

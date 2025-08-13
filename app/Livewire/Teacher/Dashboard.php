@@ -146,6 +146,7 @@ class Dashboard extends Component
             // Reset ID dan tampilkan pesan sukses
             $this->itemToDeleteId = null;
             session()->flash('flash-message', ['message' => 'Data berhasil dihapus.', 'type' => 'success']);
+            $this->dispatch('flash-message', ['message' => 'Data berhasil dihapus.', 'type' => 'success']);
         }
 
         // Tutup modal setelah selesai
