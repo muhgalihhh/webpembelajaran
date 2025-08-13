@@ -24,18 +24,20 @@ class ManageClasses extends Component
     public ?Classes $editingClass = null;
     public ?int $itemToDeleteId = null;
 
-    // Properti Form
+    // --- PERBAIKAN DI SINI ---
+    // Properti Form dibuat nullable agar tidak error saat mengedit data kosong
     #[Rule('required|string|max:255', as: 'Nama Kelas')]
     public string $class = '';
-    #[Rule('nullable|string|max:255', as: 'ID Grup WhatsApp')]
-    public string $whatsapp_group_id = '';
 
-    // Properti BARU untuk link grup
+    #[Rule('nullable|string|max:255', as: 'ID Grup WhatsApp')]
+    public ?string $whatsapp_group_id = null;
+
     #[Rule('nullable|url', as: 'Link Grup WhatsApp')]
-    public string $whatsapp_group_link = '';
+    public ?string $whatsapp_group_link = null;
 
     #[Rule('nullable|string', as: 'Deskripsi')]
-    public string $description = '';
+    public ?string $description = null;
+    // --- AKHIR PERBAIKAN ---
 
     // Lifecycle hooks
     public function updatingSearch()
@@ -70,8 +72,9 @@ class ManageClasses extends Component
         $this->isEditing = true;
         $this->editingClass = $class;
         $this->class = $class->class;
+        // Sekarang aman untuk mengisi dengan nilai null dari database
         $this->whatsapp_group_id = $class->whatsapp_group_id;
-        $this->whatsapp_group_link = $class->whatsapp_group_link ?? '';
+        $this->whatsapp_group_link = $class->whatsapp_group_link;
         $this->description = $class->description;
         $this->dispatch('open-modal', id: 'class-form-modal');
     }
@@ -101,10 +104,17 @@ class ManageClasses extends Component
     public function delete()
     {
         if ($this->itemToDeleteId) {
-            Classes::find($this->itemToDeleteId)->delete();
-            $this->dispatch('flash-message', message: 'Kelas berhasil dihapus.', type: 'success');
+            $class = Classes::find($this->itemToDeleteId);
+            // Tambahkan pengecekan relasi sebelum menghapus
+            if ($class && $class->users()->count() > 0) {
+                $this->dispatch('flash-message', message: 'Kelas tidak dapat dihapus karena masih memiliki siswa.', type: 'error');
+            } else {
+                $class->delete();
+                $this->dispatch('flash-message', message: 'Kelas berhasil dihapus.', type: 'success');
+            }
         }
-        $this->dispatch('close-modal');
+        $this->dispatch('close-confirm-modal');
+        $this->itemToDeleteId = null;
     }
 
     public function render()
