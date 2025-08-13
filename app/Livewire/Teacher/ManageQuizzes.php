@@ -43,6 +43,7 @@ class ManageQuizzes extends Component
     // Properti Form Modal
     public bool $isEditing = false;
     public ?Quiz $editingQuiz = null;
+
     public $title, $description, $subject_id, $class_id, $category, $duration_minutes, $passing_score, $status, $start_time, $end_time;
     public bool $shuffle_questions = false, $shuffle_options = false;
 
@@ -58,8 +59,8 @@ class ManageQuizzes extends Component
             'passing_score' => 'required|integer|min:0|max:100',
             'shuffle_questions' => 'required|boolean',
             'shuffle_options' => 'required|boolean',
-            'start_time' => 'nullable|date',
-            'end_time' => 'nullable|date|after_or_equal:start_time',
+            'start_time' => 'nullable|date_format:Y-m-d\TH:i',
+            'end_time' => 'nullable|date_format:Y-m-d\TH:i|after_or_equal:start_time',
             'status' => 'required|in:draft,publish',
         ];
     }
@@ -149,6 +150,25 @@ class ManageQuizzes extends Component
 
         $validatedData['user_id'] = Auth::id();
 
+
+        if (!empty($this->start_time)) {
+            $startCarbon = \Carbon\Carbon::parse($this->start_time);
+            $validatedData['start_date'] = $startCarbon->toDateString();
+            $validatedData['start_time'] = $startCarbon->toTimeString();
+        } else {
+            $validatedData['start_date'] = null;
+            $validatedData['start_time'] = null;
+        }
+
+        if (!empty($this->end_time)) {
+            $endCarbon = \Carbon\Carbon::parse($this->end_time);
+            $validatedData['end_date'] = $endCarbon->toDateString();
+            $validatedData['end_time'] = $endCarbon->toTimeString();
+        } else {
+            $validatedData['end_date'] = null;
+            $validatedData['end_time'] = null;
+        }
+
         $isNewRecord = !$this->isEditing;
         $wasPreviouslyPublished = $this->isEditing ? $this->editingQuiz->status === 'publish' : false;
 
@@ -157,10 +177,12 @@ class ManageQuizzes extends Component
             $quiz = $this->editingQuiz->fresh();
             $message = 'Kuis berhasil diperbarui.';
         } else {
+
+            $validatedData['total_questions'] = 0;
+
             $quiz = Quiz::create($validatedData);
             $message = 'Kuis berhasil ditambahkan.';
         }
-
 
         $isNowPublished = $quiz->status === 'publish';
         $notificationType = null;
@@ -191,21 +213,17 @@ class ManageQuizzes extends Component
             $students = $class?->users()->whereHas('roles', fn($q) => $q->where('name', 'siswa'))->get();
 
             if ($students && $students->isNotEmpty()) {
-
                 Notification::send($students, new NotificationStudent($quiz, $actionType));
 
-                // (Opsional) Kirim WA hanya untuk kuis baru
                 if ($actionType === 'new' && $class->whatsapp_group_id) {
                     $subjectName = $quiz->subject->name;
                     $className = $class->class;
-
                     $waMessage = "🔔 *Notifikasi Kuis Baru* 🔔\n\n" .
                         "Sudah siap untuk kuis baru, kelas *{$className}*?\n\n" .
                         "Ada kuis mata pelajaran *{$subjectName}* dengan judul:\n" .
                         "*\"{$quiz->title}\"*\n\n" .
                         "Durasi pengerjaan: *{$quiz->duration_minutes} menit*.\n\n" .
                         "Ayo, persiapkan dirimu dan kerjakan di web pembelajaran! Good luck! ✨";
-
                     $notificationService = new WhatsAppNotificationService();
                     $notificationService->sendMessage($class->whatsapp_group_id, $waMessage);
                 }

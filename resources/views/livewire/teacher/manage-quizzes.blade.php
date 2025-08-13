@@ -67,10 +67,12 @@
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                             <div class="text-gray-500">
                                 @if ($quiz->start_time)
-                                    <div class="text-xs">Mulai: {{ $quiz->start_date->format('d M Y, H:i') }}</div>
+                                    <div class="text-xs">Mulai: {{ $quiz->start_date->format('d M Y') }},
+                                        {{ $quiz->start_time->format('H:i') }}</div>
                                 @endif
                                 @if ($quiz->end_time)
-                                    <div class="text-xs">Selesai: {{ $quiz->end_date->format('d M Y, H:i') }}</div>
+                                    <div class="text-xs">Selesai: {{ $quiz->end_date->format('d M Y') }},
+                                        {{ $quiz->end_time->format('H:i') }}</div>
                                 @endif
                                 <div class="font-semibold text-blue-600">{{ $quiz->total_questions ?? '0' }} soal</div>
                             </div>
