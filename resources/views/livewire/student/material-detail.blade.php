@@ -7,10 +7,20 @@
         x-transition:leave-end="opacity-0" @click="sidebarOpen = false" class="fixed inset-0 z-30 bg-black/60 lg:hidden">
     </div>
 
+    {{-- Tombol toggle untuk mobile (hanya muncul saat sidebar tersembunyi di mobile) --}}
+    <button x-show="!sidebarOpen" x-transition @click="sidebarOpen = true"
+        class="fixed z-50 p-3 text-white bg-blue-600 rounded-full shadow-lg lg:hidden top-24 left-4 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+        <i class="w-5 h-5 fas fa-bars"></i>
+    </button>
 
     <aside
         class="fixed left-0 z-40 flex-shrink-0 h-full pt-4 overflow-y-auto text-black transition-all duration-300 ease-in-out bg-white rounded-lg shadow-lg top-20"
-        :class="sidebarOpen ? 'w-72' : 'w-20'">
+        x-show="sidebarOpen || window.innerWidth >= 1024"
+        x-transition:enter="transition-transform ease-in-out duration-300 lg:transition-none"
+        x-transition:enter-start="-translate-x-full lg:translate-x-0" x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition-transform ease-in-out duration-300 lg:transition-none"
+        x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full lg:translate-x-0"
+        :class="sidebarOpen ? 'w-72' : 'w-72 lg:w-20'">
 
         <div class="flex items-center p-4 border-b border-gray-200"
             :class="sidebarOpen ? 'justify-between' : 'justify-center'">
@@ -31,9 +41,8 @@
                     :class="{
                         'bg-blue-600 font-bold text-white shadow-lg': {{ $item->id === $material->id ? 'true' : 'false' }},
                         'text-gray-700 hover:bg-gray-100': {{ $item->id !== $material->id ? 'true' : 'false' }},
-                        'justify-center': !sidebarOpen
+                        'justify-center': !sidebarOpen && window.innerWidth >= 1024
                     }">
-
 
                     @php
                         $icon = 'fa-file-alt'; // Default
@@ -141,7 +150,6 @@
                                 </div>
                             </div>
                         @endif
-                        {{-- --- AKHIR PERUBAHAN --- --}}
 
                         @if ($material->youtube_url)
                             <div
