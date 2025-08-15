@@ -47,7 +47,7 @@ class WhatsAppNotificationService
             return true;
 
         } catch (\Exception $e) {
-            // Catat error jika terjadi masalah koneksi atau lainnya
+
             Log::error('Exception when sending WhatsApp message: ' . $e->getMessage());
             return false;
         }
