@@ -126,7 +126,8 @@
                     class="flex flex-col items-center justify-center w-full h-48 px-4 py-6 tracking-wide text-blue-500 uppercase transition-all duration-150 ease-linear bg-gray-100 border-2 border-dashed rounded-lg cursor-pointer hover:bg-blue-100 hover:border-blue-500">
                     <i class="mb-2 text-4xl fa-solid fa-cloud-arrow-up"></i>
                     <span class="mt-2 text-base leading-normal">Klik untuk Upload File Tugas</span>
-                    <p class="text-xs text-gray-500">Pilih Salah Satu File/Gambar/Doc/File Lain</p>
+                    <p class="text-xs text-gray-500">Pilih Salah Satu File/Gambar/Doc/File Lain </p>
+                    <p class="text-xs text-red-400">Maksimal Ukuran File 10 MB </p>
                     <input type="file" id="submissionFile" wire:model="submissionFile" class="hidden">
                 </label>
 

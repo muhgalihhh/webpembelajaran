@@ -38,7 +38,7 @@ class NotificationTeacher extends Notification implements ShouldBroadcast
 
         switch ($modelName) {
             case 'TaskSubmission':
-                $studentName = $this->model->user->name;
+                $studentName = $this->model->student->name;
                 $taskTitle = Str::limit($this->model->task->title, 40);
                 return [
                     'type' => 'Tugas Dikumpulkan',

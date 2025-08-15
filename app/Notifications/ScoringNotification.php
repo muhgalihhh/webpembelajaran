@@ -27,7 +27,7 @@ class ScoringNotification extends Notification implements ShouldBroadcast
 
         $type = 'Tugas Anda telah dinilai!';
         $title = '' . $this->model->task->title . ' telah dinilai oleh ' . $this->model->task->creator->name;
-        $link = route('tasks');
+        $link = route('teacher.tasks');
 
         return [
             'type' => $type,
