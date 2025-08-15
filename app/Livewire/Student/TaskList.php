@@ -110,10 +110,11 @@ class TaskList extends Component
     #[Computed]
     public function subjects()
     {
-        return Subject::query()
-            ->when($this->kurikulumFilter, fn($q) => $q->where('kurikulum', $this->kurikulumFilter))
-            ->orderBy('name')
-            ->get();
+        return Subject::orderBy('kurikulum', 'asc')->orderBy('name')->get()
+            ->mapWithKeys(function ($subject) {
+                $displayText = "{$subject->name} - ({$subject->kurikulum})";
+                return [$subject->id => $displayText];
+            });
     }
 
     public function openSubmissionModal(Task $task)
