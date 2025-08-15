@@ -9,7 +9,7 @@ use App\Models\StudentAnswer;
 use App\Notifications\NotificationTeacher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Notification; // <-- Pastikan ini di-import
+use Illuminate\Support\Facades\Notification;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -64,9 +64,11 @@ class QuizAttempt extends Component
         $allQuestions = $this->quiz->questions();
 
         if ($this->quiz->shuffle_questions) {
-            $this->questions = $allQuestions->inRandomOrder()->get();
+            // Ditambahkan ->values() untuk memastikan indeks array berurutan
+            $this->questions = $allQuestions->inRandomOrder()->get()->values();
         } else {
-            $this->questions = $allQuestions->get();
+            // Ditambahkan ->values() untuk memastikan indeks array berurutan
+            $this->questions = $allQuestions->get()->values();
         }
 
         if ($this->questions->isEmpty())
@@ -103,9 +105,11 @@ class QuizAttempt extends Component
             $questionOrder = $this->attempt->question_order;
         }
 
+        // Ditambahkan ->values() untuk memastikan indeks array berurutan setelah di-sortBy
         $this->questions = Question::whereIn('id', $questionOrder)
             ->get()
-            ->sortBy(fn($question) => array_search($question->id, $questionOrder));
+            ->sortBy(fn($question) => array_search($question->id, $questionOrder))
+            ->values();
 
         $startTime = $this->attempt->start_time;
         $deadline = $startTime->copy()->addMinutes($this->quiz->duration_minutes);
@@ -140,6 +144,12 @@ class QuizAttempt extends Component
 
     public function updatedUserAnswers($value, $key)
     {
+        // Pastikan $key adalah integer dan ada di dalam koleksi questions
+        $key = (int) $key;
+        if (!isset($this->questions[$key])) {
+            return;
+        }
+
         $question = $this->questions[$key];
         $originalAnswerKey = $value;
 
@@ -257,7 +267,6 @@ class QuizAttempt extends Component
 
         $teacher = $this->quiz->creator;
         if ($teacher) {
-            // Kirim notifikasi dengan objek $this->attempt (QuizAttempt)
             Notification::send($teacher, new NotificationTeacher($this->attempt));
         }
         $this->showFinishConfirmation = false;

@@ -16,7 +16,7 @@ class QuizResult extends Component
 
     public function mount(QuizAttempt $attempt)
     {
-        // Pastikan siswa hanya bisa melihat hasil miliknya
+
         if ($attempt->user_id !== auth()->id()) {
             abort(403);
         }

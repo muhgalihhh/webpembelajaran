@@ -67,14 +67,14 @@
                         <td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
                             <div class="text-gray-500">
                                 @if ($quiz->start_time)
-                                    <div class="text-xs">Mulai: {{ $quiz->start_date->format('d M Y') }},
-                                        {{ $quiz->start_time->format('H:i') }}</div>
+                                    <div class="text-xs">Mulai:
+                                        {{ \Carbon\Carbon::parse($quiz->start_time)->format('d M Y, H:i') }}</div>
                                 @endif
                                 @if ($quiz->end_time)
-                                    <div class="text-xs">Selesai: {{ $quiz->end_date->format('d M Y') }},
-                                        {{ $quiz->end_time->format('H:i') }}</div>
+                                    <div class="text-xs">Selesai:
+                                        {{ \Carbon\Carbon::parse($quiz->end_time)->format('d M Y, H:i') }}</div>
                                 @endif
-                                <div class="font-semibold text-blue-600">{{ $quiz->total_questions ?? '0' }} soal</div>
+                                <div class="font-semibold text-blue-600">{{ $quiz->questions_count ?? '0' }} soal</div>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -137,7 +137,7 @@
                     <div><span class="font-semibold">Durasi:</span> {{ $quiz->duration_minutes }} menit</div>
                     <div><span class="font-semibold">KKM:</span> {{ $quiz->passing_score }}</div>
                     <div class="col-span-2"><span class="font-semibold">Soal:</span>
-                        {{ $quiz->total_questions ?? '0' }}</div>
+                        {{ $quiz->questions_count ?? '0' }}</div>
                 </div>
                 <div class="flex flex-wrap justify-end gap-2 mt-4">
                     <a href="{{ route('teacher.quizzes.questions', $quiz) }}" wire:navigate
@@ -176,7 +176,12 @@
                     :options="$this->subjects" required optionLabel="name" />
                 <x-form.select-group label="Kelas" name="class_id" wireModel="class_id" :options="$this->classes"
                     optionLabel="class" required />
-                <x-form.select-group label="Kategori" name="category" wireModel="category" :options="['Ulangan Harian' => 'Ulangan Harian', 'Latihan' => 'Latihan']"
+                <x-form.select-group label="Kategori" name="category" wireModel="category" :options="[
+                    'Ulangan Harian' => 'Ulangan Harian',
+                    'Latihan' => 'Latihan',
+                    'UTS' => 'UTS',
+                    'UAS' => 'UAS',
+                ]"
                     required />
                 <x-form.select-group label="Status" name="status" wireModel="status" :options="['draft' => 'Draft', 'publish' => 'Published']" required />
                 <div class="md:col-span-2">
@@ -192,12 +197,12 @@
                     id="end_time" />
                 <div class="flex items-center mt-2 space-x-6 md:col-span-2">
                     <div class="flex items-center">
-                        <input id="shuffle_questions" type="checkbox" wireModel="shuffle_questions"
+                        <input id="shuffle_questions" type="checkbox" wire:model.live="shuffle_questions"
                             class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                         <label for="shuffle_questions" class="block ml-2 text-sm text-gray-900">Acak Soal</label>
                     </div>
                     <div class="flex items-center">
-                        <input id="shuffle_options" type="checkbox" wireModel="shuffle_options"
+                        <input id="shuffle_options" type="checkbox" wire:model.live="shuffle_options"
                             class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                         <label for="shuffle_options" class="block ml-2 text-sm text-gray-900">Acak Opsi</label>
                     </div>

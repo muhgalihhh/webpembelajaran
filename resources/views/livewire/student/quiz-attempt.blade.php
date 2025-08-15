@@ -58,10 +58,10 @@
                             </div>
                             <div class="max-w-lg mx-auto mt-8 space-y-4">
                                 @foreach ($this->currentQuestionOptions as $optionKey => $optionText)
-                                    <label
+                                    <label wire:key="question-{{ $currentQuestionIndex }}-option-{{ $optionKey }}"
                                         class="flex items-center w-full p-3.5 text-left transition-all duration-200 bg-white border-2 border-gray-400 rounded-lg cursor-pointer sm:p-4 hover:bg-gray-100 hover:border-gray-600"
                                         :class="{ '!bg-blue-200 !border-blue-500 ring-2 ring-blue-300': @js($userAnswers[$currentQuestionIndex] ?? null) === '{{ $optionKey }}' }">
-                                        <input type="radio" wire:model="userAnswers.{{ $currentQuestionIndex }}"
+                                        <input type="radio" wire:model.live="userAnswers.{{ $currentQuestionIndex }}"
                                             value="{{ $optionKey }}" class="hidden">
                                         <span class="mr-4 font-bold">{{ $optionKey }}.</span>
                                         <span class="text-base sm:text-lg">{{ $optionText }}</span>
