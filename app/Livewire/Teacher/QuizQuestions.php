@@ -10,6 +10,9 @@ use Livewire\Attributes\Rule;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use App\Imports\QuestionsImport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 #[Layout('layouts.teacher')]
 #[Title('Manajemen Soal Kuis')]
@@ -60,6 +63,30 @@ class QuizQuestions extends Component
     {
         $this->quiz = $quiz;
     }
+
+public $importFile; // untuk upload file
+
+public function openImportModal()
+{
+    $this->reset('importFile');
+    $this->resetValidation();
+    $this->dispatch('open-modal', id: 'import-question-modal');
+}
+
+public function importQuestions()
+{
+    $this->validate([
+        'importFile' => 'required|mimes:xlsx,xls,csv|max:2048',
+    ]);
+
+    Excel::import(new QuestionsImport($this->quiz->id), $this->importFile);
+
+    $this->updateQuestionCount();
+
+    $this->dispatch('flash-message', message: 'Soal berhasil diimport!', type: 'success');
+    $this->dispatch('close-modal', id: 'import-question-modal');
+}
+
 
     private function updateQuestionCount()
     {

@@ -14,11 +14,17 @@
     </x-slot:pageHeader>
 
     <div class="p-4 mb-6 bg-white rounded-lg shadow-md">
-        <div class="flex justify-end">
-            <x-form.button wireClick="create" icon="fa-solid fa-plus">
-                Tambah Soal
-            </x-form.button>
-        </div>
+        <div class="flex justify-end space-x-2">
+  <x-form.button wire:click="create" icon="fa-solid fa-plus">
+    Tambah Soal
+</x-form.button>
+
+<x-form.button wire:click="openImportModal" icon="fa-solid fa-file-import" variant="secondary">
+    Import Soal
+</x-form.button>
+
+</div>
+
     </div>
 
     {{-- Daftar Soal --}}
@@ -73,6 +79,33 @@
             </div>
         @endforelse
     </div>
+{{-- Modal Import Soal --}}
+<x-ui.modal id="import-question-modal">
+    <h2 class="text-2xl font-bold">Import Soal</h2>
+    <form wire:submit.prevent="importQuestions" class="mt-4">
+        <div>
+            <label for="importFile" class="block text-sm font-medium text-gray-700">
+                Pilih File (Excel/CSV)
+            </label>
+            <input type="file" id="importFile" wire:model="importFile"
+                class="w-full mt-1 file-input file-input-bordered" accept=".xlsx,.xls,.csv">
+
+            <div wire:loading wire:target="importFile" class="mt-1 text-xs text-gray-500">Uploading...</div>
+            @error('importFile')
+                <span class="text-sm text-red-500">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="flex justify-end pt-4 mt-4 space-x-4 border-t">
+            <x-form.button type="button" wireClick="closeModal" icon="fa-solid fa-times" variant="secondary">
+                Batal
+            </x-form.button>
+            <x-form.button type="submit" icon="fa-solid fa-upload" variant="primary">
+                Import
+            </x-form.button>
+        </div>
+    </form>
+</x-ui.modal>
 
     {{-- Modal Form Soal --}}
     <x-ui.modal id="question-form-modal">
