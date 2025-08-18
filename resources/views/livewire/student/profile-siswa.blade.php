@@ -4,9 +4,7 @@
 
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
 
-            {{-- Kolom Kiri: Form Edit Profil & Ganti Password --}}
             <div class="lg:col-span-2">
-                {{-- Card Edit Profil --}}
                 <div class="p-6 bg-white rounded-lg shadow-md">
                     <h3 class="pb-4 text-xl font-bold text-gray-800 border-b">Informasi Profil</h3>
                     <form wire:submit.prevent="updateUser" class="mt-6 space-y-4">
@@ -27,7 +25,7 @@
                                             clip-rule="evenodd" />
                                     </svg>
                                 @endif
-                                <input type="file" wireModel="photo" id="photo" class="hidden">
+                                <input type="file" wire:model="photo" id="photo" class="hidden">
                                 <label for="photo"
                                     class="cursor-pointer rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                                     Ganti Foto
@@ -51,7 +49,6 @@
                     </form>
                 </div>
 
-                {{-- Card Ganti Password --}}
                 <div class="p-6 mt-8 bg-white rounded-lg shadow-md">
                     <h3 class="pb-4 text-xl font-bold text-gray-800 border-b">Ubah Password</h3>
                     <form wire:submit.prevent="changePassword" class="mt-6 space-y-4">
@@ -68,7 +65,6 @@
                 </div>
             </div>
 
-            {{-- Kolom Kanan: Info Kelas --}}
             <div class="lg:col-span-1">
                 <div class="p-6 text-center bg-white rounded-lg shadow-md">
                     <h3 class="pb-4 mb-6 text-xl font-bold text-gray-800 border-b">Informasi Kelas</h3>

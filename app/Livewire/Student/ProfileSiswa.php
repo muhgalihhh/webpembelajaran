@@ -17,13 +17,11 @@ class ProfileSiswa extends Component
 {
     use WithFileUploads;
 
-    // Properti untuk form info profil
     public string $name = '';
     public string $username = '';
     public string $email = '';
     public $photo;
 
-    // Properti untuk form ubah password
     public string $password = '';
     public string $password_confirmation = '';
 
@@ -38,7 +36,6 @@ class ProfileSiswa extends Component
     #[Computed]
     public function classInfo()
     {
-        // Mengambil info kelas dari user yang sedang login
         return Auth::user()->class;
     }
 
@@ -49,7 +46,7 @@ class ProfileSiswa extends Component
         $validated = $this->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username,' . $user->id,
-            'photo' => 'nullable|image|max:1024', // 1MB Max
+            'photo' => 'nullable|image|max:1024',
         ]);
 
         if ($this->photo) {
@@ -57,13 +54,13 @@ class ProfileSiswa extends Component
                 Storage::disk('public')->delete($user->profile_picture);
             }
             $validated['profile_picture'] = $this->photo->store('profile-photos', 'public');
-        } else {
-            // Jika tidak ada foto baru yang diunggah, hapus 'photo' dari data yang divalidasi
-            unset($validated['photo']);
         }
+
+        unset($validated['photo']);
 
         $user->update($validated);
 
+        $this->dispatch('profile-updated');
         $this->dispatch('flash-message', message: 'Profil berhasil diperbarui.', type: 'success');
     }
 

@@ -23,7 +23,7 @@ class User extends Authenticatable
         'email',
         'gender',
         'password',
-        'class_id', // Nullable, jadi bisa diisi jika siswa
+        'class_id', // Nullable, jadi bisa diisi jika siswa, dan null jika guru
         'status',
         'profile_picture',
         'phone_number',
