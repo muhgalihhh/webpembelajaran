@@ -24,9 +24,6 @@ class Register extends Component
     public string $password_confirmation = '';
     public $class_id = ''; // Kolom baru untuk siswa
 
-    // Properti untuk mengontrol tab
-    public string $activeTab = 'siswa';
-
     /**
      * Mengambil daftar kelas untuk dropdown.
      */
@@ -37,31 +34,9 @@ class Register extends Component
     }
 
     /**
-     * Mengganti tab aktif.
-     */
-    public function setTab(string $tab)
-    {
-        $this->activeTab = $tab;
-        $this->resetValidation(); // Hapus error validasi saat ganti tab
-    }
-
-    /**
      * Metode utama yang dipanggil saat form disubmit.
      */
     public function register()
-    {
-        // Memanggil metode registrasi yang sesuai berdasarkan tab aktif
-        if ($this->activeTab === 'siswa') {
-            $this->registerStudent();
-        } else {
-            $this->registerTeacher();
-        }
-    }
-
-    /**
-     * Logika untuk mendaftarkan siswa.
-     */
-    private function registerStudent()
     {
         $validated = $this->validate([
             'name' => 'required|string|max:255',
@@ -85,44 +60,13 @@ class Register extends Component
 
         $user->assignRole('siswa');
         auth()->login($user);
+
         $this->dispatch('message', [
             'type' => 'success',
             'message' => 'Registrasi berhasil! Selamat datang, ' . $user->name,
         ]);
+
         return $this->redirect(route('student.dashboard'), navigate: true);
-    }
-
-    /**
-     * Logika untuk mendaftarkan guru.
-     */
-    private function registerTeacher()
-    {
-        $validated = $this->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'phone_number' => 'required|string|max:15|unique:users,phone_number',
-            'gender' => 'required|string|in:L,P', // Validasi gender
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'username' => $validated['username'],
-            'email' => $validated['email'],
-            'phone_number' => $validated['phone_number'],
-            'gender' => $validated['gender'],
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        $user->assignRole('guru');
-        auth()->login($user);
-        $this->dispatch('message', [
-            'type' => 'success',
-            'message' => 'Registrasi berhasil! Selamat Datang!' . $user->name,
-        ]);
-
-        return $this->redirect(route('teacher.dashboard'), navigate: true);
     }
 
     public function render()
