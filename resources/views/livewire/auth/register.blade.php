@@ -18,27 +18,7 @@
         </div>
     @endif
 
-    {{-- Navigasi Tab --}}
-    <div class="mb-4 border-b border-gray-200">
-        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" role="tablist">
-            <li class="mr-2" role="presentation">
-                <button
-                    class="inline-block px-4 py-3 border-b-2 rounded-t-lg transition-colors duration-300 {{ $activeTab === 'siswa' ? 'border-blue-600 text-blue-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300' }}"
-                    wire:click="setTab('siswa')" type="button" role="tab">
-                    Daftar sebagai Siswa
-                </button>
-            </li>
-            <li class="mr-2" role="presentation">
-                <button
-                    class="inline-block px-4 py-3 border-b-2 rounded-t-lg transition-colors duration-300 {{ $activeTab === 'guru' ? 'border-blue-600 text-blue-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300' }}"
-                    wire:click="setTab('guru')" type="button" role="tab">
-                    Daftar sebagai Guru
-                </button>
-            </li>
-        </ul>
-    </div>
-
-    {{-- Form Registrasi --}}
+    {{-- Form Registrasi hanya untuk Siswa --}}
     <div class="relative overflow-visible">
         <form wire:submit.prevent="register">
             @csrf
@@ -59,7 +39,6 @@
 
                     <x-form.select-group label="Pilih Jenis Kelamin" name="gender" wireModel="gender" :options="[['id' => 'L', 'class' => 'Laki-laki'], ['id' => 'P', 'class' => 'Perempuan']]"
                         optionLabel="class" optionValue="id" required />
-
                 </div>
 
                 {{-- Baris 3: Nomor Telepon --}}
@@ -75,15 +54,13 @@
                     wireModel="password_confirmation" icon="fa-solid fa-key" passwordToggle required />
 
                 {{-- Kolom khusus untuk Siswa --}}
-                @if ($activeTab === 'siswa')
-                    <div wire:key="student-fields" class="relative z-10">
-                        <div class="pb-32 mb-4">
-                            <x-form.select-group label="Pilih Kelas Anda" name="class_id" wireModel="class_id"
-                                :options="$this->classes" wire:model.live='class_id' optionLabel="class" required
-                                class="dropdown-container" />
-                        </div>
+                <div wire:key="student-fields" class="relative z-10">
+                    <div class="pb-32 mb-4">
+                        <x-form.select-group label="Pilih Kelas Anda" name="class_id" wireModel="class_id"
+                            :options="$this->classes" wire:model.live='class_id' optionLabel="class" required
+                            class="dropdown-container" />
                     </div>
-                @endif
+                </div>
             </div>
 
             {{-- Tombol Submit --}}
@@ -91,7 +68,7 @@
                 <x-form.button type="submit" class="w-full bg-[#4A90E2] hover:bg-blue-700 text-lg"
                     wire:loading.attr="disabled" wire:target="register">
                     <span wire:loading.remove wire:target="register">
-                        Buat Akun {{ $activeTab === 'siswa' ? 'Siswa' : 'Guru' }}
+                        Buat Akun Siswa
                     </span>
                     <span wire:loading wire:target="register">
                         <i class="mr-2 fa-solid fa-spinner fa-spin"></i>Mendaftar...
@@ -164,12 +141,9 @@
             font-size: 16px;
         }
 
-        <<<<<<< HEAD
-
         /* Better spacing for form rows */
         .space-y-4>*+* {
-            =======.space-y-4>*+* {
-                >>>>>>>origin/rifqi margin-top: 1rem;
-            }
+            margin-top: 1rem;
+        }
     </style>
 </x-ui.auth-card>
