@@ -1,22 +1,24 @@
 <div class="min-h-screen px-4 py-10 bg-blue-100"
-    style="background-image: url('/images/transparent bg.png'); background-size: 30rem; background-position: center;"
+    style="background-image: url('/images/transparent bg.png'); background-size: 20rem; background-position: center; background-repeat: no-repeat;"
     x-data="{ isLoaded: false }" x-init="setTimeout(() => { isLoaded = true }, 50)">
+
     <x-ui.student.container title="Daftar Materi" :subject="$subject">
         <div class="pt-6 sm:pt-8">
             @include('livewire.student.partials._tabs', ['activeTab' => $activeTab])
         </div>
 
-        <div class="p-6 rounded-lg bg-blue-50 min-h-96">
+        {{-- Padding disesuaikan, lebih kecil di mobile (p-4) dan lebih besar di desktop (sm:p-6) --}}
+        <div class="p-4 rounded-lg sm:p-6 bg-blue-50 min-h-96">
             @if ($activeTab === 'text')
                 <div>
-                    <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
                         @forelse ($textMaterials as $material)
                             <x-ui.student.materials.card :material="$material" context="text"
                                 wire:key="text-{{ $material->id }}" />
                         @empty
                             <p class="py-12 text-center text-gray-600 col-span-full">Belum ada materi teks/PDF untuk
-                                mata
-                                pelajaran ini.</p>
+                                mata pelajaran ini.</p>
                         @endforelse
                     </div>
 
@@ -27,9 +29,11 @@
                     @endif
                 </div>
             @endif
+
             @if ($activeTab === 'video')
                 <div>
-                    <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
                         @forelse ($videoMaterials as $material)
                             <x-ui.student.materials.card :material="$material" context="video"
                                 wire:key="video-{{ $material->id }}" />
@@ -47,11 +51,13 @@
             @endif
         </div>
 
-        {{-- 4. Materi Terakhir Diakses --}}
+        {{-- Materi Terakhir Diakses --}}
         @if ($lastAccessed->isNotEmpty())
-            <div class="p-6 mt-8 bg-white rounded-lg" wire:poll.5s>
+            {{-- Padding juga disesuaikan untuk bagian ini --}}
+            <div class="p-4 mt-8 bg-white rounded-lg sm:p-6" wire:poll.5s>
                 <h2 class="mb-6 text-xl font-bold text-gray-900">Materi Terakhir Diakses</h2>
-                <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+                {{-- Grid dimulai dari 1 kolom di mobile --}}
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
                     @foreach ($lastAccessed->take(5) as $material)
                         <x-ui.student.materials.last-accessed-card :material="$material" />
                     @endforeach

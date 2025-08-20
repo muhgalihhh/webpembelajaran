@@ -20,7 +20,7 @@
             <p class="font-medium text-gray-500 truncate">Rata-rata Skor</p>
             <p class="mt-1 text-3xl font-semibold text-gray-900">{{ round($this->stats['averageScore']) }}</p>
         </div>
-        {{-- Perbaikan typo: 'classa' menjadi 'class' --}}
+
         <div class="flex items-center justify-center p-4 overflow-hidden bg-white rounded-lg shadow">
             <a href="{{ route('teacher.rankings') }}" wire:navigate
                 class="flex items-center justify-center w-full h-full px-4 py-2 font-bold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600">

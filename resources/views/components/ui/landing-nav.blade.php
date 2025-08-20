@@ -8,7 +8,6 @@
                 <x-ui.logo-nav />
             </div>
 
-            <!-- Center Navigation (Desktop Only) -->
             @auth
                 <div class="justify-center flex-1 hidden lg:flex">
                     <nav class="flex items-center space-x-1">
@@ -80,7 +79,7 @@
                         @livewire('student.notification-dropdown')
                     @endrole
                     @role('guru')
-                        {{-- @livewire('teacher.notification-dropdown') --}}
+                        @livewire('teacher.notification-dropdown')
                     @endrole
                     <x-ui.profile-dropdown />
                 @else
@@ -97,9 +96,17 @@
 
             <!-- Mobile Menu Button -->
             <div class="flex space-x-2 lg:hidden">
-                @role('siswa')
-                    @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
-                @endrole
+                @auth
+                    @role('guru')
+                        @livewire('teacher.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
+                        <x-ui.profile-dropdown />
+                    @endrole
+
+                    @role('siswa')
+                        @livewire('student.notification-dropdown', ['unreadCount' => auth()->user()->unreadNotifications->count()])
+                        <x-ui.profile-dropdown />
+                    @endrole
+                @endauth
 
                 <button @click="mobileMenuOpen = !mobileMenuOpen"
                     class="p-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
@@ -117,8 +124,6 @@
                 </button>
             </div>
         </div>
-
-
     </div>
 
     <!-- Mobile Menu -->
@@ -186,14 +191,6 @@
                         class="block px-3 py-2 rounded-md text-base font-medium transition-colors {{ request()->routeIs('teacher.about-us*') ? 'bg-white text-[#4A90E2]' : 'text-white hover:bg-blue-500' }}">
                         About Us
                     </a>
-
-                    <!-- Mobile Actions for Teachers -->
-                    <div class="pt-3 mt-3 space-y-2 border-t border-blue-400/30">
-                        @livewire('teacher.notification-dropdown')
-                        <div class="pt-2">
-                            <x-ui.profile-dropdown />
-                        </div>
-                    </div>
                 @endrole
 
                 @role('admin')

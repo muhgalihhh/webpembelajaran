@@ -1,6 +1,6 @@
 @props([
     'title' => 'Judul Default',
-    'icon' => 'fa-solid fa-box-open', // Ikon default
+    'icon' => 'fa-solid fa-box-open',
     'link' => '#',
     'linkText' => 'Lihat Detail',
     'headerColor' => 'bg-blue-500',
@@ -22,16 +22,16 @@
     <div class="{{ $bodyColor }} p-6 sm:p-8 flex justify-center items-center relative">
         {{-- Elemen dekoratif di belakang ikon --}}
         <div
-            class="absolute text-3xl text-black -translate-x-12 -translate-y-6 opacity-10 sm:-translate-x-16 sm:-translate-y-8 rotate-12">
+            class="absolute text-2xl text-black -translate-x-10 -translate-y-6 opacity-10 sm:text-3xl sm:-translate-x-16 sm:-translate-y-8 rotate-12">
             <i class="fa-solid fa-ellipsis"></i>
         </div>
         <div
-            class="absolute text-3xl text-black translate-x-12 translate-y-6 opacity-10 sm:translate-x-16 sm:translate-y-8 -rotate-12">
+            class="absolute text-2xl text-black translate-x-10 translate-y-6 opacity-10 sm:text-3xl sm:translate-x-16 sm:translate-y-8 -rotate-12">
             <i class="fa-solid fa-ellipsis"></i>
         </div>
 
         {{-- Ikon Utama --}}
-        <i class="{{ $icon }} text-6xl sm:text-8xl text-gray-800 opacity-75 z-10"></i>
+        <i class="{{ $icon }} text-5xl sm:text-7xl text-gray-800 opacity-75 z-10"></i>
     </div>
 
     {{-- Footer/Tombol Kartu --}}

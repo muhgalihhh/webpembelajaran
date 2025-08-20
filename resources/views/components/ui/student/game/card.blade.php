@@ -57,6 +57,7 @@
     </div>
 
     <div class="flex flex-col items-center justify-center flex-grow p-4">
+
         <p class="text-xl font-black text-center {{ $color['text'] }} md:text-2xl">
             {{ strtoupper($game->subject->name ?? 'N/A') }}
         </p>

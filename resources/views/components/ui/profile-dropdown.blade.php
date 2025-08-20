@@ -1,7 +1,7 @@
 <div x-data="{ profileDropdownOpen: false }" @click.away="profileDropdownOpen = false" class="relative z-50">
     {{-- Tombol Profil (Sesuai gaya asli Anda) --}}
     <button @click="profileDropdownOpen = !profileDropdownOpen"
-        class="flex items-center p-2 text-lg font-semibold text-white transition-all duration-200 rounded-lg bg-blue-950 md:px-3 md:py-2 md:space-x-2 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300">
+        class="flex items-center p-3 text-lg font-semibold text-white transition-all duration-200 rounded-lg bg-blue-950 md:px-3 md:py-2 md:space-x-2 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300">
 
         {{-- Ikon Profil --}}
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -31,9 +31,6 @@
 
         {{-- Bagian Header Dropdown --}}
         <div class="px-4 py-3 border-b border-gray-100">
-
-
-
             <div class="flex items-center space-x-3">
                 <div class="flex-shrink-0">
                     <img class="object-cover w-10 h-10 rounded-full"

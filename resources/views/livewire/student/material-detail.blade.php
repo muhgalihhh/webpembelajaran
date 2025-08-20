@@ -78,13 +78,31 @@
         <div class="container w-full p-4 mx-auto my-8">
             <div class="overflow-hidden bg-white border shadow-xl rounded-2xl">
                 {{-- Header Materi --}}
-                <div class="px-8 py-6 text-white bg-blue-400 border-b border-black">
-                    <h1 class="mb-3 text-4xl font-bold leading-tight">{{ $material->title }}</h1>
-                    <div class="flex flex-wrap items-center gap-4 text-blue-100">
-                        <div class="flex items-center gap-2">
-                            <i class="text-blue-200 fas fa-book"></i>
-                            <span class="font-medium">{{ $material->subject->name }}</span>
+                <div class="px-4 py-6 text-white bg-blue-400 border-b border-black sm:px-8">
+
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+                        {{-- Konten Kiri: Judul dan Info --}}
+                        <div>
+
+                            <h1 class="mb-3 text-3xl font-bold leading-tight sm:text-4xl">{{ $material->title }}</h1>
+                            <div class="flex flex-wrap items-center gap-4 text-blue-100">
+                                <div class="flex items-center gap-2">
+                                    <i class="text-blue-200 fas fa-book"></i>
+                                    <span class="font-medium">{{ $material->subject->name }}</span>
+                                </div>
+                            </div>
                         </div>
+
+
+                        <div class="w-full sm:w-auto">
+                            <a href="{{ route('student.materials.index', $material->subject->id) }}" wire:navigate
+                                class="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-blue-600 bg-white rounded-lg shadow sm:w-auto hover:bg-blue-50">
+                                <i class="mr-2 fas fa-arrow-left"></i>
+                                Kembali ke Daftar Materi
+                            </a>
+                        </div>
+
                     </div>
                 </div>
 
@@ -115,7 +133,8 @@
                                 <div class="flex items-center gap-4 mb-3">
                                     <div
                                         class="p-3 transition-colors rounded-full group-hover:bg-opacity-80 {{ $isLink ? 'bg-green-500' : 'bg-blue-500' }}">
-                                        <i class="text-xl text-white fas {{ $isLink ? 'fa-link' : 'fa-file-pdf' }}"></i>
+                                        <i
+                                            class="text-xl text-white fas {{ $isLink ? 'fa-link' : 'fa-file-pdf' }}"></i>
                                     </div>
                                     <div>
                                         <h4 class="font-semibold text-gray-800">

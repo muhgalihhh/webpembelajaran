@@ -6,7 +6,7 @@
 
         {{-- Area Filter BARU --}}
 
-        <div class="mb-8 ">
+        <div class="w-1/3 mb-8">
             <x-form.select-group label="Filter Berdasarkan Kurikulum" name="kurikulumFilter" wireModel="kurikulumFilter"
                 :options="$this->kurikulumOptions" placeholder="Semua Kurikulum" />
         </div>
@@ -15,7 +15,7 @@
             @forelse ($this->quizzes as $quiz)
                 <x-ui.student.quiz.card :quiz="$quiz" />
             @empty
-                {{-- Tampilan Jika Tidak Ada Kuis --}}
+
                 <div class="p-12 text-center bg-white rounded-lg shadow-md xl:col-span-3">
                     <div class="flex flex-col items-center text-gray-500">
                         <i class="mb-4 text-5xl fa-solid fa-box-open"></i>
