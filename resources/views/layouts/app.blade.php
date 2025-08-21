@@ -26,8 +26,6 @@
             <span class="text-gray-700">Loading...</span>
         </div>
     </div>
-
-    <!-- Main Content -->
     <div x-show="pageLoaded" x-transition:enter="transition ease-out duration-700"
         x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
         {{ $slot }}

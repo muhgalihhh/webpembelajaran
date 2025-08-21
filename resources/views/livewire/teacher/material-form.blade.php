@@ -140,10 +140,16 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end pt-8 mt-8 border-t">
-                    <a href="{{ route('teacher.materials') }}" wire:navigate class="mr-3 btn">Batal</a>
-                    <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
-                        <span wire:loading.remove wire:target="save">Simpan Materi</span>
+                <div class="flex justify-end pt-8 mt-8 text-white border-t">
+                    <a href="{{ route('teacher.materials') }}" wire:navigate
+                        class="px-3 py-2 mr-3 text-gray-800 bg-gray-200 rounded-lg btn hover:bg-gray-300">
+                        <i class="fas fa-times"></i> Batal
+                    </a>
+                    <button type="submit" class="px-3 py-2 bg-blue-600 rounded-lg btn btn-primary hover:bg-blue-700"
+                        wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="save">
+                            <i class="mr-2 fas fa-save"></i>
+                            Simpan Materi</span>
                         <span wire:loading wire:target="save">Menyimpan...</span>
                     </button>
                 </div>

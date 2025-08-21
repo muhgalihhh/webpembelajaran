@@ -107,7 +107,8 @@
                     <a href="{{ route('login') }}"
                         class="bg-[#4A90E2] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105"
                         wire:navigate>
-                        Mulai Belajar
+                        <i class="mr-2 fas fa-sign-in-alt"></i>
+                        Masuk Sekarang
                     </a>
                 </div>
 

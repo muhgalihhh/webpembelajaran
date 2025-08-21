@@ -92,7 +92,7 @@
                                 {{-- (Konten tabel tidak berubah) --}}
                                 @if ($activityType === 'quiz')
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        {{ $result->user->name ?? 'Siswa tidak ditemukan' }}</td>
+                                        <a {{ $result->user->name ?? 'Siswa tidak ditemukan' }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $result->user->class->class ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">

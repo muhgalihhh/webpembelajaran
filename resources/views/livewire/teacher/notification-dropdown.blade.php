@@ -16,17 +16,22 @@
         </template>
     </button>
 
-    {{-- Menu Dropdown Notifikasi --}}
+    {{-- Menu Dropdown Notifikasi (dengan perbaikan mobile positioning) --}}
     <div x-show="notificationOpen" x-cloak x-transition
-        class="absolute right-0 z-50 flex flex-col mt-2 bg-white border border-gray-200 rounded-lg shadow-xl w-80 sm:w-96 top-full">
+        class="fixed sm:absolute z-50 flex flex-col mt-2 bg-white border border-gray-200 rounded-lg shadow-xl top-16 sm:top-full right-4 sm:right-0 w-[calc(100vw-2rem)] max-w-sm sm:w-96"
+        style="max-height: calc(100vh - 5rem);">
 
         <div class="px-4 py-3 border-b">
             <div class="flex items-center justify-between">
                 <h3 class="font-bold text-gray-800">Notifikasi</h3>
                 @if ($this->unreadCount > 0)
                     <button wire:click="markAllAsRead"
-                        class="text-xs font-semibold text-indigo-600 hover:underline focus:outline-none">
+                        class="hidden text-xs font-semibold text-indigo-600 hover:underline focus:outline-none sm:block">
                         Tandai semua dibaca
+                    </button>
+                    <button wire:click="markAllAsRead"
+                        class="p-1 text-xs font-semibold text-indigo-600 bg-indigo-100 rounded-full hover:underline focus:outline-none sm:hidden">
+                        <i class="fas fa-check"></i>
                     </button>
                 @endif
             </div>
@@ -34,24 +39,27 @@
 
         <div class="flex p-1 bg-gray-100 border-b">
             <button wire:click.prevent="setFilter('all')"
-                class="flex items-center justify-center w-full gap-2 px-2 py-1 text-xs rounded-md focus:outline-none {{ $filter === 'all' ? 'font-bold bg-white shadow text-indigo-600' : 'text-gray-600 hover:bg-gray-200' }}">
-                Semua
+                class="flex items-center justify-center w-full gap-1 px-2 py-1 text-xs rounded-md focus:outline-none {{ $filter === 'all' ? 'font-bold bg-white shadow text-indigo-600' : 'text-gray-600 hover:bg-gray-200' }}">
+                <span class="hidden sm:inline">Semua</span>
+                <span class="sm:hidden">All</span>
                 @if ($this->unreadCount > 0)
                     <span
                         class="flex items-center justify-center w-4 h-4 text-white bg-gray-400 rounded-full text-[10px]">{{ $this->unreadCount }}</span>
                 @endif
             </button>
             <button wire:click.prevent="setFilter('task')"
-                class="flex items-center justify-center w-full gap-2 px-2 py-1 text-xs rounded-md focus:outline-none {{ $filter === 'task' ? 'font-bold bg-white shadow text-indigo-600' : 'text-gray-600 hover:bg-gray-200' }}">
-                Tugas
+                class="flex items-center justify-center w-full gap-1 px-2 py-1 text-xs rounded-md focus:outline-none {{ $filter === 'task' ? 'font-bold bg-white shadow text-indigo-600' : 'text-gray-600 hover:bg-gray-200' }}">
+                <span class="hidden sm:inline">Tugas</span>
+                <span class="sm:hidden">Task</span>
                 @if ($this->unreadTaskCount > 0)
                     <span
                         class="flex items-center justify-center w-4 h-4 text-white bg-sky-500 rounded-full text-[10px]">{{ $this->unreadTaskCount }}</span>
                 @endif
             </button>
             <button wire:click.prevent="setFilter('quiz')"
-                class="flex items-center justify-center w-full gap-2 px-2 py-1 text-xs rounded-md focus:outline-none {{ $filter === 'quiz' ? 'font-bold bg-white shadow text-indigo-600' : 'text-gray-600 hover:bg-gray-200' }}">
-                Kuis
+                class="flex items-center justify-center w-full gap-1 px-2 py-1 text-xs rounded-md focus:outline-none {{ $filter === 'quiz' ? 'font-bold bg-white shadow text-indigo-600' : 'text-gray-600 hover:bg-gray-200' }}">
+                <span class="hidden sm:inline">Kuis</span>
+                <span class="sm:hidden">Quiz</span>
                 @if ($this->unreadQuizCount > 0)
                     <span
                         class="flex items-center justify-center w-4 h-4 text-white bg-amber-500 rounded-full text-[10px]">{{ $this->unreadQuizCount }}</span>
@@ -59,7 +67,8 @@
             </button>
         </div>
 
-        <div class="flex-grow overflow-y-auto max-h-80" wire:key="notification-list-{{ $filter }}">
+        <div class="flex-grow overflow-y-auto" style="max-height: calc(100vh - 12rem);"
+            wire:key="notification-list-{{ $filter }}">
             @forelse ($this->notifications as $notification)
                 @php
                     $data = $notification->data;
@@ -76,15 +85,17 @@
                 @endphp
                 <a href="#" wire:click.prevent="markAsReadAndRedirect('{{ $notification->id }}')"
                     class="flex items-start px-4 py-3 transition-colors duration-200 border-b border-gray-100 last:border-b-0 hover:bg-gray-100 @if (is_null($notification->read_at)) bg-indigo-50 @endif">
-                    <div class="flex-shrink-0 mr-4">
+                    <div class="flex-shrink-0 mr-3">
                         <div
-                            class="flex items-center justify-center w-10 h-10 text-white rounded-full {{ $iconColor }}">
-                            <i class="fas {{ $icon }}"></i>
+                            class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 text-white rounded-full {{ $iconColor }}">
+                            <i class="text-sm fas {{ $icon }} sm:text-base"></i>
                         </div>
                     </div>
-                    <div class="flex-grow">
-                        <p class="text-sm font-semibold text-gray-800">{{ $data['title'] ?? 'Notifikasi' }}</p>
-                        <p class="text-xs text-gray-600">{{ $data['message'] ?? 'Ada aktivitas baru dari siswa.' }}</p>
+                    <div class="flex-grow min-w-0">
+                        <p class="text-sm font-semibold text-gray-800 truncate sm:text-base">
+                            {{ $data['title'] ?? 'Notifikasi' }}</p>
+                        <p class="text-xs text-gray-600 line-clamp-2 sm:text-sm">
+                            {{ $data['message'] ?? 'Ada aktivitas baru dari siswa.' }}</p>
                         <p class="mt-1 text-xs text-gray-400">{{ $notification->created_at->diffForHumans() }}</p>
                     </div>
                     @if (is_null($notification->read_at))
@@ -95,7 +106,7 @@
                 </a>
             @empty
                 <div class="px-4 py-8 text-center">
-                    <i class="mb-2 text-4xl text-gray-300 fas fa-check-circle"></i>
+                    <i class="mb-2 text-3xl text-gray-300 fas fa-check-circle sm:text-4xl"></i>
                     <p class="text-sm text-gray-500">Tidak ada notifikasi untuk filter ini.</p>
                 </div>
             @endforelse

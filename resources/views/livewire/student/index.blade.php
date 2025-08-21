@@ -17,10 +17,11 @@
                     "Belajar hari ini adalah investasi untuk masa depan yang lebih cerah. Jadilah yang terbaik versi
                     dirimu!"
                 </p>
-                <a href="{{ route('student.dashboard') }}"
+                <a href="{{ route('student.subjects') }}"
                     class="bg-[#4A90E2] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-blue-600 transition-colors duration-200"
                     wire:navigate>
-                    Masuk Sekarang
+                    <i class="mr-2 fas fa-book-open"></i>
+                    Mulai Belajar
                 </a>
             </div>
 

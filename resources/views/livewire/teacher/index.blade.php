@@ -8,20 +8,21 @@
             class="relative z-10 flex flex-col items-center justify-center w-full max-w-6xl lg:flex-row lg:items-center">
             <div class="flex flex-col items-center text-center lg:items-start lg:text-left lg:w-1/2 lg:pr-8">
                 <h1 class="text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
-HALO {{ Auth::user()->gender == 'L' ? 'PAK' : 'BU' }} {{ Auth::user()->name }}
+                    HALO {{ Auth::user()->gender == 'L' ? 'PAK' : 'BU' }} {{ Auth::user()->name }}
                 </h1>
                 <h1 class="mb-4 text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
-                    SELAMAT DATANG DI MEDIA PEMBELAJARAN DIGITAL SEKOLAH DASAR || KELAS VI
+                    SELAMAT DATANG DI MEDIA PEMBELAJARAN DIGITAL SEKOLAH DASAR
                 </h1>
                 <p class="max-w-xl mb-8 text-base italic text-gray-600 sm:text-lg">
                     "Belajar hari ini adalah investasi untuk masa depan yang lebih cerah. Jadilah yang terbaik versi
                     dirimu!"
                 </p>
                 {{-- Tombol Masuk Sekarang --}}
-                <a href="{{ route('login') }}"
+                <a href="{{ route('teacher.dashboard') }}"
                     class="bg-[#4A90E2] text-white px-8 py-3 rounded-xl text-lg font-semibold shadow-lg hover:bg-blue-600 transition-colors duration-200"
                     wire:navigate>
-                    Masuk Sekarang
+                    <i class="mr-2 fas fa-tachometer-alt"></i>
+                    Masuk ke Dashboard
                 </a>
             </div>
 

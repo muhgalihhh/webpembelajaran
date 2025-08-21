@@ -67,7 +67,6 @@ class NotificationTeacher extends Notification implements ShouldBroadcast
 
         }
     }
-
     public function broadcastOn(): array
     {
         $teacherId = null;

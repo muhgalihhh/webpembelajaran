@@ -8,7 +8,7 @@
                     ANDA SEBAGAI : {{ Auth::user()->name }}
                 </h3>
                 <h1 class="mb-4 text-2xl font-bold leading-tight text-gray-900 sm:text-3xl lg:text-4xl xl:text-5xl">
-                    SELAMAT DATANG DI MEDIA PEMBELAJARAN DIGITAL SEKOLAH DASAR || KELAS VI
+                    SELAMAT DATANG DI MEDIA PEMBELAJARAN DIGITAL SEKOLAH DASAR
                 </h1>
                 <p class="max-w-xl mb-8 text-base italic text-gray-600 sm:text-lg">
                     "Belajar hari ini adalah investasi untuk masa depan yang lebih cerah. Jadilah yang terbaik versi
