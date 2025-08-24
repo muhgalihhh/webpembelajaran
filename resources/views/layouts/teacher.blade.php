@@ -6,12 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Dashboard Guru' }}</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
         integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+
     <style>
         /* Reset dan base styling */
         * {
@@ -58,23 +61,31 @@
             scroll-behavior: smooth;
         }
 
-        /* Footer tetap di posisi absolute bottom */
-        .fixed-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 10;
-        }
-
-        /* Main content dengan padding bottom untuk footer */
+        /* Mobile-first: footer tidak fixed di mobile */
         .main-with-footer {
-            padding-bottom: 60px;
-            /* Sesuaikan dengan tinggi footer */
+            padding-bottom: 0;
+            /* mobile: footer statis di dalam main */
         }
 
-        /* Keyboard detection */
-        @media screen and (max-height: 500px) {
+        /* Footer fixed khusus md+ (tablet/desktop) */
+        @media (min-width: 768px) {
+            .fixed-footer {
+                position: absolute;
+                /* menempel di bawah container konten */
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 10;
+            }
+
+            .main-with-footer {
+                padding-bottom: 60px;
+                /* sesuaikan dgn tinggi footer fixed */
+            }
+        }
+
+        /* Sembunyikan footer fixed saat keyboard terbuka (khusus md+) */
+        @media (min-width: 768px) and (max-height: 500px) {
             .keyboard-open .fixed-footer {
                 display: none;
             }
@@ -94,30 +105,24 @@
         init() {
             // Deteksi keyboard
             const initialHeight = window.innerHeight;
-    
             const detectKeyboard = () => {
                 const currentHeight = window.innerHeight;
                 const heightDifference = initialHeight - currentHeight;
-    
                 // Jika tinggi berkurang lebih dari 150px, keyboard terbuka
                 this.keyboardOpen = heightDifference > 150;
-    
                 if (this.keyboardOpen) {
                     document.body.classList.add('keyboard-open');
                 } else {
                     document.body.classList.remove('keyboard-open');
                 }
             };
-    
             window.addEventListener('resize', detectKeyboard);
-    
             // Visual viewport API jika tersedia
             if (window.visualViewport) {
                 window.visualViewport.addEventListener('resize', detectKeyboard);
             }
         }
     }" @keydown.escape.window="mobileSidebarOpen = false" class="flex flex-col app-container">
-
         <!-- Navbar -->
         <div class="flex-shrink-0">
             <x-ui.teacher.navbar />
@@ -140,12 +145,16 @@
                     <div class="p-4 sm:p-6">
                         {{ $slot }}
                     </div>
+
+                    <!-- Mobile footer (statis, berada di bawah halaman) -->
+                    <footer class="block md:hidden p-4 text-sm font-bold text-center text-white bg-[#4A90E2]">
+                        © 2025 MEDPEM-DIGITAL™ BY RAHMAT ALFAJRI
+                    </footer>
                 </main>
 
-                <!-- Fixed Footer -->
-                <footer class="fixed-footer p-4 text-sm font-bold text-center text-white bg-[#4A90E2]"
-                    x-show="!keyboardOpen || window.innerWidth >= 768"
-                    x-transition:enter="transition ease-out duration-200"
+                <!-- Fixed Footer (hanya md+ / tablet & desktop) -->
+                <footer class="fixed-footer hidden md:block p-4 text-sm font-bold text-center text-white bg-[#4A90E2]"
+                    x-show="!keyboardOpen" x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 transform translate-y-full"
                     x-transition:enter-end="opacity-100 transform translate-y-0">
                     © 2025 MEDPEM-DIGITAL™ BY RAHMAT ALFAJRI
@@ -156,6 +165,7 @@
 
     <x-ui.flash-message />
     <x-ui.logout-confirmation />
+
     <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
     @livewireScripts
 </body>
