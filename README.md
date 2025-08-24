@@ -1,61 +1,71 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Excel Preview & PDF Converter
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi GUI untuk preview file Excel dan konversi ke PDF menggunakan pywin32.
 
-## About Laravel
+## Fitur
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Preview Excel**: Melihat isi file Excel dalam format tabel
+- **Pemilihan Sheet**: Beralih antar sheet dalam workbook
+- **Pemilihan Cell Range**: Menentukan range cell yang akan dikonversi
+- **Pengaturan Halaman**: Mengatur ukuran kertas (A4, A3, Letter, Legal) dan orientasi (Portrait/Landscape)
+- **Konversi ke PDF**: Mengkonversi Excel ke PDF dengan pengaturan yang telah ditentukan
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Instalasi
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. Pastikan Python 3.7+ sudah terinstall
+2. Install dependensi:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Pastikan Microsoft Excel terinstall di sistem
 
-## Learning Laravel
+## Penggunaan
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Jalankan aplikasi:
+   ```bash
+   python excel_preview_converter.py
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+2. **Load File Excel**:
+   - Klik "Browse" untuk memilih file Excel (.xlsx atau .xls)
+   - Klik "Load File" untuk membuka file
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. **Pilih Sheet**:
+   - Gunakan dropdown "Sheet" untuk memilih sheet yang aktif
 
-## Laravel Sponsors
+4. **Atur Cell Range**:
+   - Masukkan range cell (contoh: A1:Z50) di field "Cell Range"
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+5. **Pengaturan Halaman**:
+   - Pilih ukuran kertas: A4, A3, Letter, atau Legal
+   - Pilih orientasi: Portrait atau Landscape
 
-### Premium Partners
+6. **Preview**:
+   - Klik "Preview" untuk melihat tampilan data Excel
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+7. **Konversi ke PDF**:
+   - Klik "Convert to PDF" untuk mengkonversi
+   - Pilih lokasi penyimpanan file PDF
 
-## Contributing
+## Struktur Kode
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- `ExcelPreviewConverter`: Class utama aplikasi
+- `create_widgets()`: Membuat interface GUI
+- `load_excel_file()`: Membuka file Excel menggunakan pywin32
+- `preview_excel()`: Menampilkan preview data Excel
+- `convert_to_pdf()`: Mengkonversi Excel ke PDF
+- `display_preview()`: Menampilkan data dalam canvas
 
-## Code of Conduct
+## Catatan
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Aplikasi memerlukan Microsoft Excel terinstall
+- File Excel akan dibuka dalam background (tidak terlihat)
+- Pastikan file Excel tidak sedang dibuka di aplikasi lain
+- Aplikasi akan otomatis menutup Excel saat aplikasi ditutup
 
-## Security Vulnerabilities
+## Troubleshooting
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. **Error "Excel not found"**: Pastikan Microsoft Excel terinstall
+2. **Error "File in use"**: Tutup file Excel di aplikasi lain
+3. **Preview tidak muncul**: Pastikan range cell valid dan data ada
+4. **PDF tidak tersimpan**: Pastikan folder tujuan memiliki permission write
