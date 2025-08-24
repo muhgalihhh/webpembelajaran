@@ -1,0 +1,379 @@
+/* Excel Preview Styles */
+.excel-container {
+    overflow: auto;
+    max-height: 70vh;
+    border: 1px solid #dee2e6;
+    background: white;
+}
+
+.excel-table {
+    display: inline-block;
+    min-width: 100%;
+    font-family: 'Calibri', 'Arial', sans-serif;
+    font-size: 11px;
+    border-collapse: collapse;
+    background: white;
+}
+
+.excel-table table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: max-content;
+}
+
+.excel-table th,
+.excel-table td {
+    border: 1px solid #d0d7de;
+    padding: 2px 4px;
+    min-width: 60px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    position: relative;
+}
+
+.excel-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.excel-table td:first-child {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 5;
+}
+
+.excel-table th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 15;
+}
+
+/* Cell formatting styles */
+.cell-bold {
+    font-weight: bold !important;
+}
+
+.cell-italic {
+    font-style: italic !important;
+}
+
+.cell-underline {
+    text-decoration: underline !important;
+}
+
+.cell-center {
+    text-align: center !important;
+}
+
+.cell-right {
+    text-align: right !important;
+}
+
+.cell-left {
+    text-align: left !important;
+}
+
+.cell-top {
+    vertical-align: top !important;
+}
+
+.cell-bottom {
+    vertical-align: bottom !important;
+}
+
+/* Border styles */
+.border-thin {
+    border-width: 1px !important;
+}
+
+.border-medium {
+    border-width: 2px !important;
+}
+
+.border-thick {
+    border-width: 3px !important;
+}
+
+.border-dashed {
+    border-style: dashed !important;
+}
+
+.border-dotted {
+    border-style: dotted !important;
+}
+
+.border-double {
+    border-style: double !important;
+}
+
+/* Zoom controls */
+.zoom-controls {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 20;
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .excel-container {
+        max-height: 50vh;
+    }
+    
+    .excel-table {
+        font-size: 10px;
+    }
+    
+    .excel-table th,
+    .excel-table td {
+        padding: 1px 2px;
+        min-width: 40px;
+    }
+}
+
+/* Custom scrollbar */
+.excel-container::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+.excel-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.excel-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 6px;
+}
+
+.excel-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Cell hover effect */
+.excel-table td:hover {
+    background-color: #f8f9fa;
+}
+
+/* Selection styles */
+.cell-selected {
+    background-color: #e3f2fd !important;
+    border: 2px solid #2196f3 !important;
+}
+
+/* Number formatting */
+.number-format {
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* Date formatting */
+.date-format {
+    color: #1976d2;
+}
+
+/* Currency formatting */
+.currency-format {
+    color: #388e3c;
+}
+
+/* Error cell */
+.error-cell {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* Formula cell */
+.formula-cell {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+}
+
+/* Header row styling */
+.header-row {
+    background-color: #e8f5e8 !important;
+    font-weight: bold;
+}
+
+/* Alternating row colors */
+.row-even {
+    background-color: #fafafa;
+}
+
+.row-odd {
+    background-color: white;
+}
+
+/* Merge cell indicator */
+.merged-cell {
+    background-color: #fff3e0;
+    border: 2px solid #ff9800;
+}
+
+/* Frozen panes */
+.frozen-row {
+    background-color: #f5f5f5;
+    border-bottom: 2px solid #2196f3;
+}
+
+.frozen-col {
+    background-color: #f5f5f5;
+    border-right: 2px solid #2196f3;
+}
+
+/* Print styles */
+@media print {
+    .excel-container {
+        overflow: visible;
+        max-height: none;
+    }
+    
+    .excel-table {
+        font-size: 10px;
+    }
+    
+    .excel-table th,
+    .excel-table td {
+        border: 1px solid #000;
+        padding: 1px 2px;
+    }
+}
+
+/* Animation for loading */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Tooltip for cell content */
+.cell-tooltip {
+    position: absolute;
+    background: #333;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 1000;
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Status indicators */
+.status-success {
+    color: #28a745;
+}
+
+.status-error {
+    color: #dc3545;
+}
+
+.status-warning {
+    color: #ffc107;
+}
+
+.status-info {
+    color: #17a2b8;
+}
+
+/* Progress bar animation */
+.progress-bar {
+    transition: width 0.3s ease;
+}
+
+/* Button states */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Card hover effects */
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+/* Form validation */
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control.is-valid {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Modal animations */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+}
+
+/* Excel-like grid lines */
+.excel-grid {
+    background-image: 
+        linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Cell focus indicator */
+.cell-focused {
+    outline: 2px solid #007bff;
+    outline-offset: -2px;
+}
+
+/* Drag and drop styles */
+.drag-over {
+    background-color: #e3f2fd;
+    border: 2px dashed #2196f3;
+}
+
+/* Context menu */
+.context-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+    min-width: 150px;
+}
+
+.context-menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.context-menu-item:hover {
+    background-color: #f8f9fa;
+}
+
+.context-menu-item:last-child {
+    border-bottom: none;
+}
