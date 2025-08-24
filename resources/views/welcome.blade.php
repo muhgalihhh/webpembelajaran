@@ -124,7 +124,7 @@
         </main>
 
         <!-- Feature cards section -->
-        <section class="grid w-full grid-cols-1 gap-4 px-6 pb-6 mx-auto md:grid-cols-3 max-w-7xl" x-show="loaded"
+        <section class="grid w-full grid-cols-1 gap-4 px-6 pb-6 mx-auto md:grid-cols-2 lg:grid-cols-4 max-w-7xl" x-show="loaded"
             x-transition:enter="transition ease-out duration-900 delay-800"
             x-transition:enter-start="opacity-0 transform translate-y-8"
             x-transition:enter-end="opacity-100 transform translate-y-0">
@@ -186,11 +186,31 @@
                 <p class="text-sm text-gray-600">Latih logika dan kreativitasmu lewat permainan seru yang penuh
                     tantangan edukatif!</p>
             </a>
+
+            {{-- Kartu Excel Preview --}}
+            <a href="{{ route('excel-preview.index') }}"
+                class="flex flex-col items-center p-4 text-center transition-all duration-300 transform bg-white shadow-md feature-card-link rounded-xl hover:scale-105 hover:shadow-lg"
+                x-transition:enter="transition ease-out duration-600 delay-1200"
+                x-transition:enter-start="opacity-0 transform translate-y-4"
+                x-transition:enter-end="opacity-100 transform translate-y-0">
+
+                <div class="bg-[#EBF3FF] rounded-full p-3 mb-3 icon-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5a2 2 0 0 0-2-2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8 5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v6H8V5z" />
+                    </svg>
+                </div>
+                <h3 class="mb-1 text-lg font-semibold">Excel Preview</h3>
+                <p class="text-sm text-gray-600">Tampilkan file Excel dengan style dan format asli, termasuk font, warna, dan layout yang tepat!</p>
+            </a>
         </section>
 
         <!-- Footer -->
         <footer class="w-full py-4 mx-auto text-xs font-bold text-center text-white bg-[#4A90E2] rounded-t-lg fade-in"
-            :class="{ 'show': loaded }" x-transition:enter="transition ease-out duration-600 delay-1200"
+            :class="{ 'show': loaded }" x-transition:enter="transition ease-out duration-600 delay-1300"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
 
             &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR

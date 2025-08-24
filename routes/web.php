@@ -17,6 +17,15 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Excel Preview Routes
+Route::prefix('excel-preview')->name('excel-preview.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ExcelPreviewController::class, 'index'])->name('index');
+    Route::post('/upload', [\App\Http\Controllers\ExcelPreviewController::class, 'upload'])->name('upload');
+    Route::post('/preview', [\App\Http\Controllers\ExcelPreviewController::class, 'preview'])->name('preview');
+    Route::get('/download/{fileName}', [\App\Http\Controllers\ExcelPreviewController::class, 'download'])->name('download');
+    Route::delete('/delete/{fileName}', [\App\Http\Controllers\ExcelPreviewController::class, 'delete'])->name('delete');
+});
+
 Route::middleware('guest.custom')->group(function () {
     Route::get('/login', \App\Livewire\Auth\Login::class)->name('login');
     Route::get('/register', \App\Livewire\Auth\Register::class)->name('register');
