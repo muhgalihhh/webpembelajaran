@@ -3,14 +3,14 @@
     'link' => '#',
     'bgColor' => 'bg-yellow-300',
     'borderColor' => 'black',
-    'footerBg' => 'bg-teal-700',
+    'footerBg' => 'bg-blue-400',
     'buttonText' => 'Lihat Materi',
 ])
 
 <a href="{{ $link }}" wire:navigate
-    class="block w-full max-w-xs mx-auto bg-teal-700 border sm:max-w-sm rounded-2xl hover:shadow-xl hover:-translate-y-1">
+    class="block w-full max-w-xs mx-auto bg-blue-400 border sm:max-w-sm rounded-2xl hover:shadow-xl hover:-translate-y-1">
     {{-- Outer container with teal border --}}
-    <div class="pt-4 transition-all duration-200 bg-teal-700 border shadow-lg rounded-2xl hover:shadow-xl">
+    <div class="pt-4 transition-all duration-200 bg-blue-400 border shadow-lg rounded-2xl hover:shadow-xl">
 
         {{-- Yellow top section - positioned lower to show teal top --}}
         <div class="{{ $bgColor }} rounded-xl h-32 sm:h-36 flex items-center justify-center border">

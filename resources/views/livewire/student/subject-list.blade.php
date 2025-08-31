@@ -6,7 +6,7 @@
 
         <div class="flex flex-col items-center justify-center mb-6">
             <h1
-                class="inline-flex items-center gap-2 px-4 py-2 text-3xl font-bold text-white bg-green-500 border-2 border-green-500 rounded-lg shadow sm:text-4xl">
+                class="inline-flex items-center gap-2 px-4 py-2 text-3xl font-bold text-white bg-blue-400 border-2 border-blue-500 rounded-lg shadow sm:text-4xl">
                 <i class="fa-solid fa-book-open"></i>
                 LIHAT MATERI PEMBELAJARAN
             </h1>
@@ -38,15 +38,16 @@
             <div class="grid grid-cols-2 gap-6 mt-8 sm:grid-cols-3 lg:grid-cols-5">
                 @php
                     // Array warna untuk membuat kartu lebih menarik
-                    $colors = [
-                        ['bg' => 'bg-yellow-400', 'border' => 'border-blue-500'],
-                        ['bg' => 'bg-blue-400', 'border' => 'border-orange-500'],
-                        ['bg' => 'bg-orange-400', 'border' => 'border-green-500'],
-                        ['bg' => 'bg-green-400', 'border' => 'border-teal-500'],
-                        ['bg' => 'bg-teal-400', 'border' => 'border-indigo-500'],
-                        ['bg' => 'bg-indigo-400', 'border' => 'border-pink-500'],
-                        ['bg' => 'bg-pink-400', 'border' => 'border-red-500'],
-                    ];
+                 $colors = [
+    ['bg' => 'bg-sky-200', 'border' => 'border-sky-600'],
+    ['bg' => 'bg-blue-200', 'border' => 'border-blue-600'],
+    ['bg' => 'bg-indigo-200', 'border' => 'border-indigo-600'],
+    ['bg' => 'bg-cyan-200', 'border' => 'border-cyan-600'],
+    ['bg' => 'bg-blue-400', 'border' => 'border-blue-700'],
+    ['bg' => 'bg-sky-400', 'border' => 'border-sky-700'],
+    ['bg' => 'bg-indigo-400', 'border' => 'border-indigo-700'],
+];
+
                 @endphp
                 @foreach ($this->subjects as $index => $subject)
                     @php
