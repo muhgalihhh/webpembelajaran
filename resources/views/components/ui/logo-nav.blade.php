@@ -11,8 +11,8 @@
 
         {{-- Sub-judul --}}
         <span class="text-xs text-white">
-            MEDPEM-DIGITAL ||
-            <span class="text-xs text-orange-300">by Raumath Alfajr</span>
+            Platfrom E-Learning ||
+            <span class="text-xs text-orange-300">SDN 02 Madukoro Baru</span>
         </span>
     </div>
 </div>

@@ -182,12 +182,12 @@
                                         <p class="text-sm text-gray-600">Tonton penjelasan lengkap</p>
                                     </div>
                                 </div>
-                             <a href="{{ $material->youtube_url }}" target="_blank" rel="noopener noreferrer"
-   class="inline-flex items-center gap-2 px-4 py-2 font-medium text-white transition-colors duration-200 transform bg-red-500 rounded-lg hover:bg-red-600 hover:scale-105">
-    <i class="fas fa-play"></i>
-    <span>Tonton Video</span>
-</a>
-
+                                <button type="button"
+                                    wire:click="viewYouTubeVideo('{{ $material->youtube_url }}', '{{ $material->title }}')"
+                                    class="inline-flex items-center gap-2 px-4 py-2 font-medium text-white transition-colors duration-200 transform bg-red-500 rounded-lg hover:bg-red-600 hover:scale-105">
+                                    <i class="fas fa-play"></i>
+                                    <span>Tonton Video</span>
+                                </button>
                             </div>
                         @endif
                     </div>

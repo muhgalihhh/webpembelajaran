@@ -142,7 +142,7 @@
                     x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 transform translate-y-full"
                     x-transition:enter-end="opacity-100 transform translate-y-0">
-                    © 2025 MEDPEM-DIGITAL™ BY RAHMAT ALFAJRI
+                    © 2025 PLATFORM E-LEARNING™ Sekolah Dasar
                 </footer>
             </div>
         </div>

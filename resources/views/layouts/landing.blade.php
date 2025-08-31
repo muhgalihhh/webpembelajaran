@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Media Pembelajaran Digital' }}</title>
+    <title>{{ $title ?? 'Platform E-Learning' }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
@@ -42,7 +42,7 @@
         </main>
     </div>
     <footer class="w-full py-4 mx-auto text-xs font-bold text-center text-white bg-[#4A90E2] rounded-t-lg mt-auto">
-        &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
+        &copy; 2025 PLATFORM E-Learning Sekolah Dasar
     </footer>
 
     @livewireScripts

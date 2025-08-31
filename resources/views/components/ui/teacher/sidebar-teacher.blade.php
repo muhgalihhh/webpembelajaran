@@ -127,7 +127,7 @@
 
     <div class="p-4 mt-auto border-t border-gray-300" x-show="!sidebarCollapsed">
         <div class="text-xs text-center text-gray-500">
-            <p>&copy; 2025 Website Pembelajaran Digital SD</p>
+            <p>&copy; 2025 Platform E-Learning SD</p>
         </div>
     </div>
 </aside>

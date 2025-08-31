@@ -58,19 +58,16 @@
             scroll-behavior: smooth;
         }
 
-        /* Footer tetap di posisi absolute bottom */
-        .fixed-footer {
-            position: relative;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 10;
+        /* Footer berada di dalam flow content (tidak fixed) */
+        .content-footer {
+            position: static; /* Footer mengikuti flow normal */
+            width: 100%;
+            margin-top: auto; /* Push footer ke bawah */
         }
 
-        /* Main content dengan padding bottom untuk footer */
+        /* Main content tanpa padding bottom karena footer dalam flow */
         .main-with-footer {
-            padding-bottom: 60px;
-            /* Sesuaikan dengan tinggi footer */
+            /* Hapus padding bottom karena footer sudah dalam flow content */
         }
 
         /* Keyboard detection */
@@ -129,7 +126,7 @@
 
             <!-- Content area -->
             <div class="relative flex-1 overflow-hidden">
-                <!-- Scrollable content -->
+                <!-- Content Footer - Pindah ke dalam main content -->
                 <main class="h-full overflow-y-auto content-scroll main-with-footer">
                     @if (isset($pageHeader))
                         <div class="flex items-center p-4 bg-white border-b border-gray-200 shadow-sm sm:p-6">
@@ -140,16 +137,16 @@
                     <div class="p-4 sm:p-6">
                         {{ $slot }}
                     </div>
-                </main>
 
-                <!-- Fixed Footer -->
-                <footer class="fixed-footer p-4 text-sm font-bold text-center text-white bg-[#4A90E2]"
-                    x-show="!keyboardOpen || window.innerWidth >= 768"
-                    x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 transform translate-y-full"
-                    x-transition:enter-end="opacity-100 transform translate-y-0">
-                    © 2025 MEDPEM-DIGITAL™ BY RAHMAT ALFAJRI
-                </footer>
+                    <!-- Footer sekarang berada di dalam main content -->
+                    <footer class="content-footer p-4 text-sm font-bold text-center text-white bg-[#4A90E2]"
+                        x-show="!keyboardOpen || window.innerWidth >= 768"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform translate-y-full"
+                        x-transition:enter-end="opacity-100 transform translate-y-0">
+                        ©2025-PLATFORM E-LEARNING™ Sekolah Dasar
+                    </footer>
+                </main>
             </div>
         </div>
     </div>

@@ -39,15 +39,14 @@
                 @php
                     // Array warna untuk membuat kartu lebih menarik
                     $colors = [
-    ['bg' => 'bg-blue-200', 'border' => 'border-blue-400'],
-    ['bg' => 'bg-blue-300', 'border' => 'border-blue-500'],
-    ['bg' => 'bg-blue-400', 'border' => 'border-blue-600'],
-    ['bg' => 'bg-cyan-200', 'border' => 'border-cyan-400'],
-    ['bg' => 'bg-cyan-300', 'border' => 'border-cyan-500'],
-    ['bg' => 'bg-sky-200', 'border' => 'border-sky-400'],
-    ['bg' => 'bg-sky-300', 'border' => 'border-sky-500'],
-]
-;
+                        ['bg' => 'bg-yellow-400', 'border' => 'border-blue-500'],
+                        ['bg' => 'bg-blue-400', 'border' => 'border-orange-500'],
+                        ['bg' => 'bg-orange-400', 'border' => 'border-green-500'],
+                        ['bg' => 'bg-green-400', 'border' => 'border-teal-500'],
+                        ['bg' => 'bg-teal-400', 'border' => 'border-indigo-500'],
+                        ['bg' => 'bg-indigo-400', 'border' => 'border-pink-500'],
+                        ['bg' => 'bg-pink-400', 'border' => 'border-red-500'],
+                    ];
                 @endphp
                 @foreach ($this->subjects as $index => $subject)
                     @php
