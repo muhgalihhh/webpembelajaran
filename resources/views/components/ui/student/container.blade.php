@@ -13,7 +13,7 @@
                 <i class="{{ $icon }} text-white text-lg sm:text-xl"></i>
             </div>
             <!-- Title -->
-            <h2 class="text-sm font-bold tracking-wide text-black uppercase sm:text-base lg:text-lg whitespace-nowrap">
+            <h2 class="text-sm font-bold tracking-wide text-white uppercase sm:text-base lg:text-lg whitespace-nowrap">
                 {{ $title }}
             </h2>
         </div>

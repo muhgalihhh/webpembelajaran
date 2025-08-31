@@ -24,21 +24,21 @@
             x-transition:enter-start="opacity-0 transform translate-y-4"
             x-transition:enter-end="opacity-100 transform translate-y-0">
 
-            <x-ui.student.feature-card title="Materi Pembelajaran" icon="fa-solid fa-book-open"
-                link="{{ route('student.subjects') }}" linkText="Lihat Materi Pembelajaran" headerColor="bg-blue-500"
-                bodyColor="bg-yellow-300" linkColor="bg-purple-600" />
+           <x-ui.student.feature-card title="Materi Pembelajaran" icon="fa-solid fa-book-open"
+    link="{{ route('student.subjects') }}" linkText="Lihat Materi Pembelajaran"
+    headerColor="bg-blue-400" bodyColor="bg-blue-100" linkColor="bg-blue-500" />
 
-            <x-ui.student.feature-card title="Mengerjakan Kuis" icon="fa-solid fa-file-pen"
-                link="{{ route('student.quizzes') }}" linkText="Kerjakan Kuis / Latihan Soal"
-                headerColor="bg-yellow-500" bodyColor="bg-green-300" linkColor="bg-green-600" />
+<x-ui.student.feature-card title="Mengerjakan Kuis" icon="fa-solid fa-file-pen"
+    link="{{ route('student.quizzes') }}" linkText="Kerjakan Kuis / Latihan Soal"
+    headerColor="bg-indigo-400" bodyColor="bg-indigo-100" linkColor="bg-indigo-500" />
 
-            <x-ui.student.feature-card title="Bermain Game Edukatif" icon="fa-solid fa-gamepad"
-                link="{{ route('student.games') }}" linkText="Main Game Edukatif" headerColor="bg-teal-500"
-                bodyColor="bg-cyan-200" linkColor="bg-cyan-600" />
+<x-ui.student.feature-card title="Bermain Game Edukatif" icon="fa-solid fa-gamepad"
+    link="{{ route('student.games') }}" linkText="Main Game Edukatif"
+    headerColor="bg-cyan-400" bodyColor="bg-cyan-100" linkColor="bg-cyan-500" />
 
-            <x-ui.student.feature-card title="Mengerjakan Tugas" icon="fa-solid fa-clipboard-list"
-                link="{{ route('student.tasks') }}" linkText="Mengerjakan Tugas" headerColor="bg-orange-500"
-                bodyColor="bg-red-300" linkColor="bg-red-600" />
+<x-ui.student.feature-card title="Mengerjakan Tugas" icon="fa-solid fa-clipboard-list"
+    link="{{ route('student.tasks') }}" linkText="Mengerjakan Tugas"
+    headerColor="bg-teal-400" bodyColor="bg-teal-100" linkColor="bg-teal-500" />
 
         </div>
 
