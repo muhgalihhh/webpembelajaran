@@ -10,7 +10,7 @@
 
     {{-- Statistics Cards with Clean Design --}}
     <div class="grid grid-cols-1 gap-4 mt-6 sm:grid-cols-2 lg:grid-cols-4">
-        <!-- Siswa Aktif Card - ENHANCED VISIBILITY -->
+        <!-- Siswa Aktif Card -->
         <div class="relative p-4 overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
             <div class="relative z-10">
                 <div class="flex items-center justify-between mb-3">
@@ -19,7 +19,7 @@
                         <p class="text-3xl font-black text-white mb-1">{{ $this->stats['activeStudents'] }}</p>
                         <div class="flex items-center text-white">
                             <div class="w-2 h-2 bg-green-300 rounded-full mr-2 animate-pulse"></div>
-                            <span class="text-sm font-semibold">Online sekarang</span>
+                            <span class="text-sm font-semibold">{{ ucfirst($activityType) }}</span>
                         </div>
                     </div>
                     <div class="flex-shrink-0 ml-3">
@@ -32,12 +32,19 @@
                 <!-- Progress Section -->
                 <div class="space-y-2 mt-4">
                     <div class="flex justify-between items-center text-sm text-white">
-                        <span class="font-semibold">Target: 50 siswa</span>
-                        <span class="bg-white bg-opacity-25 px-3 py-1 rounded-lg font-bold text-blue-700">75%</span>
+                        <span class="font-semibold">Target bulanan</span>
+                        @php
+                            $targetStudents = 50;
+                            $progressPercentage = $targetStudents > 0 ? min(($this->stats['activeStudents'] / $targetStudents) * 100, 100) : 0;
+                        @endphp
+                        <span class="bg-white bg-opacity-25 px-3 py-1 rounded-lg font-bold text-blue-700">
+                            {{ round($progressPercentage) }}%
+                        </span>
                     </div>
                     
                     <div class="w-full bg-blue-700 bg-opacity-30 rounded-full h-2">
-                        <div class="bg-white h-2 rounded-full transition-all duration-1000 ease-out" style="width: 75%"></div>
+                        <div class="bg-white h-2 rounded-full transition-all duration-1000 ease-out" 
+                             style="width: {{ $progressPercentage }}%"></div>
                     </div>
                 </div>
             </div>
@@ -47,7 +54,7 @@
             <div class="absolute -bottom-2 -left-2 w-8 h-8 bg-white bg-opacity-5 rounded-full"></div>
         </div>
 
-        <!-- Total Pengerjaan Card - ENHANCED VISIBILITY -->
+        <!-- Total Pengerjaan Card -->
         <div class="relative p-4 overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
             <div class="relative z-10">
                 <div class="flex items-center justify-between mb-3">
@@ -56,12 +63,12 @@
                         <p class="text-3xl font-black text-white mb-1">{{ $this->stats['totalAttempts'] }}</p>
                         <div class="flex items-center text-white">
                             <div class="w-2 h-2 bg-yellow-300 rounded-full mr-2 animate-pulse"></div>
-                            <span class="text-sm font-semibold">Hari ini: +5</span>
+                            <span class="text-sm font-semibold">Hari ini: +{{ $this->stats['todayCount'] }}</span>
                         </div>
                     </div>
                     <div class="flex-shrink-0 ml-3">
-                        <div class="w-14 h-14 bg-gren bg-opacity-25 rounded-2xl flex items-center justify-center">
-                            <i class="fas fa-tasks text-xl text-white"></i>
+                        <div class="w-14 h-14 bg-green bg-opacity-25 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-{{ $activityType === 'quiz' ? 'file-alt' : 'clipboard-check' }} text-xl text-white"></i>
                         </div>
                     </div>
                 </div>
@@ -71,29 +78,35 @@
                     <div class="flex justify-between items-center text-sm text-white">
                         <span class="font-semibold">Trend 7 hari</span>
                         <span class="bg-white bg-opacity-25 px-3 py-1 rounded-lg font-bold text-green-700 flex items-center">
-                            <i class="fas fa-arrow-up mr-1 text-sm"></i>
-                            +24%
+                            <i class="fas fa-arrow-{{ $this->stats['weeklyTrend']['direction'] }} mr-1 text-sm"></i>
+                            {{ abs($this->stats['weeklyTrend']['percentage']) }}%
                         </span>
                     </div>
                     
-                    <!-- Simple bar chart -->
+                    <!-- Dynamic bar chart based on actual data -->
                     <div class="flex items-end justify-between h-6 space-x-1">
-                        <div class="flex-1 bg-white bg-opacity-40 rounded-t-sm" style="height: 60%;"></div>
-                        <div class="flex-1 bg-white bg-opacity-60 rounded-t-sm" style="height: 85%;"></div>
-                        <div class="flex-1 bg-white bg-opacity-30 rounded-t-sm" style="height: 45%;"></div>
-                        <div class="flex-1 bg-white bg-opacity-50 rounded-t-sm" style="height: 75%;"></div>
-                        <div class="flex-1 bg-white bg-opacity-70 rounded-t-sm" style="height: 95%;"></div>
-                        <div class="flex-1 bg-white bg-opacity-50 rounded-t-sm" style="height: 68%;"></div>
-                        <div class="flex-1 bg-yellow-300 rounded-t-sm" style="height: 100%;"></div>
+                        @foreach($this->stats['weeklyTrend']['data'] as $index => $value)
+                            @php
+                                $maxValue = max($this->stats['weeklyTrend']['data']) ?: 1;
+                                $height = ($value / $maxValue) * 100;
+                                $isToday = $index === 6;
+                            @endphp
+                            <div class="flex-1 {{ $isToday ? 'bg-yellow-300' : 'bg-white bg-opacity-60' }} rounded-t-sm" 
+                                 style="height: {{ max($height, 10) }}%;" 
+                                 title="{{ $value }} pengerjaan"></div>
+                        @endforeach
                     </div>
                     <div class="flex justify-between text-sm text-white font-semibold mt-1">
-                        <span class="flex-1 text-center">S</span>
-                        <span class="flex-1 text-center">S</span>
-                        <span class="flex-1 text-center">R</span>
-                        <span class="flex-1 text-center">K</span>
-                        <span class="flex-1 text-center">J</span>
-                        <span class="flex-1 text-center">S</span>
-                        <span class="flex-1 text-center font-black text-yellow-300">M</span>
+                        @php
+                            $days = ['M', 'S', 'S', 'R', 'K', 'J', 'S'];
+                            $today = now()->dayOfWeek; // 0 = Sunday, 1 = Monday, etc.
+                        @endphp
+                        @foreach($days as $index => $day)
+                            @php
+                                $isToday = $index === 6; // Hari terakhir dalam array adalah hari ini
+                            @endphp
+                            <span class="flex-1 text-center {{ $isToday ? 'font-black text-yellow-300' : '' }}">{{ $day }}</span>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -102,7 +115,7 @@
             <div class="absolute -bottom-2 -left-2 w-8 h-8 bg-white bg-opacity-5 rounded-full"></div>
         </div>
 
-        <!-- Rata-rata Skor Card - ENHANCED VISIBILITY -->
+        <!-- Rata-rata Skor Card -->
         <div class="relative p-4 overflow-hidden bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
             <div class="relative z-10">
                 <div class="flex items-center justify-between mb-3">
@@ -111,7 +124,18 @@
                         <p class="text-3xl font-black text-white mb-1">{{ round($this->stats['averageScore']) }}</p>
                         <div class="flex items-center text-white">
                             <div class="w-2 h-2 bg-pink-300 rounded-full mr-2 animate-pulse"></div>
-                            <span class="text-sm font-semibold">Grade: A</span>
+                            <span class="text-sm font-semibold">
+                                Grade: 
+                                @if($this->stats['averageScore'] >= 85)
+                                    A
+                                @elseif($this->stats['averageScore'] >= 70)
+                                    B
+                                @elseif($this->stats['averageScore'] >= 60)
+                                    C
+                                @else
+                                    D
+                                @endif
+                            </span>
                         </div>
                     </div>
                     <div class="flex-shrink-0 ml-3">
@@ -144,25 +168,31 @@
                         </span>
                     </div>
                     
-                    <!-- Distribution bars -->
+                    <!-- Distribution bars with actual data -->
                     <div class="grid grid-cols-3 gap-2 text-center">
                         <div>
                             <div class="w-full bg-purple-700 bg-opacity-30 rounded-full h-2 mb-1">
-                                <div class="bg-red-400 h-2 rounded-full" style="width: 15%;"></div>
+                                <div class="bg-red-400 h-2 rounded-full transition-all duration-1000" 
+                                     style="width: {{ $this->stats['scoreDistribution']['poor'] }}%"></div>
                             </div>
-                            <span class="text-sm text-white font-semibold">0-60</span>
+                            <span class="text-xs text-white font-semibold">0-60</span>
+                            <div class="text-xs text-white opacity-75">{{ $this->stats['scoreDistribution']['poor'] }}%</div>
                         </div>
                         <div>
                             <div class="w-full bg-purple-700 bg-opacity-30 rounded-full h-2 mb-1">
-                                <div class="bg-yellow-400 h-2 rounded-full" style="width: 35%;"></div>
+                                <div class="bg-yellow-400 h-2 rounded-full transition-all duration-1000" 
+                                     style="width: {{ $this->stats['scoreDistribution']['average'] }}%"></div>
                             </div>
-                            <span class="text-sm text-white font-semibold">61-80</span>
+                            <span class="text-xs text-white font-semibold">61-80</span>
+                            <div class="text-xs text-white opacity-75">{{ $this->stats['scoreDistribution']['average'] }}%</div>
                         </div>
                         <div>
                             <div class="w-full bg-purple-700 bg-opacity-30 rounded-full h-2 mb-1">
-                                <div class="bg-green-400 h-2 rounded-full" style="width: 85%;"></div>
+                                <div class="bg-green-400 h-2 rounded-full transition-all duration-1000" 
+                                     style="width: {{ $this->stats['scoreDistribution']['good'] }}%"></div>
                             </div>
-                            <span class="text-sm text-white font-semibold">81-100</span>
+                            <span class="text-xs text-white font-semibold">81-100</span>
+                            <div class="text-xs text-white opacity-75">{{ $this->stats['scoreDistribution']['good'] }}%</div>
                         </div>
                     </div>
                 </div>
@@ -172,13 +202,13 @@
             <div class="absolute -bottom-2 -left-2 w-8 h-8 bg-white bg-opacity-5 rounded-full"></div>
         </div>
 
-        <!-- Lihat Nilai Siswa Button Card - FIXED MOBILE LAYOUT -->
+        <!-- Lihat Nilai Siswa Button Card -->
         <div class="relative p-4 overflow-hidden bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300 group cursor-pointer">
             <a href="{{ route('teacher.rankings') }}" wire:navigate class="relative z-10 block">
                 <!-- Header with Icon and Title -->
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center space-x-3">
-                        <div class="w-14 h-14 bg-green bg-opacity-20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <div class="w-14 h-14 bg-red bg-opacity-20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                             <i class="fas fa-chart-line text-xl text-white"></i>
                         </div>
                         <div>
@@ -194,8 +224,8 @@
                 <!-- Description -->
                 <p class="text-white opacity-90 text-xs font-medium mb-4">Ranking & analisis lengkap</p>
                 
-                <!-- Stats Preview in Simple Layout -->
-                <div class="bg-blue bg-opacity-15 rounded-xl p-3">
+                <!-- Stats Preview with Dynamic Data -->
+                <div class="bg-red bg-opacity-15 rounded-xl p-3">
                     <div class="grid grid-cols-3 gap-3 text-center">
                         <div>
                             <div class="text-xs text-white opacity-80 font-medium mb-1">Total</div>
@@ -208,7 +238,7 @@
                         <div>
                             <div class="text-xs text-white opacity-80 font-medium mb-1">Top</div>
                             <div class="text-lg font-black text-white">
-                                <i class="fas fa-trophy text-yellow-300 mr-1"></i>95
+                                <i class="fas fa-trophy text-yellow-300 mr-1"></i>{{ round($this->stats['topScore'] ?? 0) }}
                             </div>
                         </div>
                     </div>
