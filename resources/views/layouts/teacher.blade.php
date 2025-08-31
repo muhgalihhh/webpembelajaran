@@ -60,7 +60,7 @@
 
         /* Footer tetap di posisi absolute bottom */
         .fixed-footer {
-            position: absolute;
+            position: relative;
             bottom: 0;
             left: 0;
             right: 0;
