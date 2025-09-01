@@ -9,17 +9,17 @@
 ])
 
 <a href="{{ $link }}" wire:navigate
-    class="{{ $bodyColor }} block overflow-hidden transition-all duration-300 border shadow-lg rounded-2xl hover:shadow-xl hover:-translate-y-1">
+    class="flex flex-col justify-between h-full overflow-hidden transition-all duration-300 border shadow-lg rounded-2xl hover:shadow-xl hover:-translate-y-1">
 
     {{-- Header Kartu --}}
-    <div class="{{ $headerColor }} p-3 sm:p-4 text-center rounded-2xl border">
-        <h3 class="text-base font-bold tracking-wide text-white uppercase sm:text-lg">
+    <div class="{{ $headerColor }} p-3 sm:p-4 text-center">
+        <h3 class="text-base font-bold tracking-wide text-white uppercase sm:text-lg leading-snug line-clamp-2">
             {{ $title }}
         </h3>
     </div>
 
     {{-- Badan Kartu dengan Ikon --}}
-    <div class="{{ $bodyColor }} p-6 sm:p-8 flex justify-center items-center relative">
+    <div class="{{ $bodyColor }} flex-1 p-6 sm:p-8 flex justify-center items-center relative">
         {{-- Elemen dekoratif di belakang ikon --}}
         <div
             class="absolute text-2xl text-black -translate-x-10 -translate-y-6 opacity-10 sm:text-3xl sm:-translate-x-16 sm:-translate-y-8 rotate-12">
@@ -35,7 +35,7 @@
     </div>
 
     {{-- Footer/Tombol Kartu --}}
-    <div class="{{ $linkColor }} p-3 sm:p-4 text-center rounded-2xl border">
+    <div class="{{ $linkColor }} p-3 sm:p-4 text-center">
         <span class="text-sm font-bold tracking-wide text-white uppercase">
             {{ $linkText }}
         </span>
