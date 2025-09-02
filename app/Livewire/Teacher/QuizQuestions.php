@@ -54,7 +54,7 @@ class QuizQuestions extends Component
     public string $correct_option = 'A';
 
     #[Rule('nullable|string', as: 'Penjelasan')]
-    public string $explanation = '';
+    public ?string $explanation = '';
 
     #[Rule('required|integer|min:1', as: 'Bobot Nilai')]
     public int $weight = 1;
