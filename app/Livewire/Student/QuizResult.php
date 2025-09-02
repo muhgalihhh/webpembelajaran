@@ -17,9 +17,10 @@ class QuizResult extends Component
     public function mount(QuizAttempt $attempt)
     {
 
-        if ($attempt->user_id !== auth()->id()) {
-            abort(403);
-        }
+       if ($attempt->user_id != auth()->id()) {
+    abort(403);
+}
+
         $this->attempt = $attempt->load('quiz.subject', 'studentAnswers.question');
     }
 
