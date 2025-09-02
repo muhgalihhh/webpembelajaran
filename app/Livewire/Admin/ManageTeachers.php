@@ -32,7 +32,7 @@ class ManageTeachers extends Component
     public $perPage = 10;
 
     // Properti Form
-    public $name, $username, $email, $phone_number, $password, $password_confirmation, $status;
+    public $name, $username, $email, $phone_number, $password, $password_confirmation, $status, $gender;
 
     // Properti untuk state modal & data
     public $isEditing = false;
@@ -61,6 +61,7 @@ class ManageTeachers extends Component
             'password' => $this->isEditing ? 'nullable|min:8|same:password_confirmation' : 'required|min:8|same:password_confirmation',
             'password_confirmation' => $this->isEditing ? 'nullable|required_with:password|min:8' : 'required|min:8',
             'status' => 'required|in:active,inactive',
+            'gender' => 'required|in:L,P',
         ];
     }
 
@@ -95,7 +96,18 @@ class ManageTeachers extends Component
 
     private function resetForm()
     {
-        $this->reset(['isEditing', 'editingUser', 'name', 'username', 'email', 'phone_number', 'password', 'password_confirmation', 'status']);
+        $this->reset([
+            'isEditing',
+            'editingUser',
+            'name',
+            'username',
+            'email',
+            'phone_number',
+            'password',
+            'password_confirmation',
+            'status',
+            'gender',
+        ]);
         $this->resetValidation();
     }
 
@@ -104,6 +116,7 @@ class ManageTeachers extends Component
         $this->isEditing = false;
         $this->resetForm();
         $this->status = 'active';
+        $this->gender = 'L'; // default Laki-laki
         $this->dispatch('open-modal', id: 'teacher-form-modal');
     }
 
@@ -116,6 +129,7 @@ class ManageTeachers extends Component
         $this->email = $user->email;
         $this->phone_number = $user->phone_number;
         $this->status = $user->status;
+        $this->gender = $user->gender;
         $this->password = null;
         $this->password_confirmation = null;
         $this->resetValidation();
@@ -142,12 +156,10 @@ class ManageTeachers extends Component
                 $message = 'Data guru berhasil ditambahkan.';
             }
 
-            // Jika berhasil, kirim notifikasi dan tutup modal
             $this->dispatch('flash-message', message: $message, type: 'success');
             $this->dispatch('close-modal');
 
         } catch (QueryException $e) {
-            // Tangkap error spesifik dari database
             Log::error('Error saving teacher (QueryException): ' . $e->getMessage());
             $this->dispatch('flash-message', message: 'Terjadi kesalahan pada database saat menyimpan data.', type: 'error');
             $this->handleDatabaseError($e);
@@ -159,7 +171,6 @@ class ManageTeachers extends Component
         }
     }
 
-    // Fungsi baru untuk menangani error database dan menambahkan pesan ke form
     private function handleDatabaseError(QueryException $e)
     {
         $errorMessage = $e->getMessage();
@@ -170,11 +181,12 @@ class ManageTeachers extends Component
             $this->addError('username', 'Username ini sudah digunakan. Silakan pilih username lain.');
         } elseif (str_contains($errorMessage, 'users_phone_number_unique')) {
             $this->addError('phone_number', 'Nomor telepon ini sudah terdaftar.');
+        } elseif (str_contains($errorMessage, 'users_gender_check')) {
+            $this->addError('gender', 'Jenis kelamin tidak valid.');
         } else {
             $this->addError('name', 'Terjadi kesalahan pada database saat menyimpan.');
         }
     }
-
 
     public function confirmDelete($id)
     {
