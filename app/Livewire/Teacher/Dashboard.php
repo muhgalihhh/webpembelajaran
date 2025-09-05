@@ -160,7 +160,7 @@ class Dashboard extends Component
 
     // filter kelas
     $query->when($this->classFilter, fn($q) =>
-        $q->whereHas('user', fn($sq) => $sq->where('class_id', $this->classFilter))
+        $q->whereHas('student', fn($sq) => $sq->where('class_id', $this->classFilter))
     );
 
     // filter mapel

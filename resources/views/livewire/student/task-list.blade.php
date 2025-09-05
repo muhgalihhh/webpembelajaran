@@ -85,6 +85,27 @@
                             </div>
                             <h3 class="text-lg font-bold text-gray-900">{{ $task->title }}</h3>
                             <p class="text-sm text-gray-700">{{ $task->description }}</p>
+                            
+                            {{-- Tampilkan attachment dari guru jika ada --}}
+                            @if ($task->attachment_path)
+                                <div class="flex items-center mt-3 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                                    <i class="mr-2 text-blue-600 fa-solid fa-paperclip"></i>
+                                    <span class="text-sm text-blue-800 font-medium mr-2">Lampiran dari Guru:</span>
+                                    <div class="flex space-x-2">
+                                        <button type="button" 
+                                            wire:click="viewTaskAttachment({{ $task->id }})"
+                                            class="text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                                            <i class="mr-1 fa-solid fa-eye"></i>Lihat
+                                        </button>
+                                        <span class="text-gray-400">|</span>
+                                        <button type="button" 
+                                            wire:click="downloadTaskAttachment({{ $task->id }})"
+                                            class="text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                                            <i class="mr-1 fa-solid fa-download"></i>Unduh
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                         <div class="flex-shrink-0 mt-4 md:mt-0 md:ml-6">
                             @if ($isSubmitted)
@@ -153,8 +174,13 @@
                 <button type="button" @click="$dispatch('close-modal')"
                     class="px-6 py-2 font-bold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Kembali</button>
                 <button type="submit"
-                    class="px-6 py-2 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600">Upload
-                    Tugas</button>
+                    class="px-6 py-2 font-bold text-white bg-blue-500 rounded-lg hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    wire:loading.attr="disabled" wire:target="submitTask">
+                    <span wire:loading.remove wire:target="submitTask">Upload Tugas</span>
+                    <span wire:loading wire:target="submitTask">
+                        <i class="mr-2 fa-solid fa-spinner fa-spin"></i>Mengupload...
+                    </span>
+                </button>
             </div>
         </form>
     </x-ui.modal>
@@ -189,7 +215,7 @@
                     <button type="button" wire:click="viewFile({{ $viewingSubmission->id }})"
                         class="text-blue-500 hover:underline">
                         <i class="mr-1 fa-solid fa-file"></i>
-                        Cek File Jawaban
+                        {{ $viewingSubmission->original_filename ?: 'Cek File Jawaban' }}
                     </button>
                 </div>
                 @if ($viewingSubmission->notes)
@@ -224,7 +250,7 @@
                     @if ($fileViewerType === 'pdf')
                         <iframe src="{{ $fileViewerUrl }}" class="w-full h-[75vh]" frameborder="0"></iframe>
                     @elseif ($fileViewerType === 'image')
-                        <img src="{{ $fileViewerUrl }}" alt="File Jawaban"
+                        <img src="{{ $fileViewerUrl }}" alt="File Lampiran"
                             class="object-contain w-full max-h-[75vh]">
                     @endif
                 </div>
