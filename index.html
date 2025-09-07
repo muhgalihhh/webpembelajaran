@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LMS Psikologi Pendidikan</title>
+    <meta name="description" content="Aplikasi LMS berbasis web untuk mata kuliah Psikologi Pendidikan dengan 16 pertemuan, materi, kuis/simulasi, dan evaluasi formatif.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <a href="#app" class="skip-link">Lewati ke konten utama</a>
+    <div class="app-shell" id="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-logo" aria-hidden="true">PP</div>
+          <div class="brand-text">
+            <div class="brand-title">Psikologi Pendidikan</div>
+            <div class="brand-subtitle">LMS Akademik</div>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <a class="nav-link" href="#/dashboard" data-link>
+            <span>Dasbor</span>
+          </a>
+          <div class="nav-section">Pertemuan</div>
+          <div id="session-links" class="session-links" aria-label="Daftar pertemuan"></div>
+        </nav>
+
+        <div class="sidebar-footer">
+          <button id="themeToggle" class="btn btn-ghost" aria-label="Toggle tema gelap">Tema</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <button id="sidebarToggle" class="btn btn-ghost only-mobile" aria-label="Toggle sidebar">Menu</button>
+          <h1 class="page-title" id="page-title">Dasbor</h1>
+          <div class="topbar-actions">
+            <div class="progress" id="global-progress" aria-label="Progres perkuliahan">
+              <div class="progress-bar" id="global-progress-bar" style="width:0%"></div>
+            </div>
+          </div>
+        </header>
+
+        <section id="app" class="content" aria-live="polite"></section>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+  </html>
+
