@@ -36,6 +36,7 @@ class MaterialDetail extends Component
 
         $this->subjectMaterials = Material::where('subject_id', $this->material->subject_id)
             ->where('is_published', true)
+            ->where('class_id', Auth::user()->class_id)
             ->orderBy('chapter')
             ->orderBy('title')
             ->get();
