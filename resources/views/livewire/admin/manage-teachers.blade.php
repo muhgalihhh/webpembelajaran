@@ -26,7 +26,7 @@
         </div>
     </div>
 
-    {{-- Tampilan Tabel untuk Desktop (Terlihat di layar lg ke atas) --}}
+    {{-- Tabel Desktop --}}
     <div class="hidden overflow-x-auto bg-white rounded-lg shadow-md lg:block">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -34,6 +34,8 @@
                     <th wire:click="sortBy('name')"
                         class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                         Nama</th>
+                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                        Gender</th>
                     <th wire:click="sortBy('email')"
                         class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase cursor-pointer">
                         Email / No. Telp</th>
@@ -47,6 +49,9 @@
                 @forelse ($this->teachers as $teacher)
                     <tr class="hover:bg-gray-100">
                         <td class="px-6 py-4 whitespace-nowrap">{{ $teacher->name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {{ $teacher->gender == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-900">{{ $teacher->email }}</div>
                             <div class="text-sm text-gray-500">{{ $teacher->phone_number }}</div>
@@ -74,14 +79,14 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="py-4 text-center text-gray-500">Tidak ada data guru ditemukan.</td>
+                        <td colspan="5" class="py-4 text-center text-gray-500">Tidak ada data guru ditemukan.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
-    {{-- Tampilan Kartu untuk Mobile (Tersembunyi di layar lg ke atas) --}}
+    {{-- Kartu Mobile --}}
     <div class="grid grid-cols-1 gap-4 lg:hidden">
         @forelse ($this->teachers as $teacher)
             <div class="p-4 bg-white rounded-lg shadow-md">
@@ -93,6 +98,7 @@
                     </span>
                 </div>
                 <div class="mt-2 text-sm text-gray-600">
+                    <p>Gender: {{ $teacher->gender == 'L' ? 'Laki-laki' : 'Perempuan' }}</p>
                     <p>{{ $teacher->email }}</p>
                     <p>{{ $teacher->phone_number }}</p>
                 </div>
@@ -123,8 +129,14 @@
                 <x-form.input-group label="Email" type="email" wireModel="email" id="email" />
                 <x-form.input-group label="No. Telepon (Opsional)" type="tel" wireModel="phone_number"
                     id="phone_number" />
-                <x-form.select-group label="Status" name="status" wireModel="status" :options="['active' => 'Aktif', 'inactive' => 'Nonaktif']" />
-                <div></div>
+
+                {{-- Tambahan Gender --}}
+                <x-form.select-group label="Gender" name="gender" wireModel="gender"
+                    :options="['L' => 'Laki-laki', 'P' => 'Perempuan']" />
+
+                <x-form.select-group label="Status" name="status" wireModel="status"
+                    :options="['active' => 'Aktif', 'inactive' => 'Nonaktif']" />
+
                 <x-form.input-group label="Password" type="password" wireModel="password" id="password"
                     :required="!$isEditing" passwordToggle />
                 <x-form.input-group label="Konfirmasi Password" type="password" wireModel="password_confirmation"

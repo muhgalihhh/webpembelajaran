@@ -1,7 +1,7 @@
 <div class="min-h-screen px-4 py-10 bg-blue-100"
     style="background-image: url('/images/transparent bg.png'); background-size: 30rem; background-position: center;"
     x-data="{ isLoaded: false }" x-init="setTimeout(() => { isLoaded = true }, 50)">
-    <x-ui.student.container title="Halaman Kuis" header_color="bg-gradient-to-r from-green-200 to-green-300"
+    <x-ui.student.container title="Halaman Kuis" header_color="bg-gradient-to-r from-sky-200 to-sky-300"
         icon="fa-solid fa-question-circle">
 
         {{-- Area Filter BARU --}}

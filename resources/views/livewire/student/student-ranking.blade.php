@@ -3,7 +3,7 @@
     x-data="{ isLoaded: false }" x-init="setTimeout(() => { isLoaded = true }, 50)">
     <x-ui.student.container icon="fa fa-trophy" class="bg-white rounded-lg shadow-lg">
         <x-slot:title>
-            <h2 class="text-xl font-bold text-gray-800">Halaman Cek Peringkat Siswa</h2>
+            <h2 class="text-xl font-bold text-white">Halaman Cek Peringkat Siswa</h2>
         </x-slot:title>
 
         {{-- Header dengan Filter Responsif --}}

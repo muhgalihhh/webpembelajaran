@@ -1,7 +1,7 @@
 <x-ui.auth-card>
     <x-ui.auth-header>
         MASUK AKUN (Siswa atau Guru)
-        <div class="mt-1 text-sm font-normal">MEDIA PEMBELAJARAN DIGITAL</div>
+        <div class="mt-1 text-sm font-normal">PLATFORM E-LEARNING</div>
     </x-ui.auth-header>
 
     <a href="{{ url('/') }}" class="inline-flex items-center text-sm font-bold text-blue-600 hover:underline"

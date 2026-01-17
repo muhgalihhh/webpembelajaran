@@ -46,6 +46,7 @@ class ScoreTaskList extends Component
     {
         return Task::with(['subject', 'class', 'submissions'])
             ->where('status', '!=', 'draft')
+            ->where('user_id', Auth::id())
             ->when($this->search, fn($q) => $q->where('title', 'like', '%' . $this->search . '%'))
             ->when($this->subjectFilter, fn($q) => $q->where('subject_id', $this->subjectFilter))
             ->when($this->classFilter, fn($q) => $q->where('class_id', $this->classFilter))

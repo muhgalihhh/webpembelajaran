@@ -48,13 +48,13 @@ class QuizQuestions extends Component
     public string $option_d = '';
 
     #[Rule('nullable|string', as: 'Opsi E')]
-    public string $option_e = '';
+    public ?string $option_e = null;
 
     #[Rule('required|in:A,B,C,D,E', as: 'Kunci Jawaban')]
     public string $correct_option = 'A';
 
     #[Rule('nullable|string', as: 'Penjelasan')]
-    public string $explanation = '';
+    public ?string $explanation = '';
 
     #[Rule('required|integer|min:1', as: 'Bobot Nilai')]
     public int $weight = 1;

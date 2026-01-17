@@ -61,27 +61,16 @@
             scroll-behavior: smooth;
         }
 
-        /* Mobile-first: footer tidak fixed di mobile */
-        .main-with-footer {
-            padding-bottom: 0;
-            /* mobile: footer statis di dalam main */
+        /* Footer berada di dalam flow content (tidak fixed) */
+        .content-footer {
+            position: static; /* Footer mengikuti flow normal */
+            width: 100%;
+            margin-top: auto; /* Push footer ke bawah */
         }
 
-        /* Footer fixed khusus md+ (tablet/desktop) */
-        @media (min-width: 768px) {
-            .fixed-footer {
-                position: absolute;
-                /* menempel di bawah container konten */
-                bottom: 0;
-                left: 0;
-                right: 0;
-                z-index: 10;
-            }
-
-            .main-with-footer {
-                padding-bottom: 60px;
-                /* sesuaikan dgn tinggi footer fixed */
-            }
+        /* Main content tanpa padding bottom karena footer dalam flow */
+        .main-with-footer {
+            /* Hapus padding bottom karena footer sudah dalam flow content */
         }
 
         /* Sembunyikan footer fixed saat keyboard terbuka (khusus md+) */
@@ -134,7 +123,7 @@
 
             <!-- Content area -->
             <div class="relative flex-1 overflow-hidden">
-                <!-- Scrollable content -->
+                <!-- Content Footer - Pindah ke dalam main content -->
                 <main class="h-full overflow-y-auto content-scroll main-with-footer">
                     @if (isset($pageHeader))
                         <div class="flex items-center p-4 bg-white border-b border-gray-200 shadow-sm sm:p-6">
@@ -146,19 +135,15 @@
                         {{ $slot }}
                     </div>
 
-                    <!-- Mobile footer (statis, berada di bawah halaman) -->
-                    <footer class="block md:hidden p-4 text-sm font-bold text-center text-white bg-[#4A90E2]">
-                        © 2025 MEDPEM-DIGITAL™ BY RAHMAT ALFAJRI
+                    <!-- Footer sekarang berada di dalam main content -->
+                    <footer class="content-footer p-4 text-sm font-bold text-center text-white bg-[#4A90E2]"
+                        x-show="!keyboardOpen || window.innerWidth >= 768"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform translate-y-full"
+                        x-transition:enter-end="opacity-100 transform translate-y-0">
+                        ©2025-PLATFORM E-LEARNING™ Sekolah Dasar
                     </footer>
                 </main>
-
-                <!-- Fixed Footer (hanya md+ / tablet & desktop) -->
-                <footer class="fixed-footer hidden md:block p-4 text-sm font-bold text-center text-white bg-[#4A90E2]"
-                    x-show="!keyboardOpen" x-transition:enter="transition ease-out duration-200"
-                    x-transition:enter-start="opacity-0 transform translate-y-full"
-                    x-transition:enter-end="opacity-100 transform translate-y-0">
-                    © 2025 MEDPEM-DIGITAL™ BY RAHMAT ALFAJRI
-                </footer>
             </div>
         </div>
     </div>

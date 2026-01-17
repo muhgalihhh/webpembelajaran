@@ -165,13 +165,7 @@
                         Peringkat
                     </a>
 
-                    <!-- Mobile Actions for Students -->
-                    <div class="pt-3 mt-3 space-y-2 border-t border-blue-400/30">
-
-                        <div class="pt-2">
-                            <x-ui.profile-dropdown />
-                        </div>
-                    </div>
+                  
                 @endrole
 
                 @role('guru')
@@ -200,10 +194,7 @@
                         Dashboard Admin
                     </a>
 
-                    <!-- Mobile Actions for Admin -->
-                    <div class="pt-3 mt-3 border-t border-blue-400/30">
-                        <x-ui.profile-dropdown />
-                    </div>
+                 
                 @endrole
             @else
                 <!-- Guest Mobile Menu -->

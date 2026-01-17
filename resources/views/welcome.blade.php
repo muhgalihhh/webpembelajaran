@@ -193,7 +193,7 @@
             :class="{ 'show': loaded }" x-transition:enter="transition ease-out duration-600 delay-1200"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
 
-            &copy; 2025 MEDPEM-DIGITAL BY RAUMAT ALFAJR
+            &copy; 2025 PLATFORM E-LEARNING SEKOLAH DASAR
         </footer>
     </div>
 

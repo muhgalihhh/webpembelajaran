@@ -1,7 +1,7 @@
 <x-ui.auth-card>
     <x-ui.auth-header>
         DAFTAR AKUN
-        <div class="mt-1 text-sm font-normal">MEDIA PEMBELAJARAN DIGITAL</div>
+        <div class="mt-1 text-sm font-normal">PLATFORM E-LEARNING</div>
     </x-ui.auth-header>
 
     <div class="mb-4 text-center">
